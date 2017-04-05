@@ -49,10 +49,10 @@ _branch_changes() {
     *'modified:'*) symbols="!${symbols}";;
   esac
 
-  if [ ! -z "$symbols" ]; then
-    echo " $symbols"
-  else
+  if [ "$symbols" = '' ]; then
     echo ''
+  else
+    echo " $symbols"
   fi
 }
 
