@@ -56,6 +56,11 @@ _branch_changes() {
   fi
 }
 
+_branch_status_with_bang() {
+  ksh_branch_status=$(_branch_status)
+  echo "${ksh_branch_status/!/!!}"
+}
+
 export HOSTNAME
 HOSTNAME=$(hostname)
 
@@ -85,14 +90,13 @@ elif [ -n "$KSH_VERSION" ]; then
       PS1='$LOGNAME@$HOSTNAME ${PWD/$HOME/~}$(_branch_status) \$ '
     ;;
     *)
-      branch_status_with_bang=$(_branch_status)
       case $TERM in
         *-256color)
           # shellcheck disable=SC2039
-          PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m${PWD/$HOME/~}\E[0m\E[33m${branch_status_with_bang/!/!!}\E[0m \$ '
+          PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m${PWD/$HOME/~}\E[0m\E[33m$(_branch_status_with_bang)\E[0m \$ '
         ;;
         *)
-          PS1='$LOGNAME@$HOSTNAME ${PWD/$HOME/~}${branch_status_with_bang/!/!!} \$ '
+          PS1='$LOGNAME@$HOSTNAME ${PWD/$HOME/~}$(_branch_status_with_bang) \$ '
         ;;
       esac
     ;;
