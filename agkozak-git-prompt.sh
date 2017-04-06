@@ -76,7 +76,7 @@ if [ -n "$ZSH_VERSION" ]; then
   fi
 
   # shellcheck disable=SC2154
-  mode_indicator="%{$fg_bold[black]%}%{$bg[white]%}"
+  mode_indicator="%{$fg_bold[black]%}%{$bg[white]%}<<"
 
   # shellcheck disable=SC2154
   PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$mode_indicator}/(main|viins)/}%#%{$reset_color%} '
