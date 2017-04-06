@@ -58,6 +58,7 @@ _branch_changes() {
 
 _branch_status_with_bang() {
   ksh_branch_status=$(_branch_status)
+  # shellcheck disable=SC2039
   echo "${ksh_branch_status/!/!!}"
 }
 
