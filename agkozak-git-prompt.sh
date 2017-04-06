@@ -5,7 +5,7 @@
 #  \__,_|\__, |_|\_\___/___\__,_|_|\_\
 #        |___/
 #
-# agkozak Git prompt
+# agkozak Git Prompt
 #
 # https://github.com/agkozak/agkozak-git-prompt
 #
@@ -64,6 +64,7 @@ _branch_status_with_bang() {
 export HOSTNAME
 HOSTNAME=$(hostname)
 
+# zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
@@ -82,8 +83,12 @@ if [ -n "$ZSH_VERSION" ]; then
   # The right prompt will show the exit code if it is not zero.
   # shellcheck disable=SC2034
   RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
+
+# bash
 elif [ -n "$BASH_VERSION" ]; then
   export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\e[m\]\[\e[0;33m\]\`_branch_status\`\[\e[m\]\\$ "
+
+# ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then
   case "$KSH_VERSION" in
     *MIRBSD*)
@@ -102,6 +107,8 @@ elif [ -n "$KSH_VERSION" ]; then
     ;;
   esac
   return
+
+# dash
 elif [ "$(basename "$0")" = 'dash' ]; then
   PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 else
