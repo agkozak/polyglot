@@ -73,12 +73,20 @@ if [ -n "$ZSH_VERSION" ]; then
     autoload -Uz colors
     colors
   fi
+ 
+  # vi-mode indicator
+  #
+  # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
+  zle_keymap_select() {
+    #shellcheck disable=SC2034
+    _AGKOZAK_VI_MODE_INDICATOR="%{$fg_bold[black]%}%{$bg[white]%}<<"
+    zle reset-prompt
+  }
+
+  zle -N zle-keymap-select zle_keymap_select
 
   # shellcheck disable=SC2154
-  mode_indicator="%{$fg_bold[black]%}%{$bg[white]%}<<"
-
-  # shellcheck disable=SC2154
-  PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$mode_indicator}/(main|viins)/}%#%{$reset_color%} '
+  PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$_AGKOZAK_VI_MODE_INDICATOR}/(main|viins)/}%#%{$reset_color%} '
 
   # The right prompt will show the exit code if it is not zero.
   # shellcheck disable=SC2034
