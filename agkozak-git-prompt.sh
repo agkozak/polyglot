@@ -93,14 +93,24 @@ if [ -n "$ZSH_VERSION" ]; then
 
   # vi-mode indicator
   #
+  # Hat-tip to oh-my-zsh's vi-mode plugin, with which this prompt is compatible:
+  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/vi-mode
+  #
   # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
   zle_keymap_select() {
-    #shellcheck disable=SC2034
+    #shellcheck disable=SC2154
     _AGKOZAK_VI_MODE_INDICATOR="%{$fg_bold[black]%}%{$bg[white]%}<<"
     zle reset-prompt
+    zle -R
   }
 
-  zle -N zle-keymap-select zle_keymap_select
+  # Redraw prompt when terminal size changes
+  TRAPWINCH() {
+    zle && zle -R
+  }
+
+  zle -N zle_keymap_select
+  zle -A zle_keymap_select zle-keymap-select
 
   # shellcheck disable=SC2154
   PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$_AGKOZAK_VI_MODE_INDICATOR}/(main|viins)/}%#%{$reset_color%} '
