@@ -1,6 +1,6 @@
 # agkozak Git Prompt
-![agkozak supports five shells: zsh, bash, ksh, mksh, and dash`](https://github.com/agkozak/agkozak-git-prompt/raw/master/img/agkozak-git-prompt.jpg)
-*agkozak supports five shells: `zsh`, `bash`, `ksh`, `mksh`, and `dash4`*
+![agkozak supports five shells: zsh, bash, ksh, mksh, and dash](https://github.com/agkozak/agkozak-git-prompt/raw/master/img/agkozak-git-prompt.jpg)
+*agkozak supports five shells: `zsh`, `bash`, `ksh`, `mksh`, and `dash`*
 
 ![In zsh, the exit status is displayed in the right prompt. The left prompt alters in appearance when the line editor is in vi command mode.](https://github.com/agkozak/agkozak-git-prompt/raw/master/img/exit-status-and-vi-mode.jpg)
 *In `zsh`, the exit status is displayed in the right prompt. The left prompt alters in appearance when the line editor is in `vi` command mode.*
