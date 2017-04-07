@@ -75,11 +75,8 @@ _branch_changes() {
     ;;
   esac
 
-  if [ "$symbols" = '' ]; then
-    echo ''
-  else
-    echo " $symbols"
-  fi
+  [ ! "$symbols" = '' ] && printf '%s' " $symbols"
+
 }
 
 export HOSTNAME
