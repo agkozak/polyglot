@@ -21,7 +21,7 @@ _branch_status() {
     ref=$(git rev-parse --short HEAD 2> /dev/null) || return
   fi
   branch=${ref#refs/heads/}
-  echo " (${branch}$(_branch_changes))"
+  echo " (${branch}$(_branch_changes "$1"))"
 }
 
 # Display status of current branch
@@ -46,7 +46,12 @@ _branch_changes() {
     *'deleted:'*) symbols="x${symbols}";;
   esac
   case "$git_status" in
-    *'modified:'*) symbols="!${symbols}";;
+    *'modified:'*)
+      if [ "$1" = 'ksh' ]; then # In ksh93, a single exclamation point displays the command number.
+        symbols="!!${symbols}"  # Two points are displayed as one.
+      else
+        symbols="!${symbols}"
+      fi
   esac
 
   if [ "$symbols" = '' ]; then
@@ -54,12 +59,6 @@ _branch_changes() {
   else
     echo " $symbols"
   fi
-}
-
-_branch_status_with_bang() {
-  ksh_branch_status=$(_branch_status)
-  # shellcheck disable=SC2039
-  echo "${ksh_branch_status/!/!!}"
 }
 
 export HOSTNAME
@@ -99,10 +98,10 @@ elif [ -n "$KSH_VERSION" ]; then
       case $TERM in
         *-256color)
           # shellcheck disable=SC2039
-          PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status_with_bang)\E[0m \$ '
+          PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh)\E[0m \$ '
         ;;
         *)
-          PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status_with_bang) \$ '
+          PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
         ;;
       esac
     ;;
