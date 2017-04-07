@@ -39,7 +39,7 @@ _branch_status() {
     128) return ;; # No Git repository here.
     *) ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
-  echo " (${ref#refs/heads/}$(_branch_changes "$1"))"
+  printf ' (%s%s)' "${ref#refs/heads/}" "$(_branch_changes "$1")"
 }
 
 # Display symbols representing the current branch's status
