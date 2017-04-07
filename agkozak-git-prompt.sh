@@ -29,46 +29,50 @@
 
 # shellcheck disable=SC2148
 
-# Display current branch and status
+# Display current branch (if any) followed by changes to branch (if any)
+#
+# $1 is a hack that allows ksh to display a ! in its prompt
 _branch_status() {
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
-  exit=$?
-  if [ $exit -ne 0 ]; then
-    [ $exit -eq 128 ] && return  # No git repository here.
-    ref=$(git rev-parse --short HEAD 2> /dev/null) || return
-  fi
-  branch=${ref#refs/heads/}
-  echo " (${branch}$(_branch_changes "$1"))"
+  case $? in
+    0) ;;         # $ref contains the name of a checked-out branch
+    128) return ;; # No Git repository here.
+    *) ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
+  esac
+  echo " (${ref#refs/heads/}$(_branch_changes "$1"))"
 }
 
-# Display status of current branch
+# Display symbols representing the current branch's status
+#
+# $1 is a hack that allows ksh to display a ! in its prompt
 _branch_changes() {
   git_status=$(git status 2>&1)
 
   symbols=''
 
   case "$git_status" in
-    *'renamed:'*) symbols=">${symbols}";;
+    *'renamed:'*) symbols=">${symbols}" ;;
   esac
   case "$git_status" in
-    *'Your branch is ahead of'*) symbols="*${symbols}";;
+    *'Your branch is ahead of'*) symbols="*${symbols}" ;;
   esac
   case "$git_status" in
-    *'new file:'*) symbols="+${symbols}";;
+    *'new file:'*) symbols="+${symbols}" ;;
   esac
   case "$git_status" in
-    *'Untracked files'*) symbols="?${symbols}";;
+    *'Untracked files'*) symbols="?${symbols}" ;;
   esac
   case "$git_status" in
-    *'deleted:'*) symbols="x${symbols}";;
+    *'deleted:'*) symbols="x${symbols}" ;;
   esac
   case "$git_status" in
     *'modified:'*)
       if [ "$1" = 'ksh' ]; then # In ksh93, a single exclamation point displays the command number.
-        symbols="!!${symbols}"  # Two points are displayed as one.
+        symbols="!!${symbols}"  # Two exclmanation points are displayed as one.
       else
         symbols="!${symbols}"
       fi
+    ;;
   esac
 
   if [ "$symbols" = '' ]; then
@@ -110,7 +114,7 @@ if [ -n "$ZSH_VERSION" ]; then
   zle -N zle_keymap_select
   zle -A zle_keymap_select zle-keymap-select
 
-  # shellcheck disable=SC2034
+  # shellcheck disable=SC2034,SC2154
   MODE_INDICATOR="%{$fg_bold[black]%}%{$bg[white]%}<<"
 
   # shellcheck disable=SC2154
@@ -142,7 +146,6 @@ elif [ -n "$KSH_VERSION" ]; then
       esac
     ;;
   esac
-  return
 
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
