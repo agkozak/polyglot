@@ -131,18 +131,18 @@ elif [ -n "$KSH_VERSION" ]; then
   case "$KSH_VERSION" in
     *MIRBSD*)
       PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
-    ;;
+      ;;
     *)
       case $TERM in
         *-256color)
           # shellcheck disable=SC2039
           PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh)\E[0m \$ '
-        ;;
+          ;;
         *)
           PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
-        ;;
+          ;;
       esac
-    ;;
+      ;;
   esac
 
 # dash
