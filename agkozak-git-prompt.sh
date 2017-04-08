@@ -69,7 +69,7 @@ _branch_changes() {
   case "$git_status" in
     *'modified:'*)
       if [ "$1" = 'ksh' ]; then # In ksh93, a single exclamation point displays the command number.
-        symbols="!!${symbols}"  # Two exclmanation points are displayed as one.
+        symbols="!!${symbols}"  # Two exclanation points are displayed as one.
       else
         symbols="!${symbols}"
       fi
@@ -140,9 +140,9 @@ elif [ -n "$KSH_VERSION" ]; then
           ;;
         *)
           PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
-          ;;
+        ;
       esac
-      ;;
+    ;;
   esac
 
 # dash
