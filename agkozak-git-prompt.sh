@@ -34,9 +34,10 @@
 # $1 is a hack that allows ksh to display a ! in its prompt
 _branch_status() {
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
-  case $? in
-    0) ;;         # $ref contains the name of a checked-out branch
-    128) return ;; # No Git repository here.
+  case $? in        # See what the exit code is.
+    0) ;;           # $ref contains the name of a checked-out branch.
+    128) return ;;  # No Git repository here.
+    # Otherwise, see if HEAD is in detached state.
     *) ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
   printf ' (%s%s)' "${ref#refs/heads/}" "$(_branch_changes "$1")"
