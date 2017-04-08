@@ -69,7 +69,7 @@ _branch_changes() {
   case "$git_status" in
     *'modified:'*)
       if [ "$1" = 'ksh' ]; then # In ksh93, a single exclamation point displays the command number.
-        symbols="!!${symbols}"  # Two exclmanation points are displayed as one.
+        symbols="!!${symbols}"  # Two exclamation points are displayed as one.
       else
         symbols="!${symbols}"
       fi
@@ -79,9 +79,6 @@ _branch_changes() {
   [ ! -z "$symbols" ] && printf '%s' " $symbols"
 
 }
-
-export HOSTNAME
-HOSTNAME=$(hostname)
 
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
@@ -128,25 +125,32 @@ elif [ -n "$BASH_VERSION" ]; then
 
 # ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then
+
+  export HOSTNAME
+  HOSTNAME=$(hostname)
+
   case "$KSH_VERSION" in
     *MIRBSD*)
       PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
-    ;;
+      ;;
     *)
       case $TERM in
         *-256color)
           # shellcheck disable=SC2039
           PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh)\E[0m \$ '
-        ;;
+          ;;
         *)
           PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
-        ;;
+          ;;
       esac
     ;;
   esac
 
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
+  export HOSTNAME
+  HOSTNAME=$(hostname)
+
   PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 else
   echo 'agkozak-git-prompt does not yet support your shell.'
