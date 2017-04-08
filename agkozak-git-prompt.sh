@@ -76,7 +76,7 @@ _branch_changes() {
     ;;
   esac
 
-  [ ! "$symbols" = '' ] && printf '%s' " $symbols"
+  [ ! -z "$symbols" ] && printf '%s' " $symbols"
 
 }
 
