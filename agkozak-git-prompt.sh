@@ -76,8 +76,7 @@ _branch_changes() {
     ;;
   esac
 
-  [ ! -z "$symbols" ] && printf '%s' " $symbols"
-
+  [ "$symbols" ] && printf '%s' " $symbols"
 }
 
 # zsh
@@ -125,7 +124,6 @@ elif [ -n "$BASH_VERSION" ]; then
 
 # ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then
-
   export HOSTNAME
   HOSTNAME=$(hostname)
 
@@ -152,6 +150,7 @@ elif [ "$(basename "$0")" = 'dash' ]; then
   HOSTNAME=$(hostname)
 
   PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
+
 else
   echo 'agkozak-git-prompt does not yet support your shell.'
 fi
