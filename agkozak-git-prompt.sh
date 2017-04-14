@@ -125,7 +125,7 @@ elif [ -n "$BASH_VERSION" ]; then
   export PS1="\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;34m\]\w\[\e[m\]\[\e[0;33m\]\`_branch_status\`\[\e[m\] \\$ "
 
   # TODO: Load conditionally (bash v.3 or greater) 
-  bind -f "$(dirname $0)/inputrc"
+  # bind -f $(dirname $(readlink -f "$0"))/inputrc
 
 # ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then
