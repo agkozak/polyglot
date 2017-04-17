@@ -135,7 +135,7 @@ elif [ -n "$KSH_VERSION" ]; then
 
   case "$KSH_VERSION" in
     *MIRBSD*)
-      PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
+      PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       ;;
     *)
       case $TERM in
