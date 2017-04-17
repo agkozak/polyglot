@@ -124,9 +124,10 @@ elif [ -n "$BASH_VERSION" ]; then
 
   export PS1="\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;34m\]\w\[\e[m\]\[\e[0;33m\]\`_branch_status\`\[\e[m\] \\$ "
 
-  bind 'set show-mode-in-prompt'
-  bind 'set vi-ins-mode-string ""'
-  bind 'set vi-cmd-mode-string "\e[7m>> \e[0m"'
+  # vi command mode
+  bind 'set show-mode-in-prompt'                # Since bash 4.3
+  bind 'set vi-ins-mode-string ""'              # Since bash 4.4
+  bind 'set vi-cmd-mode-string "\e[7m>> \e[0m"' # Since bash 4.4
 
 # ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then

@@ -1,3 +1,0 @@
-set show-mode-in-prompt					# Requires bash v4.3
-set vi-ins-mode-string ""				# Requires bash v4.4
-set vi-cmd-mode-string "\e[7m>> \e[0m"  # Requires bash v4.4
