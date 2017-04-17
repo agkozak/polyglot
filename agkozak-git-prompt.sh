@@ -79,15 +79,13 @@ _branch_changes() {
   [ "$symbols" ] && printf '%s' " $symbols"
 }
 
+_has_colors() {
+  test $(tput colors) -ge 8
+}
+
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
-
-  # Autoload zsh colors module if it hasn't been autoloaded already
-  if ! whence -w colors > /dev/null 2>&1; then
-    autoload -Uz colors
-    colors
-  fi
 
   # vi-mode indicator
   #
@@ -108,26 +106,44 @@ if [ -n "$ZSH_VERSION" ]; then
   zle -N zle_keymap_select
   zle -A zle_keymap_select zle-keymap-select
 
-  # shellcheck disable=SC2034,SC2154
-  MODE_INDICATOR="%{$fg_bold[black]%}%{$bg[white]%}<<"
+  if _has_colors; then 
+    # Autoload zsh colors module if it hasn't been autoloaded already
+    if ! whence -w colors > /dev/null 2>&1; then
+      autoload -Uz colors
+      colors
+    fi
 
-  # shellcheck disable=SC2154
-  PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%#%{$reset_color%} '
+    # shellcheck disable=SC2034,SC2154
+    MODE_INDICATOR="%{$fg_bold[black]%}%{$bg[white]%}<<"
 
-  # The right prompt will show the exit code if it is not zero.
-  # shellcheck disable=SC2034
-  RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
+    # shellcheck disable=SC2154
+    PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%#%{$reset_color%} '
+
+    # The right prompt will show the exit code if it is not zero.
+    # shellcheck disable=SC2034
+    RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
+
+  else
+    MODE_INDICATOR="<<"
+    PS1='%n@%m %(3!|%2~|%~)$(_branch_status) ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%# '
+    RPS1="%(?..(%?%))"
+  fi
 
 # bash
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
-  export PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\`_branch_status\`\[\e[m\] \\$ "
-
   # vi command mode
   bind 'set show-mode-in-prompt'                # Since bash 4.3
   bind 'set vi-ins-mode-string ""'              # Since bash 4.4
-  bind 'set vi-cmd-mode-string "\e[7m>> \e[0m"' # Since bash 4.4
+
+  if _has_colors; then
+    export PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\`_branch_status\`\[\e[m\] \\$ "
+    bind 'set vi-cmd-mode-string "\e[7m>> \e[0m"' # Since bash 4.4
+  else
+    export PS1="\u@\h \w`_branch_status` \\$ "
+    bind 'set vi-cmd-mode-string "\e[7m>> "'
+  fi
 
 # ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then
@@ -136,21 +152,21 @@ elif [ -n "$KSH_VERSION" ]; then
 
   case "$KSH_VERSION" in
     *MIRBSD*)
-      PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
+      if _has_colors; then
+        PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
+      else
+        PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
+      fi
       ;;
     *)
-      case $TERM in
-        *-256color)
-          # shellcheck disable=SC2039
-          PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh)\E[0m \$ '
-          ;;
-        *)
-          PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
-          ;;
-      esac
-    ;;
+      if _has_colors; then
+        # shellcheck disable=SC2039
+        PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh)\E[0m \$ '
+      else
+        PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
+      fi
+      ;;
   esac
-
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
   export HOSTNAME
