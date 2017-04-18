@@ -157,12 +157,15 @@ elif [ -n "$KSH_VERSION" ]; then
 
   case "$KSH_VERSION" in
     *MIRBSD*)
-      if _has_colors; then
+      # For now, a color prompt is disabled for mksh, as that shell tends to
+      # "wrap" incorrectly
+      #
+      # if _has_colors; then
         # shellcheck disable=SC2016
-        PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
-      else
+        # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
+      # else
         PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
-      fi
+      # fi
       ;;
     *)
       if _has_colors; then
