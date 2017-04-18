@@ -32,6 +32,7 @@
 # Display current branch (if any) followed by changes to branch (if any)
 #
 # $1 is a hack that allows ksh to display a ! in its prompt
+# shellcheck disable=SC2120
 _branch_status() {
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
@@ -80,7 +81,7 @@ _branch_changes() {
 }
 
 _has_colors() {
-  test $(tput colors) -ge 8
+  test "$(tput colors)" -ge 8
 }
 
 # zsh
