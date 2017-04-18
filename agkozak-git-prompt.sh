@@ -27,11 +27,12 @@
 # https://github.com/agkozak/agkozak-git-prompt
 #
 
-# shellcheck disable=SC2148
+# vim: filetype=sh foldmethod=marker tabstop=2 expandtab
 
 # Display current branch (if any) followed by changes to branch (if any)
 #
 # $1 is a hack that allows ksh to display a ! in its prompt
+#
 # shellcheck disable=SC2120
 _branch_status() {
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
@@ -69,9 +70,9 @@ _branch_changes() {
   esac
   case "$git_status" in
     *'modified:'*)
-      if [ "$1" = 'ksh' ]; then # In ksh93, a single exclamation point displays the command number.
-        symbols="!!${symbols}"  # Two exclamation points are displayed as one.
-      else
+      if [ "$1" = 'ksh' ]; then # In ksh93, a single `!` displays the command
+        symbols="!!${symbols}"  # number, while two exclamation points are
+      else                      # displayed as one.
         symbols="!${symbols}"
       fi
     ;;
@@ -85,6 +86,8 @@ _has_colors() {
 }
 
 # zsh
+#
+# vim: filetype=zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
@@ -121,16 +124,17 @@ if [ -n "$ZSH_VERSION" ]; then
     PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%#%{$reset_color%} '
 
     # The right prompt will show the exit code if it is not zero.
-    # shellcheck disable=SC2034
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
     MODE_INDICATOR="<<"
     PS1='%n@%m %(3!|%2~|%~)$(_branch_status) ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%# '
+    # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
 
 # bash
+# vim: filetype=sh
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
@@ -154,6 +158,7 @@ elif [ -n "$KSH_VERSION" ]; then
   case "$KSH_VERSION" in
     *MIRBSD*)
       if _has_colors; then
+        # shellcheck disable=SC2016
         PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       else
         PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
@@ -176,7 +181,5 @@ elif [ "$(basename "$0")" = 'dash' ]; then
   PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
 else
-  echo 'agkozak-git-prompt does not yet support your shell.'
+  echo 'agkozak-git-prompt does not support your shell.'
 fi
-
-# vim:filetype=sh foldmethod=marker tabstop=2 expandtab
