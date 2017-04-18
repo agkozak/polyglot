@@ -153,7 +153,7 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh and mksh
 elif [ -n "$KSH_VERSION" ]; then
   export HOSTNAME
-  HOSTNAME=$(hostname)
+  HOSTNAME=$(hostname | cut -f1 -d'.')
 
   case "$KSH_VERSION" in
     *MIRBSD*)
@@ -179,7 +179,7 @@ elif [ -n "$KSH_VERSION" ]; then
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
   export HOSTNAME
-  HOSTNAME=$(hostname)
+  HOSTNAME=$(hostname | cut -f1 -d'.')
 
   PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
