@@ -31,7 +31,7 @@
 
 # Display current branch (if any) followed by changes to branch (if any)
 #
-# $1 is a hack that allows ksh to display a ! in its prompt
+# $1 is a hack that allows ksh93 to display a ! in its prompt
 #
 # shellcheck disable=SC2120
 _branch_status() {
@@ -47,7 +47,7 @@ _branch_status() {
 
 # Display symbols representing the current branch's status
 #
-# $1 is a hack that allows ksh to display a ! in its prompt
+# $1 is a hack that allows ksh93 to display a ! in its prompt
 _branch_changes() {
   git_status=$(git status 2>&1)
 
@@ -70,7 +70,7 @@ _branch_changes() {
   esac
   case "$git_status" in
     *'modified:'*)
-      if [ "$1" = 'ksh' ]; then # In ksh93, a single `!` displays the command
+      if [ "$1" = 'ksh93' ]; then # In ksh93, a single `!` displays the command
         symbols="!!${symbols}"  # number, while two exclamation points are
       else                      # displayed as one.
         symbols="!${symbols}"
@@ -170,9 +170,9 @@ elif [ -n "$KSH_VERSION" ]; then
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
-        PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh)\E[0m \$ '
+        PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
-        PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh) \$ '
+        PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
       fi
       ;;
   esac
