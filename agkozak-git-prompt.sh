@@ -7,7 +7,7 @@
 #
 # agkozak Git Prompt
 #
-# A Dynamic color Git prompt for zsh, bash, ksh, mksh, and dash
+# A Dynamic color Git prompt for zsh, bash, ksh93, mksh, and dash
 #
 # Copyright (C) 2017 Alexandros Kozák
 #
@@ -110,7 +110,7 @@ if [ -n "$ZSH_VERSION" ]; then
   zle -N zle_keymap_select
   zle -A zle_keymap_select zle-keymap-select
 
-  if _has_colors; then 
+  if _has_colors; then
     # Autoload zsh colors module if it hasn't been autoloaded already
     if ! whence -w colors > /dev/null 2>&1; then
       autoload -Uz colors
@@ -150,7 +150,7 @@ elif [ -n "$BASH_VERSION" ]; then
     bind 'set vi-cmd-mode-string "\e[7m>> "'
   fi
 
-# ksh and mksh
+# ksh93 and mksh
 elif [ -n "$KSH_VERSION" ]; then
   export HOSTNAME
   HOSTNAME=$(hostname | cut -f1 -d'.')

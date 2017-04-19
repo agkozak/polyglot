@@ -7,7 +7,7 @@
 #
 # agkozak Git Prompt
 #
-# A Dynamic color Git prompt for zsh, bash, ksh, mksh, and dash
+# A Dynamic color Git prompt for zsh, bash, ksh93, mksh, and dash
 #
 # Copyright (C) 2017 Alexandros Kozák
 #
