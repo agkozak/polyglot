@@ -143,11 +143,11 @@ elif [ -n "$BASH_VERSION" ]; then
   bind 'set vi-ins-mode-string ""'              # Since bash 4.4
 
   if _has_colors; then
-    export PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\`_branch_status\`\[\e[m\] \\$ "
+    export PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
     bind 'set vi-cmd-mode-string "\e[7m>> \e[0m"' # Since bash 4.4
   else
-    # shellcheck disable=SC2155
-    export PS1="\u@\h \w`_branch_status` \\$ "
+    # shellcheck disable=SC2119,SC2155
+    export PS1="\u@\h \w$(_branch_status) \\$ "
     bind 'set vi-cmd-mode-string "\e[7m>> "'
   fi
 
