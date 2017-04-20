@@ -92,20 +92,31 @@ if [ -n "$ZSH_VERSION" ]; then
   #
   # Hat-tip to oh-my-zsh's vi-mode plugin, with which this prompt is compatible:
   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/vi-mode
-  #
+
+  MODE_INDICATOR=':'  # Defined only so that it will not be overridden by
+                      # oh-my-zsh's vi-mode plugin
+
   # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
   zle_keymap_select() {
     zle reset-prompt
     zle -R
   }
 
+  zle -N zle_keymap_select
+  zle -A zle_keymap_select zle-keymap-select
+
   # Redraw prompt when terminal size changes
   TRAPWINCH() {
     zle && zle -R
   }
 
-  zle -N zle_keymap_select
-  zle -A zle_keymap_select zle-keymap-select
+  _zsh_vi_mode_indicator() {
+    if [ -z "$KEYMAP" ]; then
+      printf '%s' "+"
+    else
+      printf '%s' "${${KEYMAP/vicmd/:}/(main|viins)/+}"
+    fi
+  }
 
   if _has_colors; then
     # Autoload zsh colors module if it hasn't been autoloaded already
@@ -114,18 +125,14 @@ if [ -n "$ZSH_VERSION" ]; then
       colors
     fi
 
-    # shellcheck disable=SC2034,SC2154
-    MODE_INDICATOR="%{$fg_bold[black]%}%{$bg[white]%}<<"
-
     # shellcheck disable=SC2154
-    PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%#%{$reset_color%} '
+    PS1='$(_zsh_vi_mode_indicator)%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} %# '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    MODE_INDICATOR="<<"
-    PS1='%n@%m %(3!|%2~|%~)$(_branch_status) ${${KEYMAP/vicmd/$MODE_INDICATOR}/(main|viins)/}%# '
+    PS1='$(_zsh_vi_mode_indicator)%n@%m %(3!|%2~|%~)$(_branch_status) %# '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
