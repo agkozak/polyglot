@@ -93,6 +93,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # Hat-tip to oh-my-zsh's vi-mode plugin, with which this prompt is compatible:
   # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/vi-mode
 
+  # shellcheck disable=SC2034
   MODE_INDICATOR=':'  # Defined only so that it will not be overridden by
                       # oh-my-zsh's vi-mode plugin
 
@@ -112,7 +113,13 @@ if [ -n "$ZSH_VERSION" ]; then
 
   _zsh_vi_mode_indicator() {
     case "$KEYMAP" in
-      vicmd) printf '%s' ':' ;;
+      vicmd)
+        if whence -w colors > /dev/null 2>&1; then
+          printf '%s' "%{$bg[cyan]$fg[black]%}:%{$reset_color%}"
+        else
+          printf '%s' ':'
+        fi
+        ;;
       *) printf '%s' '+' ;;
     esac
   }
@@ -143,7 +150,11 @@ elif [ -n "$BASH_VERSION" ]; then
   # vi command mode
   bind 'set show-mode-in-prompt'                # Since bash 4.3
   bind 'set vi-ins-mode-string "+"'             # Since bash 4.4
-  bind 'set vi-cmd-mode-string ":"'             # Since bash 4.4
+  if _has_colors; then
+    bind 'set vi-cmd-mode-string "\e[30;46m:\e[00m"'           # Since bash 4.4
+  else
+    bind 'set vi-cmd-mode-string ":"'
+  fi
 
   if _has_colors; then
     PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
