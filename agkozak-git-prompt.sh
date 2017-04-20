@@ -149,8 +149,9 @@ elif [ -n "$BASH_VERSION" ]; then
 
 # ksh93 and mksh
 elif [ -n "$KSH_VERSION" ]; then
-  export HOSTNAME
-  HOSTNAME=$(hostname | cut -f1 -d'.')
+  export _AGKOZAK_HOSTNAME
+  _AGKOZAK_HOSTNAME=$(hostname)
+  _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
 
   case "$KSH_VERSION" in
     *MIRBSD*)
@@ -161,24 +162,25 @@ elif [ -n "$KSH_VERSION" ]; then
         # shellcheck disable=SC2016
         # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       # else
-        PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
+        PS1='$LOGNAME@$_AGKOZAK_HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
       # fi
       ;;
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
-        PS1=$'\E[32;1m$LOGNAME@$HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        PS1=$'\E[32;1m$LOGNAME@$_AGKOZAK_HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
-        PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
+        PS1='$LOGNAME@$_AGKOZAK_HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
       fi
       ;;
   esac
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
-  export HOSTNAME
-  HOSTNAME=$(hostname | cut -f1 -d'.')
+  export _AGKOZAK_HOSTNAME
+  _AGKOZAK_HOSTNAME=$(hostname)
+  _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
 
-  PS1='$LOGNAME@$HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
+  PS1='$LOGNAME@$_AGKOZAK_HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
 else
   echo 'agkozak-git-prompt does not support your shell.'
