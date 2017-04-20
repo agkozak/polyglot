@@ -125,13 +125,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='$(_zsh_vi_mode_indicator)%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} %# '
+    PS1='$(_zsh_vi_mode_indicator)%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} %# '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='$(_zsh_vi_mode_indicator)%n@%m %(3!|%2~|%~)$(_branch_status) %# '
+    PS1='$(_zsh_vi_mode_indicator)%n@%m %(3~|.../%2~|%~)$(_branch_status) %# '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
