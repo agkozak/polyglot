@@ -112,9 +112,9 @@ if [ -n "$ZSH_VERSION" ]; then
 
   _zsh_vi_mode_indicator() {
     if [ -z "$KEYMAP" ]; then
-      printf '%s' "+"
+      echo '+'
     else
-      printf '%s' "${${KEYMAP/vicmd/:}/(main|viins)/+}"
+      echo '${${KEYMAP/vicmd/:}/(main|viins)/+}'
     fi
   }
 
