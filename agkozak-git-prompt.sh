@@ -26,8 +26,7 @@
 #
 # https://github.com/agkozak/agkozak-git-prompt
 #
-
-# vim: filetype=sh foldmethod=marker tabstop=2 expandtab
+# shellcheck disable=SC2148
 
 # Display current branch (if any) followed by changes to branch (if any)
 #
@@ -86,8 +85,6 @@ _has_colors() {
 }
 
 # zsh
-#
-# vim: filetype=zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
@@ -134,7 +131,6 @@ if [ -n "$ZSH_VERSION" ]; then
   fi
 
 # bash
-# vim: filetype=sh
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
@@ -187,3 +183,5 @@ elif [ "$(basename "$0")" = 'dash' ]; then
 else
   echo 'agkozak-git-prompt does not support your shell.'
 fi
+
+# vim: foldmethod=marker tabstop=2 expandtab
