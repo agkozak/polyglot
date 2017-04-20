@@ -114,7 +114,7 @@ if [ -n "$ZSH_VERSION" ]; then
     if [ -z "$KEYMAP" ]; then
       echo '+'
     else
-      echo '${${KEYMAP/vicmd/:}/(main|viins)/+}'
+      echo "${${KEYMAP/vicmd/:}/(main|viins)/+}"
     fi
   }
 
