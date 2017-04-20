@@ -147,15 +147,14 @@ elif [ -n "$BASH_VERSION" ]; then
   bind 'set vi-cmd-mode-string ":"'             # Since bash 4.4
 
   if _has_colors; then
-    export PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
+    PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
   else
     # shellcheck disable=SC2119,SC2155
-    export PS1="\u@\h \w$(_branch_status) \\$ "
+    PS1="\u@\h \w$(_branch_status) \\$ "
   fi
 
 # ksh93 and mksh
 elif [ -n "$KSH_VERSION" ]; then
-  export _AGKOZAK_HOSTNAME
   _AGKOZAK_HOSTNAME=$(hostname)
   _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
 
@@ -182,7 +181,6 @@ elif [ -n "$KSH_VERSION" ]; then
   esac
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
-  export _AGKOZAK_HOSTNAME
   _AGKOZAK_HOSTNAME=$(hostname)
   _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
 
