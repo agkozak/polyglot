@@ -111,16 +111,12 @@ if [ -n "$ZSH_VERSION" ]; then
     zle && zle -R
   }
 
+  # When the user enters vi command mode, the % or # in the prompt changes into
+  # a :
   _zsh_vi_mode_indicator() {
     case "$KEYMAP" in
-      vicmd)
-        if whence -w colors > /dev/null 2>&1; then
-          printf '%s' "%{$bg[cyan]$fg[black]%}:%{$reset_color%}"
-        else
-          printf '%s' ':'
-        fi
-        ;;
-      *) printf '%s' '+' ;;
+      vicmd) printf '%s' ':' ;;
+      *) printf '%s' '%#' ;;
     esac
   }
 
@@ -132,13 +128,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='$(_zsh_vi_mode_indicator)%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} %# '
+    PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='$(_zsh_vi_mode_indicator)%n@%m %(3~|.../%2~|%~)$(_branch_status) %# '
+    PS1='%n@%m %(3~|.../%2~|%~)$(_branch_status) $(_zsh_vi_mode_indicator) '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
