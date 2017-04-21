@@ -88,15 +88,6 @@ _has_colors() {
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
-  # vi-mode indicator
-  #
-  # Hat-tip to oh-my-zsh's vi-mode plugin, with which this prompt is compatible:
-  # https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/vi-mode
-
-  # shellcheck disable=SC2034
-  MODE_INDICATOR=':'  # Defined only so that it will not be overridden by
-                      # oh-my-zsh's vi-mode plugin
-
   # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
   zle_keymap_select() {
     zle reset-prompt
