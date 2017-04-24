@@ -99,16 +99,6 @@ _is_ssh() {
   fi
 }
 
-_display_ssh_status() {
-  if _is_ssh; then
-    case "$1" in
-      zsh) _is_ssh && printf '%s' '@%m' ;;
-      bash) _is_ssh && printf '%s' '@\h' ;;
-      *) _is_ssh && printf '%s' "@$_AGKOZAK_HOSTNAME" ;;
-    esac
-  fi
-}
-
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
@@ -135,6 +125,12 @@ if [ -n "$ZSH_VERSION" ]; then
       *) printf '%s' '%#' ;;
     esac
   }
+  
+  if _is_ssh; then
+    _AGKOZAK_HOSTNAME_STRING='@%m'
+  else
+    _AGKOZAK_HOSTNAME_STRING=''
+  fi
 
   if _has_colors; then
     # Autoload zsh colors module if it hasn't been autoloaded already
@@ -144,13 +140,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='%{$fg_bold[green]%}%n$(_display_ssh_status zsh)%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
+    PS1='%{$fg_bold[green]%}%n$_AGKOZAK_HOSTNAME_STRING%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='%n$(_display_ssh_status zsh) %(3~|.../%2~|%~)$(_branch_status) $(_zsh_vi_mode_indicator) '
+    PS1='%n$_AGKOZAK_HOSTNAME_STRING %(3~|.../%2~|%~)$(_branch_status) $(_zsh_vi_mode_indicator) '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
@@ -158,6 +154,12 @@ if [ -n "$ZSH_VERSION" ]; then
 # bash
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
+  
+  if _is_ssh; then
+    _AGKOZAK_HOSTNAME_STRING='@\h'
+  else
+    _AGKOZAK_HOSTNAME_STRING=''
+  fi
 
   # vi command mode
   bind 'set show-mode-in-prompt'                # Since bash 4.3
@@ -169,16 +171,20 @@ elif [ -n "$BASH_VERSION" ]; then
   fi
 
   if _has_colors; then
-    PS1="\[\e[01;32m\]\u$(_display_ssh_status bash)\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
+    PS1="\[\e[01;32m\]\u$_AGKOZAK_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
   else
     # shellcheck disable=SC2119,SC2155
-    PS1="\u$(_display_ssh_status) \w$(_branch_status bash) \\$ "
+    PS1="\u$_AGKOZAK_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
   fi
 
 # ksh93 and mksh
 elif [ -n "$KSH_VERSION" ]; then
-  _AGKOZAK_HOSTNAME=$(hostname)
-  _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
+  if _is_ssh; then
+    _AGKOZAK_HOSTNAME_STRING=$(hostname)
+    _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
+  else
+    _AGKOZAK_HOSTNAME_STRING=''
+  fi
 
   case "$KSH_VERSION" in
     *MIRBSD*)
@@ -189,24 +195,28 @@ elif [ -n "$KSH_VERSION" ]; then
         # shellcheck disable=SC2016
         # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       # else
-        PS1='$LOGNAME$(_display_ssh_status) $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
+        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
       # fi
       ;;
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
-        PS1=$'\E[32;1m$LOGNAME$(_display_ssh_status)\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
-        PS1='$LOGNAME$(_display_ssh_status)E $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
+        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
       fi
       ;;
   esac
 # dash
 elif [ "$(basename "$0")" = 'dash' ]; then
-  _AGKOZAK_HOSTNAME=$(hostname)
-  _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
+  if _is_ssh; then
+    _AGKOZAK_HOSTNAME_STRING=$(hostname)
+    _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
+  else
+    _AGKOZAK_HOSTNAME_STRING=''
+  fi
 
-  PS1='$LOGNAME$(_display_ssh_status) $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
+  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
 else
   echo 'agkozak-git-prompt does not support your shell.'
