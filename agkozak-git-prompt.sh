@@ -84,6 +84,31 @@ _has_colors() {
   test "$(tput colors)" -ge 8
 }
 
+_is_ssh() {
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    true
+  else
+    case "$EUID" in
+      0)
+        case $(ps -o comm= -p $PPID) in
+          sshd|*/sshd) true ;;
+        esac
+        ;;
+      *) false;
+    esac
+  fi
+}
+
+_display_ssh_status() {
+  if _is_ssh; then
+    case "$1" in
+      zsh) _is_ssh && printf '%s' '@%m' ;;
+      bash) _is_ssh && printf '%s' '@\h' ;;
+      *) _is_ssh && printf '%s' "@$_AGKOZAK_HOSTNAME" ;;
+    esac
+  fi
+}
+
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
@@ -119,13 +144,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='%{$fg_bold[green]%}%n@%m%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
+    PS1='%{$fg_bold[green]%}%n$(_display_ssh_status zsh)%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='%n@%m %(3~|.../%2~|%~)$(_branch_status) $(_zsh_vi_mode_indicator) '
+    PS1='%n$(_display_ssh_status zsh) %(3~|.../%2~|%~)$(_branch_status) $(_zsh_vi_mode_indicator) '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
@@ -144,10 +169,10 @@ elif [ -n "$BASH_VERSION" ]; then
   fi
 
   if _has_colors; then
-    PS1="\[\e[01;32m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
+    PS1="\[\e[01;32m\]\u$(_display_ssh_status bash)\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
   else
     # shellcheck disable=SC2119,SC2155
-    PS1="\u@\h \w$(_branch_status) \\$ "
+    PS1="\u$(_display_ssh_status) \w$(_branch_status bash) \\$ "
   fi
 
 # ksh93 and mksh
@@ -164,15 +189,15 @@ elif [ -n "$KSH_VERSION" ]; then
         # shellcheck disable=SC2016
         # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       # else
-        PS1='$LOGNAME@$_AGKOZAK_HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
+        PS1='$LOGNAME$(_display_ssh_status) $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
       # fi
       ;;
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
-        PS1=$'\E[32;1m$LOGNAME@$_AGKOZAK_HOSTNAME\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        PS1=$'\E[32;1m$LOGNAME$(_display_ssh_status)\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
-        PS1='$LOGNAME@$_AGKOZAK_HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
+        PS1='$LOGNAME$(_display_ssh_status)E $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
       fi
       ;;
   esac
@@ -181,7 +206,7 @@ elif [ "$(basename "$0")" = 'dash' ]; then
   _AGKOZAK_HOSTNAME=$(hostname)
   _AGKOZAK_HOSTNAME=${_AGKOZAK_HOSTNAME%?${_AGKOZAK_HOSTNAME#*.}}
 
-  PS1='$LOGNAME@$_AGKOZAK_HOSTNAME $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
+  PS1='$LOGNAME$(_display_ssh_status) $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
 else
   echo 'agkozak-git-prompt does not support your shell.'
