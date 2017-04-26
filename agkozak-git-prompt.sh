@@ -81,7 +81,7 @@ _branch_changes() {
 }
 
 _has_colors() {
-  [[  $(tput colors) -ge 8 ]]
+  test "$(tput colors)" -ge 8
 }
 
 _is_ssh() {
