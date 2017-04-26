@@ -99,6 +99,18 @@ _is_ssh() {
   fi
 }
 
+_is_dash_or_busybox() {
+  if [ "$0" = 'dash' ]; then
+    return 0
+  elif command -v readlink > /dev/null 2>&1; then
+    case "$(exec 2>/dev/null; readlink "/proc/$$/exe")" in
+      */busybox) return 0 ;;
+    esac
+  else
+    return 1
+  fi
+}
+
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
@@ -125,7 +137,7 @@ if [ -n "$ZSH_VERSION" ]; then
       *) printf '%s' '%#' ;;
     esac
   }
-  
+
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING='@%m'
   else
@@ -154,7 +166,7 @@ if [ -n "$ZSH_VERSION" ]; then
 # bash
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
-  
+
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING='@\h'
   else
@@ -207,8 +219,9 @@ elif [ -n "$KSH_VERSION" ]; then
       fi
       ;;
   esac
-# dash
-elif [ "$0" = 'dash' ]; then
+
+# dash or busybox sh
+elif _is_dash_or_busybox; then
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING=$(hostname)
     _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
@@ -219,7 +232,7 @@ elif [ "$0" = 'dash' ]; then
   PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
 else
-  echo 'agkozak-git-prompt does not support your shell.'
+  printf '%s' 'agkozak-git-prompt does not support your shell.'
 fi
 
 # vim: foldmethod=marker tabstop=2 expandtab
