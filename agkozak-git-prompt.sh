@@ -208,7 +208,7 @@ elif [ -n "$KSH_VERSION" ]; then
       ;;
   esac
 # dash
-elif [ "$(basename "$0")" = 'dash' ]; then
+elif [ "$0" = 'dash' ]; then
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING=$(hostname)
     _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
