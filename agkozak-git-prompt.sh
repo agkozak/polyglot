@@ -99,10 +99,8 @@ _is_ssh() {
   fi
 }
 
-_is_dash_or_busybox() {
-  if [ "$0" = 'dash' ]; then
-    return 0
-  elif command -v readlink > /dev/null 2>&1; then
+_is_busybox() {
+  if command -v readlink > /dev/null 2>&1; then
     case "$(exec 2>/dev/null; readlink "/proc/$$/exe")" in
       */busybox) return 0 ;;
     esac
@@ -221,7 +219,7 @@ elif [ -n "$KSH_VERSION" ]; then
   esac
 
 # dash or busybox sh
-elif _is_dash_or_busybox; then
+elif [ "$0" = 'dash' ] || _is_busybox; then
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING=$(hostname)
     _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
