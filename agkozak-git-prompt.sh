@@ -86,15 +86,15 @@ _has_colors() {
 
 _is_ssh() {
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    :										# return true
+    return 0
   else
     case "$EUID" in
       0)
         case $(ps -o comm= -p $PPID) in
-          sshd|*/sshd) : ;;					# return true
+          sshd|*/sshd) return 0 ;;
         esac
         ;;
-      *) return 1;							# return false
+      *) return 1 ;;
     esac
   fi
 }
