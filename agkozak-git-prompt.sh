@@ -141,8 +141,8 @@ if [ -n "$ZSH_VERSION" ]; then
   _zsh_prompt_dirtrim() {
     case "$PWD" in
       $HOME*)
-        1=$(print -P "%(4~|.../%2~|%~)")
-        printf '%s' "${1/.../~/...}"
+        _zsh_prompt_dirtrim_pwd="$(print -P "%(4~|.../%2~|%~)")"
+        printf '%s' "${_zsh_prompt_dirtrim_pwd/.../~/...}"
         ;;
       *) print -P "%(3~|.../%2~|%~)" ;;
     esac
