@@ -103,6 +103,7 @@ _is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
     case "$(exec 2>/dev/null; readlink "/proc/$$/exe")" in
       */busybox) return 0 ;;
+      *) return 1 ;;
     esac
   else
     return 1
