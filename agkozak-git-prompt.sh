@@ -137,6 +137,17 @@ if [ -n "$ZSH_VERSION" ]; then
     esac
   }
 
+  # emulate bash's PROMPT_DIRTRIM behavior
+  _zsh_prompt_dirtrim() {
+    case "$PWD" in
+      $HOME*)
+        1=$(print -P "%(4~|.../%2~|%~)")
+        printf '%s' "${1/.../~/...}"
+        ;;
+      *) print -P "%(3~|.../%2~|%~)" ;;
+    esac
+  }
+
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING='@%m'
   else
@@ -151,13 +162,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='%{$fg_bold[green]%}%n$_AGKOZAK_HOSTNAME_STRING%{$reset_color%} %{$fg_bold[blue]%}%(3~|.../%2~|%~)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
+    PS1='%{$fg_bold[green]%}%n$_AGKOZAK_HOSTNAME_STRING%{$reset_color%} %{$fg_bold[blue]%}$(_zsh_prompt_dirtrim)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='%n$_AGKOZAK_HOSTNAME_STRING %(3~|.../%2~|%~)$(_branch_status) $(_zsh_vi_mode_indicator) '
+    PS1='%n$_AGKOZAK_HOSTNAME_STRING $(_zsh_prompt_dirtrim)$(_branch_status) $(_zsh_vi_mode_indicator) '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
