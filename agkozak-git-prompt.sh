@@ -209,7 +209,7 @@ elif [ -n "$KSH_VERSION" ]; then
   fi
 
   case "$KSH_VERSION" in
-    *MIRBSD*)
+    *MIRBSD*|*'PD KSH'*)
       # For now, a color prompt is disabled for mksh, as that shell tends to
       # "wrap" incorrectly
       #
