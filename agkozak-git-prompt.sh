@@ -242,7 +242,7 @@ elif [ "$0" = 'dash' ] || _is_busybox; then
   PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
 
 else
-  printf '%s' 'agkozak-git-prompt does not support your shell.'
+  printf '%s\n' 'agkozak-git-prompt does not support your shell.'
 fi
 
 # vim: foldmethod=marker tabstop=2 expandtab
