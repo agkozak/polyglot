@@ -77,11 +77,11 @@ _branch_changes() {
     ;;
   esac
 
-  [ "$symbols" ] && printf '%s' " $symbols"
+  [ -n "$symbols" ] && printf '%s' " $symbols"
 }
 
 _has_colors() {
-  test "$(tput colors)" -ge 8
+  [ "$(tput colors)" -ge 8 ]
 }
 
 _is_ssh() {
@@ -101,7 +101,7 @@ _is_ssh() {
 
 _is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
-    case "$(exec 2>/dev/null; readlink "/proc/$$/exe")" in
+    case "$(exec 2> /dev/null; readlink "/proc/$$/exe")" in
       */busybox) return 0 ;;
       *) return 1 ;;
     esac
