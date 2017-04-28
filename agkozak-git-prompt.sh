@@ -137,21 +137,28 @@ if [ -n "$ZSH_VERSION" ]; then
     esac
   }
 
-  # emulate bash's PROMPT_DIRTRIM behavior
-  _zsh_prompt_dirtrim() {
+  # precmd() runs before each prompt is drawn
+  #
+  # Emulate bash's PROMPT_DIRTRIM behavior
+  # Calculate working branch and branch status
+  precmd() {
     case "$PWD" in
       $HOME*)
-        _zsh_prompt_dirtrim_pwd="$(print -P "%(4~|.../%2~|%~)")"
-        printf '%s' "${_zsh_prompt_dirtrim_pwd/.../~/...}"
+        psvar[2]=$(print -P "%(4~|.../%2~|%~)")
+        case "$psvar[2]" in
+          '...'*) psvar[2]=$(printf '~/%s' "$psvar[2]")
+        esac
         ;;
-      *) print -P "%(3~|.../%2~|%~)" ;;
+      *) psvar[2]=$(print -P "%(3~|.../%2~|%~)") ;;
     esac
+    psvar[3]=$(_branch_status)
   }
 
   if _is_ssh; then
-    _AGKOZAK_HOSTNAME_STRING='@%m'
+    psvar[1]=$(print -P '@%m')
   else
-    _AGKOZAK_HOSTNAME_STRING=''
+    #shellcheck disable=SC2034
+    psvar[1]=''
   fi
 
   if _has_colors; then
@@ -162,13 +169,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='%{$fg_bold[green]%}%n$_AGKOZAK_HOSTNAME_STRING%{$reset_color%} %{$fg_bold[blue]%}$(_zsh_prompt_dirtrim)%{$reset_color%}%{$fg[yellow]%}$(_branch_status)%{$reset_color%} $(_zsh_vi_mode_indicator) '
+    PS1='%{$fg_bold[green]%}%n%1v%{$reset_color%} %{$fg_bold[blue]%}%2v%{$reset_color%}%{$fg[yellow]%}%3v%{$reset_color%} $(_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='%n$_AGKOZAK_HOSTNAME_STRING $(_zsh_prompt_dirtrim)$(_branch_status) $(_zsh_vi_mode_indicator) '
+    PS1='%n%1v %2v%3v $(_zsh_vi_mode_indicator) '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
