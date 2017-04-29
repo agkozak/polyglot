@@ -5,7 +5,7 @@
 ![In zsh, the exit status is displayed in the right prompt. The left prompt alters in appearance when the line editor is in vi command mode.](https://github.com/agkozak/agkozak-git-prompt/raw/master/img/exit-status-and-vi-mode.jpg)
 *In `zsh` and in `bash` v4.3 and higher the prompt alters in appearance when the line editor is in `vi` command mode. In `zsh` the exit status is displayed in the right prompt.*
 
-**agkozak Git Prompt** is a dynamic color prompt for `zsh`, `bash`, `ksh93`, `mksh`, `dash`, and `busybox ash/sh` that displays the current Git branch and status of the working directory. It uses basic ASCII symbols to do so, not Unicode glyphs, so it works with more fonts. An SSH connection is indicated by the presence of a hostname in the prompt; local connections only show a username. In `zsh` and in `bash` v4.3 and higher, agkozak-git-prompt has the added feature of altering the appearance of the prompt when in vi command mode. In `zsh` the exit code is displayed in the right prompt.
+**agkozak Git Prompt** is a dynamic color prompt for `zsh`, `bash`, `ksh93`, `mksh`, `dash`, and `busybox ash/sh` that displays the working directory's Git branch and indicates any changes to its status. It uses basic ASCII symbols to do so, not Unicode glyphs, so it works with more fonts. An SSH connection is indicated by the presence of a hostname in the prompt; local connections only show a username. In `zsh` and in `bash` v4.3 and higher, agkozak-git-prompt has the added feature of altering the appearance of the prompt when in vi command mode. In `zsh` the exit code is displayed in the right prompt.
 
 The symbols that agkozak Git Prompt uses to represent Git status are as follows:
 
@@ -17,6 +17,22 @@ Untracked | ?
 New file(s) | +
 Ahead | \*
 Renamed | >
+
+agkozak Git Prompt uses bash's PROMPT_DIRTRIM=2 behavior in all shells, so that
+
+	$HOME/src/neovim/config
+
+is abbreviated as
+
+	~/.../neovim/config
+
+and
+
+	/usr/share/vim/vim74
+
+is shortened to
+
+	.../vim/vim80
 
 agkozak Git Prompt can be used without any shell framework and can be loaded thus:
 
