@@ -110,6 +110,13 @@ _is_busybox() {
   fi
 }
 
+_tilde_pwd() {
+  case "$PWD" in
+    $HOME*) printf '%s' "~${PWD#$HOME}" ;;
+    *) printf '%s' "$PWD" ;;
+  esac
+}
+
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
@@ -224,15 +231,15 @@ elif [ -n "$KSH_VERSION" ]; then
         # shellcheck disable=SC2016
         # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       # else
-        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) \$ '
+        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_tilde_pwd)$(_branch_status) \$ '
       # fi
       ;;
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
-        PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(echo $PWD | sed "s,^$HOME,~,")\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_tilde_pwd)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
-        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status ksh93) \$ '
+        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_tilde_pwd)$(_branch_status ksh93) \$ '
       fi
       ;;
   esac
@@ -246,7 +253,7 @@ elif [ "$0" = 'dash' ] || _is_busybox; then
     _AGKOZAK_HOSTNAME_STRING=''
   fi
 
-  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(echo $PWD | sed "s,^$HOME,~,")$(_branch_status) $ '
+  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_tilde_pwd)$(_branch_status) $ '
 
 else
   printf '%s\n' 'agkozak-git-prompt does not support your shell.'
