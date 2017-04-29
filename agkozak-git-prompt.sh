@@ -109,7 +109,7 @@ _branch_changes() {
 # /usr/share/vim/vim74 .../share/vim/
 _prompt_dirtrim() {
   first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
-  last_two_dirs="$(echo "${PWD#$HOME}" | rev | cut -d '/' -f-2 | rev)"
+  last_two_dirs="$(echo "${PWD#$HOME}" | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//' | cut -d '/' -f-2 | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//')"
   if [ "$last_two_dirs" = "$first_two_dirs" ]; then
     case "$PWD" in
       $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
