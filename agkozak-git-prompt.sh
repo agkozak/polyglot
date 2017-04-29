@@ -96,7 +96,7 @@ _branch_changes() {
     ;;
   esac
 
-  [ -n "$symbols" ] && printf '%s' " $symbols"
+  [ "$symbols" ] && printf '%s' " $symbols"
 }
 
 # PROMPT_DIRTRIM emulation
