@@ -116,7 +116,7 @@ _prompt_dirtrim() {
       *) printf '%s\n' "$PWD" ;;
     esac
   else
-    case $PWD in
+    case "$PWD" in
       $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
       *) printf '.../%s\n' "$last_two_dirs" ;;
     esac
