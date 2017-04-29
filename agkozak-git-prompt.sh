@@ -28,6 +28,25 @@
 #
 # shellcheck disable=SC2148
 
+_is_ssh() {
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    return 0
+  else
+    case "$EUID" in
+      0)
+        case $(ps -o comm= -p $PPID) in
+          sshd|*/sshd) return 0 ;;
+        esac
+        ;;
+      *) return 1 ;;
+    esac
+  fi
+}
+
+_has_colors() {
+  [ "$(tput colors)" -ge 8 ]
+}
+
 # Display current branch (if any) followed by changes to branch (if any)
 #
 # $1 is a hack that allows ksh93 to display a ! in its prompt
@@ -80,23 +99,11 @@ _branch_changes() {
   [ -n "$symbols" ] && printf '%s' " $symbols"
 }
 
-_has_colors() {
-  [ "$(tput colors)" -ge 8 ]
-}
-
-_is_ssh() {
-  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    return 0
-  else
-    case "$EUID" in
-      0)
-        case $(ps -o comm= -p $PPID) in
-          sshd|*/sshd) return 0 ;;
-        esac
-        ;;
-      *) return 1 ;;
-    esac
-  fi
+_tilde_pwd() {
+  case "$PWD" in
+    $HOME*) printf '%s' "~${PWD#$HOME}" ;;
+    *) printf '%s' "$PWD" ;;
+  esac
 }
 
 _is_busybox() {
@@ -110,39 +117,9 @@ _is_busybox() {
   fi
 }
 
-_tilde_pwd() {
-  case "$PWD" in
-    $HOME*) printf '%s' "~${PWD#$HOME}" ;;
-    *) printf '%s' "$PWD" ;;
-  esac
-}
-
 # zsh
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
-
-  # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
-  zle_keymap_select() {
-    zle reset-prompt
-    zle -R
-  }
-
-  zle -N zle_keymap_select
-  zle -A zle_keymap_select zle-keymap-select
-
-  # Redraw prompt when terminal size changes
-  TRAPWINCH() {
-    zle && zle -R
-  }
-
-  # When the user enters vi command mode, the % or # in the prompt changes into
-  # a :
-  _zsh_vi_mode_indicator() {
-    case "$KEYMAP" in
-      vicmd) printf '%s' ':' ;;
-      *) printf '%s' '%#' ;;
-    esac
-  }
 
   # precmd() runs before each prompt is drawn
   #
@@ -159,6 +136,29 @@ if [ -n "$ZSH_VERSION" ]; then
       *) psvar[2]=$(print -P "%(3~|.../%2~|%~)") ;;
     esac
     psvar[3]=$(_branch_status)
+  }
+
+  # When the user enters vi command mode, the % or # in the prompt changes into
+  # a :
+  _zsh_vi_mode_indicator() {
+    case "$KEYMAP" in
+      vicmd) printf '%s' ':' ;;
+      *) printf '%s' '%#' ;;
+    esac
+  }
+
+  # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
+  zle_keymap_select() {
+    zle reset-prompt
+    zle -R
+  }
+
+  zle -N zle_keymap_select
+  zle -A zle_keymap_select zle-keymap-select
+
+  # Redraw prompt when terminal size changes
+  TRAPWINCH() {
+    zle && zle -R
   }
 
   if _is_ssh; then
