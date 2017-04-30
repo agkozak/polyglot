@@ -99,13 +99,6 @@ _branch_changes() {
   [ "$symbols" ] && printf '%s' " $symbols"
 }
 
-_tilde_pwd() {
-  case "$PWD" in
-    $HOME*) printf '%s' "~${PWD#$HOME}" ;;
-    *) printf '%s' "$PWD" ;;
-  esac
-}
-
 # PROMPT_DIRTRIM emulation
 #
 # Substitute $HOME with ~; thereafter, if there are more than two directories
