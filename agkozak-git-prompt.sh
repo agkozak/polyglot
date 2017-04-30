@@ -99,28 +99,11 @@ _branch_changes() {
   [ "$symbols" ] && printf '%s' " $symbols"
 }
 
-# PROMPT_DIRTRIM emulation
-#
-# Substitute $HOME with ~; thereafter, if there are more than two directories
-# in the $PWD to display, abbreviate the $PWD by displaying the last two
-# directories, thus:
-#
-# $HOME/src/neovim/config becomes ~/.../neovim/config
-# /usr/share/vim/vim74 .../share/vim/
-_prompt_dirtrim() {
-  first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
-  last_two_dirs="$(echo "${PWD#$HOME}" | rev | cut -d '/' -f-2 | rev)"
-  if [ "$last_two_dirs" = "$first_two_dirs" ]; then
-    case "$PWD" in
-      $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
-      *) printf '%s\n' "$PWD" ;;
-    esac
-  else
-    case "$PWD" in
-      $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
-      *) printf '.../%s\n' "$last_two_dirs" ;;
-    esac
-  fi
+_tilde_pwd() {
+  case "$PWD" in
+    $HOME*) printf '%s' "~${PWD#$HOME}" ;;
+    *) printf '%s' "$PWD" ;;
+  esac
 }
 
 _is_busybox() {
@@ -248,15 +231,15 @@ elif [ -n "$KSH_VERSION" ]; then
         # shellcheck disable=SC2016
         # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
       # else
-        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) \$ '
+        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_tilde_pwd)$(_branch_status) \$ '
       # fi
       ;;
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
-        PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_tilde_pwd)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
-        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
+        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_tilde_pwd)$(_branch_status ksh93) \$ '
       fi
       ;;
   esac
@@ -270,7 +253,7 @@ elif [ "$0" = 'dash' ] || _is_busybox; then
     _AGKOZAK_HOSTNAME_STRING=''
   fi
 
-  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
+  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_tilde_pwd)$(_branch_status) $ '
 
 else
   printf '%s\n' 'agkozak-git-prompt does not support your shell.'

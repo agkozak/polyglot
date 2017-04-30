@@ -18,22 +18,6 @@ New file(s) | +
 Ahead | \*
 Renamed | >
 
-agkozak Git Prompt uses bash's PROMPT_DIRTRIM=2 behavior in all shells, so that
-
-	$HOME/src/neovim/config
-
-is abbreviated as
-
-	~/.../neovim/config
-
-and
-
-	/usr/share/vim/vim74
-
-is shortened to
-
-	.../vim/vim80
-
 agkozak Git Prompt can be used without any shell framework and can be loaded thus:
 
      . /path/to/agkozak-git-prompt/agkozak-git-prompt.sh
