@@ -116,32 +116,8 @@ _tilde_pwd() {
 # /usr/share/vim/vim74 .../share/vim/
 _prompt_dirtrim() {
   first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
-  last_two_dirs="$(echo "${PWD#$HOME}" | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//' | cut -d '/' -f-2 | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//')"
+  last_two_dirs=$(echo "${PWD#$HOME}" | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' | cut -d '/' -f-2 | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
   if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
-    case "$PWD" in
-      $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
-      *) printf '%s\n' "$PWD" ;;
-    esac
-  else
-    case "$PWD" in
-      $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
-      *) printf '.../%s\n' "$last_two_dirs" ;;
-    esac
-  fi
-}
-
-# PROMPT_DIRTRIM emulation
-#
-# Substitute $HOME with ~; thereafter, if there are more than two directories
-# in the $PWD to display, abbreviate the $PWD by displaying the last two
-# directories, thus:
-#
-# $HOME/src/neovim/config becomes ~/.../neovim/config
-# /usr/share/vim/vim74 .../share/vim/
-_busybox_prompt_dirtrim() {
-  first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
-  last_two_dirs="$(echo "${PWD#$HOME}" | rev | cut -d '/' -f-2 | rev)"
-  if [ "$last_two_dirs" = "$first_two_dirs" ]; then
     case "$PWD" in
       $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
       *) printf '%s\n' "$PWD" ;;
@@ -302,16 +278,6 @@ elif [ "$0" = 'dash' ] || _is_busybox; then
   fi
 
   PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
-
-elif _is_busybox; then
-    if _is_ssh; then
-    _AGKOZAK_HOSTNAME_STRING=$(hostname)
-    _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
-  else
-    _AGKOZAK_HOSTNAME_STRING=''
-  fi
-
-  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_busybox_prompt_dirtrim)$(_branch_status) $ '
 
 else
   printf '%s\n' 'agkozak-git-prompt does not support your shell.'
