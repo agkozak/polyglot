@@ -1,13 +1,15 @@
-#              _                 _
-#   __ _  __ _| | _____ ______ _| | __
-#  / _` |/ _` | |/ / _ \_  / _` | |/ /
-# | (_| | (_| |   < (_) / / (_| |   <
-#  \__,_|\__, |_|\_\___/___\__,_|_|\_\
-#        |___/
+#              _             _       _
+#  _ __   ___ | |_   _  __ _| | ___ | |_
+# | '_ \ / _ \| | | | |/ _` | |/ _ \| __|
+# | |_) | (_) | | |_| | (_| | | (_) | |_
+# | .__/ \___/|_|\__, |\__, |_|\___/ \__|
+# |_|            |___/ |___/
 #
-# agkozak Git Prompt
+# Polyglot Prompt
 #
-# A dynamic color Git prompt for zsh, bash, ksh93, mksh, dash, and busybox sh
+# A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, dash, and
+# busybox sh
+#
 #
 # Copyright (C) 2017 Alexandros Kozák
 #
@@ -24,15 +26,15 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #
-# https://github.com/agkozak/agkozak-git-prompt
+# https://github.com/agkozak/polyglot
 #
 
 # shellcheck disable=SC2148
 
-# Compile agkozak-git-prompt.sh with zcompile when necessary
-if [[ ${0:a:h}/agkozak-git-prompt.sh -nt ${0:a:h}/agkozak-git-prompt.sh.zwc ]] || [[ ! -e ${0:a:h}/agkozak-git-prompt.sh.zwc ]]; then
-  zcompile "${0:a:h}/agkozak-git-prompt.sh"
+# Compile polyglot.sh with zcompile when necessary
+if [[ ${0:a:h}/polyglot.sh -nt ${0:a:h}/polyglot.sh.zwc ]] || [[ ! -e ${0:a:h}/polyglot.sh.zwc ]]; then
+  zcompile "${0:a:h}/polyglot.sh"
 fi
 
 #shellcheck source=/dev/null
- . "${0:a:h}/agkozak-git-prompt.sh"
+ . "${0:a:h}/polyglot.sh"

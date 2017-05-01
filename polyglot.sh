@@ -1,19 +1,20 @@
-#              _                 _
-#   __ _  __ _| | _____ ______ _| | __
-#  / _` |/ _` | |/ / _ \_  / _` | |/ /
-# | (_| | (_| |   < (_) / / (_| |   <
-#  \__,_|\__, |_|\_\___/___\__,_|_|\_\
-#        |___/
+#              _             _       _
+#  _ __   ___ | |_   _  __ _| | ___ | |_
+# | '_ \ / _ \| | | | |/ _` | |/ _ \| __|
+# | |_) | (_) | | |_| | (_| | | (_) | |_
+# | .__/ \___/|_|\__, |\__, |_|\___/ \__|
+# |_|            |___/ |___/
 #
-# agkozak Git Prompt
+# Polyglot Prompt
 #
-# A dynamic color Git prompt for zsh, bash, ksh93, mksh, dash, and busybox sh
+# A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, dash, and
+# busybox sh
 #
 #
 # Source this file from a relevant dotfile (e.g. .zshrc, .bashrc, .kshrc,
 # .mkshrc, or .shrc) thus:
 #
-#   . /path/to/agkozak-git-prompt.sh
+#   . /path/to/polyglot.sh
 #
 #
 # Copyright (C) 2017 Alexandros Kozák
@@ -31,7 +32,7 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #
-# https://github.com/agkozak/agkozak-git-prompt
+# https://github.com/agkozak/polyglot
 #
 
 # shellcheck disable=SC2148
@@ -127,7 +128,7 @@ _branch_changes() {
 # $PWD has more than two directory elements to display,
 # abbreviate it with '...', e.g.
 #
-#   ~/.../agkozak-git-prompt/img
+#   ~/.../polyglot/img
 ###########################################################
 _prompt_dirtrim() {
   first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
@@ -255,9 +256,9 @@ elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
   if _is_ssh; then
-    _AGKOZAK_HOSTNAME_STRING='@\h'
+    _POLYGLOT_HOSTNAME_STRING='@\h'
   else
-    _AGKOZAK_HOSTNAME_STRING=''
+    _POLYGLOT_HOSTNAME_STRING=''
   fi
 
   # vi command mode
@@ -270,9 +271,9 @@ elif [ -n "$BASH_VERSION" ]; then
   fi
 
   if _has_colors; then
-    PS1="\[\e[01;32m\]\u$_AGKOZAK_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
+    PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
   else
-    PS1="\u$_AGKOZAK_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
+    PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
   fi
 
 #####################################################################
@@ -280,13 +281,13 @@ elif [ -n "$BASH_VERSION" ]; then
 #####################################################################
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   if _is_ssh; then
-    _AGKOZAK_HOSTNAME_STRING=$(hostname)
-    _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
+    _POLYGLOT_HOSTNAME_STRING=$(hostname)
+    _POLYGLOT_HOSTNAME_STRING="@${_POLYGLOT_HOSTNAME_STRING%?${_POLYGLOT_HOSTNAME_STRING#*.}}"
   else
-    _AGKOZAK_HOSTNAME_STRING=''
+    _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
+  PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case "$KSH_VERSION" in
@@ -295,16 +296,16 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _has_colors; then
-          PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+          PS1=$'\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
         else
-          PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
+          PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
         fi
         ;;
     esac
   fi
 
 else
-  printf '%s\n' 'agkozak-git-prompt does not support your shell.'
+  printf '%s\n' 'Polyglot Prompt does not support your shell.'
 fi
 
 # vim: foldmethod=marker tabstop=2 expandtab
