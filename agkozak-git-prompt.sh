@@ -9,6 +9,13 @@
 #
 # A dynamic color Git prompt for zsh, bash, ksh93, mksh, dash, and busybox sh
 #
+#
+# Source this file from a relevant dotfile (e.g. .zshrc, .bashrc, .kshrc,
+# .mkshrc, or .shrc) thus:
+#
+#   . /path/to/agkozak-git-prompt.sh
+#
+#
 # Copyright (C) 2017 Alexandros Kozák
 #
 # This program is free software; you can redistribute it and/or modify
@@ -26,8 +33,14 @@
 #
 # https://github.com/agkozak/agkozak-git-prompt
 #
+
 # shellcheck disable=SC2148
 
+###########################################################
+# Is the user connected via SSH?
+# Returns:
+#   boolean
+###########################################################
 _is_ssh() {
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     return 0
@@ -43,15 +56,21 @@ _is_ssh() {
   fi
 }
 
+###########################################################
+# Does the terminal support enough colors?
+# Returns:
+#   boolean
+###########################################################
 _has_colors() {
   [ "$(tput colors)" -ge 8 ]
 }
 
-# Display current branch (if any) followed by changes to branch (if any)
-#
-# $1 is a hack that allows ksh93 to display a ! in its prompt
-#
-# shellcheck disable=SC2120
+###########################################################
+# Display current branch name, followed by symbols
+# representing changes to the working copy
+# Arguments:
+#   $1 if ksh93, escape ! as !!
+###########################################################
 _branch_status() {
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
@@ -63,9 +82,11 @@ _branch_status() {
   printf ' (%s%s)' "${ref#refs/heads/}" "$(_branch_changes "$1")"
 }
 
-# Display symbols representing the current branch's status
-#
-# $1 is a hack that allows ksh93 to display a ! in its prompt
+###########################################################
+# Display symbols representing changes to the working copy
+# Arguments:
+#   $1 if ksh93, escape ! as !!
+###########################################################
 _branch_changes() {
   git_status=$(git status 2>&1)
 
@@ -99,14 +120,15 @@ _branch_changes() {
   [ "$symbols" ] && printf '%s' " $symbols"
 }
 
-# PROMPT_DIRTRIM emulation
+###########################################################
+# Emulation of bash's PROMPT_DIRTRIM for other POSIX shells
 #
-# Substitute $HOME with ~; thereafter, if there are more than two directories
-# in the $PWD to display, abbreviate the $PWD by displaying the last two
-# directories, thus:
+# In $PWD, substitute $HOME with ~; if the remainder of the
+# $PWD has more than two directory elements to display,
+# abbreviate it with '...', e.g.
 #
-# $HOME/src/neovim/config becomes ~/.../neovim/config
-# /usr/share/vim/vim74 .../share/vim/
+#   ~/.../agkozak-git-prompt/img
+###########################################################
 _prompt_dirtrim() {
   first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
   last_two_dirs=$(echo "${PWD#$HOME}" | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' | cut -d '/' -f-2 | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
@@ -116,6 +138,7 @@ _prompt_dirtrim() {
       *) printf '%s\n' "$PWD" ;;
     esac
   else
+    #shellcheck disable=SC2088
     case "$PWD" in
       $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
       *) printf '.../%s\n' "$last_two_dirs" ;;
@@ -123,6 +146,11 @@ _prompt_dirtrim() {
   fi
 }
 
+###########################################################
+# Tests to see if the current shell is busybox sh (ash)
+# Returns:
+#   boolean
+###########################################################
 _is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
     case "$(exec 2> /dev/null; readlink "/proc/$$/exe")" in
@@ -138,11 +166,14 @@ _is_busybox() {
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
-  # precmd() runs before each prompt is drawn
+  ###########################################################
+  # Runs right before the prompts is displayed
   #
-  # Emulate bash's PROMPT_DIRTRIM behavior
-  # Calculate working branch and branch status
+  # 1) Imitates bash's PROMPT_DIRTRIM=2 behavior
+  # 2) Calculates working branch and working copy status
+  ###########################################################
   precmd() {
+    # shellcheck disable=SC2128,SC2088
     case "$PWD" in
       $HOME*)
         psvar[2]=$(print -P "%(4~|.../%2~|%~)")
@@ -155,8 +186,10 @@ if [ -n "$ZSH_VERSION" ]; then
     psvar[3]=$(_branch_status)
   }
 
-  # When the user enters vi command mode, the % or # in the prompt changes into
-  # a :
+  ###########################################################
+  # When the user enters vi command mode, the % or # in the
+  # prompt changes into a colon
+  ###########################################################
   _zsh_vi_mode_indicator() {
     case "$KEYMAP" in
       vicmd) printf '%s' ':' ;;
@@ -164,7 +197,12 @@ if [ -n "$ZSH_VERSION" ]; then
     esac
   }
 
-  # Underscores are used in the new keymap's name to keep `dash` from choking on hyphens
+  ###########################################################
+  # Redraw the prompt when the vi mode changes
+  #
+  # Underscores are used in this function's name to keep
+  # dash from choking on hyphens
+  ###########################################################
   zle_keymap_select() {
     zle reset-prompt
     zle -R
@@ -173,7 +211,9 @@ if [ -n "$ZSH_VERSION" ]; then
   zle -N zle_keymap_select
   zle -A zle_keymap_select zle-keymap-select
 
+  ###########################################################
   # Redraw prompt when terminal size changes
+  ###########################################################
   TRAPWINCH() {
     zle && zle -R
   }
