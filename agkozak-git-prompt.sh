@@ -138,7 +138,7 @@ _prompt_dirtrim() {
       *) printf '%s\n' "$PWD" ;;
     esac
   else
-    #shellcheck disable=SC2088
+    # shellcheck disable=SC2088
     case "$PWD" in
       $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
       *) printf '.../%s\n' "$last_two_dirs" ;;
@@ -223,7 +223,6 @@ if [ -n "$ZSH_VERSION" ]; then
   if _is_ssh; then
     psvar[1]=$(print -P '@%m')
   else
-    #shellcheck disable=SC2034
     psvar[1]=''
   fi
 
@@ -270,7 +269,6 @@ elif [ -n "$BASH_VERSION" ]; then
   if _has_colors; then
     PS1="\[\e[01;32m\]\u$_AGKOZAK_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
   else
-    # shellcheck disable=SC2119,SC2155
     PS1="\u$_AGKOZAK_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
   fi
 
@@ -293,7 +291,6 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     # ksh93 handles color well, but requires escaping ! as !!
     *)
       if _has_colors; then
-        # shellcheck disable=SC2039
         PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
       else
         PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
