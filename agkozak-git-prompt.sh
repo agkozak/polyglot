@@ -110,8 +110,8 @@ _branch_changes() {
   case "$git_status" in
     *'modified:'*)
       if [ "$1" = 'ksh93' ]; then # In ksh93, a single `!` displays the command
-        symbols="!!${symbols}"  # number, while two exclamation points are
-      else                      # displayed as one.
+        symbols="!!${symbols}"    # number, while two exclamation points are
+      else                        # displayed as one.
         symbols="!${symbols}"
       fi
     ;;
