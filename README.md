@@ -28,7 +28,7 @@ is abbreviated as
 
 and
 
-	/usr/share/vim/vim74
+	/usr/share/vim/vim80
 
 is shortened to
 
