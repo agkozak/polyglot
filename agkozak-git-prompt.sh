@@ -131,7 +131,10 @@ _branch_changes() {
 ###########################################################
 _prompt_dirtrim() {
   first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
-  last_two_dirs=$(echo "${PWD#$HOME}" | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' | cut -d '/' -f-2 | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
+  last_two_dirs=$(echo "${PWD#$HOME}" \
+    | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' \
+    | cut -d '/' -f-2 \
+    | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
   if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
     case "$PWD" in
       $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
@@ -285,18 +288,20 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
 
   PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
 
-  case "$KSH_VERSION" in
-    # mksh handles color badly, so I'm avoiding it for now
-    *MIRBSD*|*'PD KSH'*) ;;
-    # ksh93 handles color well, but requires escaping ! as !!
-    *)
-      if _has_colors; then
-        PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
-      else
-        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
-      fi
-      ;;
-  esac
+  if [ -n "$KSH_VERSION" ]; then
+    case "$KSH_VERSION" in
+      # mksh handles color badly, so I'm avoiding it for now
+      *MIRBSD*|*'PD KSH'*) ;;
+      # ksh93 handles color well, but requires escaping ! as !!
+      *)
+        if _has_colors; then
+          PS1=$'\E[32;1m$LOGNAME$_AGKOZAK_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        else
+          PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
+        fi
+        ;;
+    esac
+  fi
 
 else
   printf '%s\n' 'agkozak-git-prompt does not support your shell.'
