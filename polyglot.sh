@@ -39,8 +39,6 @@
 
 ###########################################################
 # Is the user connected via SSH?
-# Returns:
-#   boolean
 ###########################################################
 _is_ssh() {
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
@@ -59,8 +57,6 @@ _is_ssh() {
 
 ###########################################################
 # Does the terminal support enough colors?
-# Returns:
-#   boolean
 ###########################################################
 _has_colors() {
   [ "$(tput colors)" -ge 8 ]
@@ -152,8 +148,6 @@ _prompt_dirtrim() {
 
 ###########################################################
 # Tests to see if the current shell is busybox sh (ash)
-# Returns:
-#   boolean
 ###########################################################
 _is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
