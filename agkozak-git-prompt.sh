@@ -162,7 +162,9 @@ _is_busybox() {
   fi
 }
 
+#####################################################################
 # zsh
+#####################################################################
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
@@ -244,7 +246,9 @@ if [ -n "$ZSH_VERSION" ]; then
     RPS1="%(?..(%?%))"
   fi
 
+#####################################################################
 # bash
+#####################################################################
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
@@ -270,8 +274,10 @@ elif [ -n "$BASH_VERSION" ]; then
     PS1="\u$_AGKOZAK_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
   fi
 
-# ksh93 and mksh
-elif [ -n "$KSH_VERSION" ]; then
+#####################################################################
+# ksh93, mksh, pdksh, dash, busybox sh
+#####################################################################
+elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   if _is_ssh; then
     _AGKOZAK_HOSTNAME_STRING=$(hostname)
     _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
@@ -279,18 +285,12 @@ elif [ -n "$KSH_VERSION" ]; then
     _AGKOZAK_HOSTNAME_STRING=''
   fi
 
+  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
+
   case "$KSH_VERSION" in
-    *MIRBSD*|*'PD KSH'*)
-      # For now, a color prompt is disabled for mksh, as that shell tends to
-      # "wrap" incorrectly
-      #
-      # if _has_colors; then
-        # shellcheck disable=SC2016
-        # PS1=$(print '\e[01;32m$LOGNAME@$HOSTNAME\e[00m \e[01;34m$(echo $PWD | sed "s,^$HOME,~,")\e[0;33m$(_branch_status)\e[00m \$ ')
-      # else
-        PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) \$ '
-      # fi
-      ;;
+    # mksh handles color badly, so I'm avoiding it for now
+    *MIRBSD*|*'PD KSH'*) ;;
+    # ksh93 handles color well, but requires escaping ! as !!
     *)
       if _has_colors; then
         # shellcheck disable=SC2039
@@ -300,17 +300,6 @@ elif [ -n "$KSH_VERSION" ]; then
       fi
       ;;
   esac
-
-# dash or busybox sh
-elif [ "$0" = 'dash' ] || _is_busybox; then
-  if _is_ssh; then
-    _AGKOZAK_HOSTNAME_STRING=$(hostname)
-    _AGKOZAK_HOSTNAME_STRING="@${_AGKOZAK_HOSTNAME_STRING%?${_AGKOZAK_HOSTNAME_STRING#*.}}"
-  else
-    _AGKOZAK_HOSTNAME_STRING=''
-  fi
-
-  PS1='$LOGNAME$_AGKOZAK_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
 
 else
   printf '%s\n' 'agkozak-git-prompt does not support your shell.'
