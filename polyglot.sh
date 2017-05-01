@@ -167,7 +167,7 @@ if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
   ###########################################################
-  # Runs right before the prompts is displayed
+  # Runs right before the prompt is displayed
   #
   # 1) Imitates bash's PROMPT_DIRTRIM=2 behavior
   # 2) Calculates working branch and working copy status
