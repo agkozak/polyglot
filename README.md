@@ -1,7 +1,7 @@
 ![Polyglot mascot](https://github.com/agkozak/polyglot/blob/master/img/polyglot_mascot.png)
 # Polyglot Prompt
 ![Polyglot Prompt supports seven shells: zsh, bash, ksh93, mksh, pdksh, dash, and busybox ash/sh](https://github.com/agkozak/polyglot/raw/master/img/polyglot-prompt.jpg)
-*Polyglot Prompt supports seven shells: `zsh`, `bash`, `ksh`, `mksh`, `pdksh`, dash`, and `busybox sh`*
+*Polyglot Prompt supports seven shells: `zsh`, `bash`, `ksh`, `mksh`, `pdksh`, `dash`, and `busybox sh`*
 
 ![In `zsh`, the exit status is displayed in the right prompt. The left prompt alters in appearance when the line editor is in vi command mode.](https://github.com/agkozak/polyglot/raw/master/img/exit-status-and-vi-mode.jpg)
 *In `zsh` and in `bash` v4.3 and higher the prompt alters in appearance when the line editor is in `vi` command mode. In `zsh` the exit status is displayed in the right prompt.*
