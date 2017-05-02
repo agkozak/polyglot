@@ -118,35 +118,6 @@ _branch_changes() {
 }
 
 ###########################################################
-# Emulation of bash's PROMPT_DIRTRIM for other shells
-#
-# In $PWD, substitute $HOME with ~; if the remainder of the
-# $PWD has more than two directory elements to display,
-# abbreviate it with '...', e.g.
-#
-#   ~/.../polyglot/img
-###########################################################
-_prompt_dirtrim() {
-  first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
-  last_two_dirs=$(echo "${PWD#$HOME}" \
-    | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' \
-    | cut -d '/' -f-2 \
-    | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
-  if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
-    case "$PWD" in
-      $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
-      *) printf '%s\n' "$PWD" ;;
-    esac
-  else
-    # shellcheck disable=SC2088
-    case "$PWD" in
-      $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
-      *) printf '.../%s\n' "$last_two_dirs" ;;
-    esac
-  fi
-}
-
-###########################################################
 # Tests to see if the current shell is busybox sh (ash)
 ###########################################################
 _is_busybox() {
@@ -274,6 +245,36 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93, mksh, pdksh, dash, busybox sh
 #####################################################################
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
+
+  ############################################################
+  # Emulation of bash's PROMPT_DIRTRIM for other shells
+  #
+  # In $PWD, substitute $HOME with ~; if the remainder of the
+  # $PWD has more than two directory elements to display,
+  # abbreviate it with '...', e.g.
+  #
+  #   ~/.../polyglot/img
+  ############################################################
+  _prompt_dirtrim() {
+    first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
+    last_two_dirs=$(echo "${PWD#$HOME}" \
+      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' \
+      | cut -d '/' -f-2 \
+      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
+    if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
+      case "$PWD" in
+        $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
+        *) printf '%s\n' "$PWD" ;;
+      esac
+    else
+      # shellcheck disable=SC2088
+      case "$PWD" in
+        $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
+        *) printf '.../%s\n' "$last_two_dirs" ;;
+      esac
+    fi
+  }
+
   if _is_ssh; then
     _POLYGLOT_HOSTNAME_STRING=$(hostname)
     _POLYGLOT_HOSTNAME_STRING="@${_POLYGLOT_HOSTNAME_STRING%?${_POLYGLOT_HOSTNAME_STRING#*.}}"
