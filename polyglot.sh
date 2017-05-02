@@ -246,6 +246,22 @@ elif [ -n "$BASH_VERSION" ]; then
 #####################################################################
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
 
+  # Most systems have a `rev` command for reversing a string of text
+  if command -v rev > /dev/null 2>&1; then
+    _HAS_REV=1
+  fi
+
+  ############################################################
+  # Reverses a line of text (uses rev when possible for speed)
+  ############################################################
+  _reverse_text() {
+    if [ -n "$_HAS_REV" ]; then
+      rev
+    else
+      sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;/\(.\)\(.*\n\)/D;s/.//'
+    fi
+  }
+
   ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for other shells
   #
@@ -258,9 +274,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   _prompt_dirtrim() {
     first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
     last_two_dirs=$(echo "${PWD#$HOME}" \
-      | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;/\(.\)\(.*\n\)/D;s/.//' \
+      | _reverse_text \
       | cut -d '/' -f-2 \
-      | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;/\(.\)\(.*\n\)/D;s/.//')
+      | _reverse_text)
     if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
       case "$PWD" in
         $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
