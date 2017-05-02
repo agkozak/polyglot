@@ -258,9 +258,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   _prompt_dirtrim() {
     first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
     last_two_dirs=$(echo "${PWD#$HOME}" \
-      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}' \
+      | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//' \
       | cut -d '/' -f-2 \
-      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1)) }{print x;x=""}')
+      | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//')
     if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
       case "$PWD" in
         $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
