@@ -118,6 +118,14 @@ _branch_changes() {
 }
 
 ###########################################################
+# If the exit status is not 0, display it
+###########################################################
+_exit_status() {
+  _exit_status="$?"
+  [ "$_exit_status" -ne 0 ] && printf ' (%s)' "$_exit_status"
+}
+
+###########################################################
 # Tests to see if the current shell is busybox sh (ash)
 ###########################################################
 _is_busybox() {
@@ -282,7 +290,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
+  PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status)$(_exit_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case "$KSH_VERSION" in
@@ -291,9 +299,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _has_colors; then
-          PS1=$'\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+          PS1=$'\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m$\E[31;1m(_exit_status)\E[0m \$ '
         else
-          PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
+          PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93)$(_exit_status) \$ '
         fi
         ;;
     esac
