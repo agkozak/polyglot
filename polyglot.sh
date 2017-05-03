@@ -131,6 +131,8 @@ _is_busybox() {
   fi
 }
 
+_has_colors && _HAS_COLORS=1
+
 #####################################################################
 # zsh
 #####################################################################
@@ -220,11 +222,27 @@ if [ -n "$ZSH_VERSION" ]; then
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
+  _prompt_command() {
+    _exit_status=$?
+    if [ $_exit_status -ne 0 ]; then
+      _exit_status=" ($_exit_status)"
+    else
+      _exit_status=''
+    fi
+    if [ $_HAS_COLORS ]; then
+      PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\]\[\e[0;31m\]$_exit_status\[\e[00m\] \\$ "
+    else
+      PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash)$_exit_status \\$ "
+    fi
+  }
+
   if _is_ssh; then
     _POLYGLOT_HOSTNAME_STRING='@\h'
   else
     _POLYGLOT_HOSTNAME_STRING=''
   fi
+
+  PROMPT_COMMAND='_prompt_command'
 
   # vi command mode
   bind 'set show-mode-in-prompt'                      # Since bash 4.3
@@ -233,12 +251,6 @@ elif [ -n "$BASH_VERSION" ]; then
     bind 'set vi-cmd-mode-string "\e[30;46m:\e[00m"'  # Since bash 4.4
   else
     bind 'set vi-cmd-mode-string ":"'
-  fi
-
-  if _has_colors; then
-    PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
-  else
-    PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
   fi
 
 #####################################################################
