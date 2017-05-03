@@ -114,7 +114,7 @@ _branch_changes() {
     ;;
   esac
 
-  [ "$symbols" ] && printf '%s' " $symbols"
+  [ "$symbols" ] && printf ' %s' "$symbols"
 }
 
 ###########################################################
