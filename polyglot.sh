@@ -126,6 +126,19 @@ _branch_changes() {
 }
 
 ###########################################################
+# If the exit status is not 0, capture it in
+# $_POLYGLOT_EXIT_STATUS for display
+###########################################################
+_capture_exit_status() {
+    _POLYGLOT_EXIT_STATUS=$?
+    if [ "$_POLYGLOT_EXIT_STATUS" -ne 0 ]; then
+      _POLYGLOT_EXIT_STATUS=" ($_POLYGLOT_EXIT_STATUS)"
+    else
+      _POLYGLOT_EXIT_STATUS=''
+    fi
+}
+
+###########################################################
 # Tests to see if the current shell is busybox sh (ash)
 ###########################################################
 _is_busybox() {
@@ -230,16 +243,11 @@ elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
   _prompt_command() {
-    _exit_status=$?
-    if [ $_exit_status -ne 0 ]; then
-      _exit_status=" ($_exit_status)"
-    else
-      _exit_status=''
-    fi
+    _capture_exit_status
     if _has_colors; then
-      PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\]\[\e[0;31m\]$_exit_status\[\e[00m\] \\$ "
+      PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\]\[\e[0;31m\]$_POLYGLOT_EXIT_STATUS\[\e[00m\] \\$ "
     else
-      PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash)$_exit_status \\$ "
+      PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash)$_POLYGLOT_EXIT_STATUS \\$ "
     fi
   }
 
