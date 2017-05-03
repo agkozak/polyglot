@@ -59,7 +59,14 @@ _is_ssh() {
 # Does the terminal support enough colors?
 ###########################################################
 _has_colors() {
-  [ "$(tput colors)" -ge 8 ]
+  if [ "$_POLYGLOT_HAS_COLORS" ]; then
+    return 0
+  elif [ "$(tput colors)" -ge 8 ]; then
+    _POLYGLOT_HAS_COLORS=1
+    return 0
+  else
+    return 1
+  fi
 }
 
 ###########################################################
@@ -131,8 +138,6 @@ _is_busybox() {
     return 1
   fi
 }
-
-_has_colors && _HAS_COLORS=1
 
 #####################################################################
 # zsh
@@ -231,7 +236,7 @@ elif [ -n "$BASH_VERSION" ]; then
     else
       _exit_status=''
     fi
-    if [ $_HAS_COLORS ]; then
+    if _has_colors; then
       PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\]\[\e[0;31m\]$_exit_status\[\e[00m\] \\$ "
     else
       PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash)$_exit_status \\$ "
