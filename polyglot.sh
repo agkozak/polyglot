@@ -288,18 +288,21 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
       | cut -d '/' -f-2 \
       | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
-    if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
-      case "$PWD" in
-        $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
-        *) printf '%s\n' "$PWD" ;;
-      esac
-    else
-      # shellcheck disable=SC2088
-      case "$PWD" in
-        $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
-        *) printf '.../%s\n' "$last_two_dirs" ;;
-      esac
-    fi
+    case $first_two_dirs in
+      $last_two_dirs|/$last_two_dirs)
+        case "$PWD" in
+          $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
+          *) printf '%s\n' "$PWD" ;;
+        esac
+        ;;
+      *)
+        # shellcheck disable=SC2088
+        case "$PWD" in
+          $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
+          *) printf '.../%s\n' "$last_two_dirs" ;;
+        esac
+        ;;
+    esac
   }
 
   if _is_ssh; then
