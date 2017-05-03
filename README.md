@@ -19,7 +19,7 @@ New file(s) | +
 Ahead | \*
 Renamed | >
 
-Polyglot Prompt uses bash's PROMPT_DIRTRIM=2 behavior in all shells, so that
+Polyglot Prompt emulates bash's PROMPT_DIRTRIM=2 behavior in all other shells, so that
 
 	$HOME/src/neovim/config
 
