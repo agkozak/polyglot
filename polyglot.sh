@@ -68,6 +68,7 @@ _has_colors() {
 # Arguments:
 #   $1 if ksh93, escape ! as !!
 ###########################################################
+# shellcheck disable=SC2120
 _branch_status() {
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
@@ -114,7 +115,7 @@ _branch_changes() {
     ;;
   esac
 
-  [ "$symbols" ] && printf '%s' " $symbols"
+  [ "$symbols" ] && printf ' %s' "$symbols"
 }
 
 ###########################################################
@@ -156,6 +157,7 @@ if [ -n "$ZSH_VERSION" ]; then
         ;;
       *) psvar[2]=$(print -P "%(3~|.../%2~|%~)") ;;
     esac
+    # shellcheck disable=SC2119
     psvar[3]=$(_branch_status)
   }
 
@@ -270,9 +272,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   _prompt_dirtrim() {
     first_two_dirs=$(echo "${PWD#$HOME}" | cut -d '/' -f1-3)
     last_two_dirs=$(echo "${PWD#$HOME}" \
-      | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;/\(.\)\(.*\n\)/D;s/.//' \
+      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
       | cut -d '/' -f-2 \
-      | sed '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;/\(.\)\(.*\n\)/D;s/.//')
+      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
     if [ "$last_two_dirs" = "$first_two_dirs" ] || [ "/$last_two_dirs" = "$first_two_dirs" ]; then
       case "$PWD" in
         $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
