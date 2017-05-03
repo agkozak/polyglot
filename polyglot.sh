@@ -238,7 +238,7 @@ elif [ -n "$BASH_VERSION" ]; then
   if _has_colors; then
     PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\]\[\e[0;33m\]\$(_branch_status)\[\e[m\] \\$ "
   else
-    PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash) \\$ "
+    PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status) \\$ "
   fi
 
 #####################################################################
