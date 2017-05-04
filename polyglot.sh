@@ -37,6 +37,17 @@
 
 # shellcheck disable=SC2148
 
+############################################################
+# Display non-zero exit status
+############################################################
+_exit_status() {
+  exit_status="$?"
+  case $exit_status in
+    0) return ;;
+    *) printf '(%d) ' "$exit_status" ;;
+  esac
+}
+
 ###########################################################
 # Is the user connected via SSH?
 ###########################################################
@@ -123,19 +134,6 @@ _branch_changes() {
   esac
 
   [ "$symbols" ] && printf ' %s' "$symbols"
-}
-
-###########################################################
-# If the exit status is not 0, capture it in
-# $_POLYGLOT_EXIT_STATUS for display
-###########################################################
-_capture_exit_status() {
-    _POLYGLOT_EXIT_STATUS=$?
-    if [ "$_POLYGLOT_EXIT_STATUS" -ne 0 ]; then
-      _POLYGLOT_EXIT_STATUS=" ($_POLYGLOT_EXIT_STATUS)"
-    else
-      _POLYGLOT_EXIT_STATUS=''
-    fi
 }
 
 ###########################################################
@@ -243,11 +241,10 @@ elif [ -n "$BASH_VERSION" ]; then
   PROMPT_DIRTRIM=2
 
   _prompt_command() {
-    _capture_exit_status
     if _has_colors; then
-      PS1="\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_branch_status)\[\e[m\e[01;31m\]$_POLYGLOT_EXIT_STATUS\[\e[00m\] \\$ "
+      PS1="\[\e[01;31m\]\$(_exit_status)\]\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_branch_status) \\$ "
     else
-      PS1="\u$_POLYGLOT_HOSTNAME_STRING \w$(_branch_status bash)$_POLYGLOT_EXIT_STATUS \\$ "
+      PS1="\$(_exit_status)\u$_POLYGLOT_HOSTNAME_STRING \w\$(_branch_status bash) \\$ "
     fi
   }
 
@@ -272,17 +269,6 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93, mksh, pdksh, dash, busybox sh
 #####################################################################
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
-
-  ############################################################
-  # Display non-zero exit status
-  ############################################################
-  _exit_status() {
-    exit_status="$?"
-    case $exit_status in
-      0) return ;;
-      *) printf '(%d) ' "$exit_status" ;;
-    esac
-  }
 
   ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for other shells
