@@ -274,6 +274,17 @@ elif [ -n "$BASH_VERSION" ]; then
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
 
   ############################################################
+  # Display non-zero exit status
+  ############################################################
+  _exit_status() {
+    exit_status="$?"
+    case $exit_status in
+      0) return ;;
+      *) printf '(%d) ' "$exit_status" ;;
+    esac
+  }
+
+  ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for other shells
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
@@ -312,7 +323,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
+  PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case "$KSH_VERSION" in
@@ -321,9 +332,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _has_colors; then
-          PS1=$'\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+          PS1=$'\E[31;1m$(_exit_status)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
         else
-          PS1='$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
+          PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
         fi
         ;;
     esac
