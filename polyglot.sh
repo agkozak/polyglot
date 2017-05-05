@@ -258,12 +258,8 @@ elif [ -n "$BASH_VERSION" ]; then
 
   # vi command mode
   bind 'set show-mode-in-prompt'                      # Since bash 4.3
-  bind 'set vi-ins-mode-string "+"'                   # Since bash 4.4
-  if _has_colors; then
-    bind 'set vi-cmd-mode-string "\e[30;46m:\e[00m"'  # Since bash 4.4
-  else
-    bind 'set vi-cmd-mode-string ":"'
-  fi
+  bind 'set vi-ins-mode-string "+"'
+  bind 'set vi-cmd-mode-string ":"'
 
 #####################################################################
 # ksh93, mksh, pdksh, dash, busybox sh
