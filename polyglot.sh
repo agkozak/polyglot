@@ -284,15 +284,15 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     case $first_two_dirs in
       $last_two_dirs|/$last_two_dirs)
         case "$PWD" in
-          $HOME*) printf '~%s\n' "${PWD#$HOME}" ;;
-          *) printf '%s\n' "$PWD" ;;
+          $HOME*) printf '~%s' "${PWD#$HOME}" ;;
+          *) printf '%s' "$PWD" ;;
         esac
         ;;
       *)
         # shellcheck disable=SC2088
         case "$PWD" in
-          $HOME*) printf '~/.../%s\n' "$last_two_dirs" ;;
-          *) printf '.../%s\n' "$last_two_dirs" ;;
+          $HOME*) printf '~/.../%s' "$last_two_dirs" ;;
+          *) printf '.../%s' "$last_two_dirs" ;;
         esac
         ;;
     esac
