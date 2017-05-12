@@ -1,7 +1,7 @@
 ![Polyglot mascot](img/polyglot_mascot.png)
 # Polyglot Prompt
 
-**Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox sh` that uses basic ASCII symbols (and color, when possible) to show
+**Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox sh` that uses basic ASCII symbols (and color, when possible) to show:
 
 * the username
 * whether a session is local or remote over SSH
@@ -15,13 +15,13 @@ The central functions of the prompt are the same in all supported shells:
 
 ![Polyglot working in several shells](img/polyglot-with-several-shells.png)
 
-Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates when the user is in `vi` line editing command mode.
+Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates when the user is in `vi` line editing command mode. In `zsh`:
 
 ![`zsh` line editing](img/zsh-line-editing.png)
-`zsh`
+
+In `bash`:
 
 ![`bash` line editing](img/bash-line-editing.png)
-`bash`
 
 Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
 
@@ -31,13 +31,13 @@ Although no framework is required, a shim (`polyglot.plugin.zsh`) is provided to
 
 ## Local and Remote Sessions
 
-When a session is local, only the username is shown; when it is remove over SSH (or `mosh`), the hostname is shown also:
+When a session is local, only the username is shown; when it is remote over SSH (or `mosh`), the hostname is also shown:
 
 ![Local and remote sessions](img/local-and-remote-sessions.png)
 
-## Abbreviated paths
+## Abbreviated Paths
 
-Polyglot Prompt emulates in all shells the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`; a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need two be show, only the last two are displayed, along with an ellipsis, so that
+In all shells, Polyglot Prompt emulates the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`: a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need to be shown, only the last two are displayed, along with an ellipsis, so that
 
     /home/pi/src/neovim/config
 
@@ -70,9 +70,9 @@ New file(s) | +
 Ahead | \*
 Renamed | >
 
-## Exit status
+## Exit Status
 
-If the exit status of the most recently executed command is other than zero (indicating success), the exit status will be displayed in the right prompt of `zsh` but to the left of the main prompt in all other shells (because they lack a right prompt):
+If the exit status of the most recently executed command is other than zero (zero indicating success), the exit status will be displayed in the right prompt of `zsh` but to the left of the main prompt in all other shells (because they lack a right prompt):
 
 ![Exit status displayed in `zsh`, `bash`, and `ksh`](img/exit-status.png)
 
