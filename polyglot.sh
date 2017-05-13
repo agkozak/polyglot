@@ -87,10 +87,14 @@ _has_colors() {
 # $PWD has more than two directory elements to display,
 # abbreviate it with '...', e.g.
 #
+#   $HOME/dotfiles/polyglot/img
+#
+# will be displayed as
+#
 #   ~/.../polyglot/img
 ############################################################
 _prompt_dirtrim() {
-  dir_count=$(echo "${PWD#$HOME}" | grep -o '/' | wc -l)
+  dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
   if [ "$dir_count" -le 2 ]; then
       # shellcheck disable=SC2088
       case "$PWD" in
@@ -98,7 +102,7 @@ _prompt_dirtrim() {
         *) printf '%s' "$PWD" ;;
       esac
   else
-    last_two_dirs=$(echo "${PWD#$HOME}" | awk -F '/' '{print $(NF-1),$(NF)}' | sed 's/\ /\//')
+    last_two_dirs=$(echo "${PWD#$HOME}" | awk -F/ '{print $(NF-1),$(NF)}' | sed 's/\ /\//')
       # shellcheck disable=SC2088
       case "$PWD" in
         $HOME*) printf '~/.../%s' "$last_two_dirs" ;;
