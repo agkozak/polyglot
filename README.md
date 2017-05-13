@@ -37,7 +37,7 @@ When a session is local, only the username is shown; when it is remote over SSH 
 
 ## Abbreviated Paths
 
-In all shells, Polyglot Prompt emulates the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`: a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need to be shown, only the last two are displayed, along with an ellipsis, so that
+In all shells, by default Polyglot Prompt emulates the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`: a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need to be shown, only the last two are displayed, along with an ellipsis, so that
 
     /home/pi/src/neovim/config
 
@@ -54,6 +54,12 @@ is displayed as
 ![.../sense-hat/examples](img/abbreviated_paths_2.png)
 
 that is, without a tilde.
+
+If you would like to display a different number of directory elements in your Polyglot Prompt, set the environment variable `$POLYGLOT_PROMPT_DIRTRIM` thus:
+
+    POLYGLOT_PROMPT_DIRTRIM=404     # Or whatever number you like
+
+Be sure to include this setting in your *rc* file *after* `polyglot.sh` is sourced.
 
 ## Git Branch and Status
 
