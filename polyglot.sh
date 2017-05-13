@@ -37,6 +37,8 @@
 
 # shellcheck disable=SC2148
 
+POLYGLOT_PROMPT_DIRTRIM=2
+
 ############################################################
 # Display non-zero exit status
 ############################################################
@@ -81,7 +83,7 @@ _has_colors() {
 }
 
 ############################################################
-# Emulation of bash's PROMPT_DIRTRIM=2 for other shells
+# Emulation of bash's PROMPT_DIRTRIM for other shells
 #
 # In $PWD, substitute $HOME with ~; if the remainder of the
 # $PWD has more than two directory elements to display,
@@ -92,10 +94,13 @@ _has_colors() {
 # will be displayed as
 #
 #   ~/.../polyglot/img
+#
+# Arguments
+#  $1 Number of directory elements to display
 ############################################################
 _prompt_dirtrim() {
   dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
-  if [ "$dir_count" -le 2 ]; then
+  if [ "$dir_count" -le "$1" ]; then
       # shellcheck disable=SC2088
       case "$PWD" in
         $HOME*) printf '~%s' "${PWD#$HOME}" ;;
@@ -104,7 +109,7 @@ _prompt_dirtrim() {
   else
     last_two_dirs=$(echo "${PWD#$HOME}" \
       | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
-      | cut -d '/' -f-2 \
+      | cut -d '/' -f-"$1" \
       | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
       # shellcheck disable=SC2088
       case "$PWD" in
@@ -193,11 +198,11 @@ if [ -n "$ZSH_VERSION" ]; then
   ###########################################################
   # Runs right before the prompt is displayed
   #
-  # 1) Imitates bash's PROMPT_DIRTRIM=2 behavior
+  # 1) Imitates bash's PROMPT_DIRTRIM behavior
   # 2) Calculates working branch and working copy status
   ###########################################################
   precmd() {
-    psvar[2]=$(_prompt_dirtrim)
+    psvar[2]=$(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)
     # shellcheck disable=SC2119
     psvar[3]=$(_branch_status)
   }
@@ -264,7 +269,7 @@ if [ -n "$ZSH_VERSION" ]; then
 # bash
 #####################################################################
 elif [ -n "$BASH_VERSION" ]; then
-  PROMPT_DIRTRIM=2
+  PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
 
   _prompt_command() {
     if _has_colors; then
@@ -299,7 +304,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status) $ '
+  PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case "$KSH_VERSION" in
@@ -308,9 +313,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _has_colors; then
-          PS1=$'\E[31;1m$(_exit_status)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+          PS1=$'\E[31;1m$(_exit_status)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
         else
-          PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim)$(_branch_status ksh93) \$ '
+          PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status ksh93) \$ '
         fi
         ;;
     esac
