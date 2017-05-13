@@ -99,8 +99,8 @@ _has_colors() {
 #  $1 Number of directory elements to display
 ############################################################
 _prompt_dirtrim() {
+  [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
   dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
-  [ "$1" -lt 1 ] && 1=1   # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
   if [ "$dir_count" -le "$1" ]; then
       # shellcheck disable=SC2088
       case "$PWD" in
