@@ -37,7 +37,7 @@
 
 # shellcheck disable=SC2148
 
-POLYGLOT_PROMPT_DIRTRIM=2
+[ -z "$POLYGLOT_PROMPT_DIRTRIM" ] && POLYGLOT_PROMPT_DIRTRIM=2
 
 ############################################################
 # Display non-zero exit status
@@ -270,9 +270,9 @@ if [ -n "$ZSH_VERSION" ]; then
 # bash
 #####################################################################
 elif [ -n "$BASH_VERSION" ]; then
-  PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
 
   _prompt_command() {
+    PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
     if _has_colors; then
       PS1="\[\e[01;31m\]\$(_exit_status)\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_branch_status)\[\e[00m\] \\$ "
     else

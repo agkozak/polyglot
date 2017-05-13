@@ -55,11 +55,9 @@ is displayed as
 
 that is, without a tilde.
 
-If you would like to display a different number of directory elements in your Polyglot Prompt, set the environment variable `$POLYGLOT_PROMPT_DIRTRIM` thus:
+If you would like to display a different number of directory elements in your Polyglot Prompt, set the environment variable `$POLYGLOT_PROMPT_DIRTRIM` in an *rc* file thus:
 
     POLYGLOT_PROMPT_DIRTRIM=4     # Or whatever number you like
-
-Be sure to include this setting in your *rc* file *after* `polyglot.sh` is sourced.
 
 ## Git Branch and Status
 
