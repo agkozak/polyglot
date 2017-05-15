@@ -57,7 +57,7 @@ _is_ssh() {
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     return 0
   else
-    case "$EUID" in
+    case $EUID in
       0)
         case $(ps -o comm= -p $PPID) in
           sshd|*/sshd) return 0 ;;
@@ -103,7 +103,7 @@ _prompt_dirtrim() {
   dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
   if [ "$dir_count" -le "$1" ]; then
       # shellcheck disable=SC2088
-      case "$PWD" in
+      case $PWD in
         $HOME*) printf '~%s' "${PWD#$HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
@@ -113,7 +113,7 @@ _prompt_dirtrim() {
       | cut -d '/' -f-"$1" \
       | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
       # shellcheck disable=SC2088
-      case "$PWD" in
+      case $PWD in
         $HOME*) printf '~/.../%s' "$last_two_dirs" ;;
         *) printf '.../%s' "$last_two_dirs" ;;
       esac
@@ -148,22 +148,22 @@ _branch_changes() {
 
   symbols=''
 
-  case "$git_status" in
+  case $git_status in
     *'renamed:'*) symbols=">${symbols}" ;;
   esac
-  case "$git_status" in
+  case $git_status in
     *'Your branch is ahead of'*) symbols="*${symbols}" ;;
   esac
-  case "$git_status" in
+  case $git_status in
     *'new file:'*) symbols="+${symbols}" ;;
   esac
-  case "$git_status" in
+  case $git_status in
     *'Untracked files'*) symbols="?${symbols}" ;;
   esac
-  case "$git_status" in
+  case $git_status in
     *'deleted:'*) symbols="x${symbols}" ;;
   esac
-  case "$git_status" in
+  case $git_status in
     *'modified:'*)
       if [ "$1" = 'ksh93' ]; then # In ksh93, a single `!` displays the command
         symbols="!!${symbols}"    # number, while two exclamation points are
@@ -181,7 +181,7 @@ _branch_changes() {
 ###########################################################
 _is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
-    case "$(exec 2> /dev/null; readlink "/proc/$$/exe")" in
+    case $(exec 2> /dev/null; readlink "/proc/$$/exe") in
       */busybox) return 0 ;;
       *) return 1 ;;
     esac
@@ -213,7 +213,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # prompt changes into a colon
   ###########################################################
   _zsh_vi_mode_indicator() {
-    case "$KEYMAP" in
+    case $KEYMAP in
       vicmd) printf '%s' ':' ;;
       *) printf '%s' '%#' ;;
     esac
@@ -308,7 +308,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
-    case "$KSH_VERSION" in
+    case $KSH_VERSION in
       # mksh handles color badly, so I'm avoiding it for now
       *MIRBSD*|*'PD KSH'*) ;;
       # ksh93 handles color well, but requires escaping ! as !!
