@@ -104,7 +104,7 @@ _prompt_dirtrim() {
   if [ "$dir_count" -le "$1" ]; then
       # shellcheck disable=SC2088
       case $PWD in
-        $HOME*) printf '~%s' "${PWD#$HOME}" ;;
+        "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
   else
@@ -114,7 +114,7 @@ _prompt_dirtrim() {
       | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
       # shellcheck disable=SC2088
       case $PWD in
-        $HOME*) printf '~/.../%s' "$last_two_dirs" ;;
+        "$HOME"*) printf '~/.../%s' "$last_two_dirs" ;;
         *) printf '.../%s' "$last_two_dirs" ;;
       esac
   fi
