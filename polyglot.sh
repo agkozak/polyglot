@@ -181,15 +181,16 @@ if [ -n "$ZSH_VERSION" ]; then
       $HOME) printf '%s' '~' ;;
       $HOME*)
         abbreviated_path=$(print -P "%($(($1 + 2))~|.../%${1}~|%~)")
+        # shellcheck disable=SC2088
         case $abbreviated_path in
-          '.../'*) abbreviated_path=$(printf '~/%s' $abbreviated_path) ;;
+          '.../'*) abbreviated_path=$(printf '~/%s' "$abbreviated_path") ;;
         esac
         ;;
       *)
         abbreviated_path=$(print -P "%($(($1 + 1))~|.../%${1}~|%~)")
         ;;
     esac
-    printf '%s' $abbreviated_path
+    printf '%s' "$abbreviated_path"
   }
 
   ###########################################################
