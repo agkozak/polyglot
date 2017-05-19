@@ -82,44 +82,6 @@ _has_colors() {
   fi
 }
 
-############################################################
-# Emulation of bash's PROMPT_DIRTRIM for other shells
-#
-# In $PWD, substitute $HOME with ~; if the remainder of the
-# $PWD has more than two directory elements to display,
-# abbreviate it with '...', e.g.
-#
-#   $HOME/dotfiles/polyglot/img
-#
-# will be displayed as
-#
-#   ~/.../polyglot/img
-#
-# Arguments
-#  $1 Number of directory elements to display
-############################################################
-_prompt_dirtrim() {
-  [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
-  dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
-  if [ "$dir_count" -le "$1" ]; then
-      # shellcheck disable=SC2088
-      case $PWD in
-        "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
-        *) printf '%s' "$PWD" ;;
-      esac
-  else
-    last_two_dirs=$(echo "${PWD#$HOME}" \
-      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
-      | cut -d '/' -f-"$1" \
-      | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
-      # shellcheck disable=SC2088
-      case $PWD in
-        "$HOME"*) printf '~/.../%s' "$last_two_dirs" ;;
-        *) printf '.../%s' "$last_two_dirs" ;;
-      esac
-  fi
-}
-
 ###########################################################
 # Display current branch name, followed by symbols
 # representing changes to the working copy
@@ -196,6 +158,40 @@ _is_busybox() {
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
 
+  ############################################################
+  # Emulation of bash's PROMPT_DIRTRIM for zsh
+  #
+  # In $PWD, substitute $HOME with ~; if the remainder of the
+  # $PWD has more than two directory elements to display,
+  # abbreviate it with '...', e.g.
+  #
+  #   $HOME/dotfiles/polyglot/img
+  #
+  # will be displayed as
+  #
+  #   ~/.../polyglot/img
+  #
+  # Arguments
+  #  $1 Number of directory elements to display
+  ############################################################
+  _zsh_prompt_dirtrim() {
+    local abbreviated_path
+    [[ $1 -ge 1 ]] || set 2
+    case $PWD in
+      $HOME) printf '%s' '~' ;;
+      $HOME*)
+        abbreviated_path=$(print -P "%($(($1 + 2))~|.../%${1}~|%~)")
+        case $abbreviated_path in
+          '.../'*) abbreviated_path=$(printf '~/%s' $abbreviated_path) ;;
+        esac
+        ;;
+      *)
+        abbreviated_path=$(print -P "%($(($1 + 1))~|.../%${1}~|%~)")
+        ;;
+    esac
+    printf '%s' $abbreviated_path
+  }
+
   ###########################################################
   # Runs right before the prompt is displayed
   #
@@ -203,7 +199,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # 2) Calculates working branch and working copy status
   ###########################################################
   precmd() {
-    psvar[2]=$(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)
+    psvar[2]=$(_zsh_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)
     # shellcheck disable=SC2119
     psvar[3]=$(_branch_status)
   }
@@ -297,6 +293,44 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93, mksh, pdksh, dash, busybox sh
 #####################################################################
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
+
+  ############################################################
+  # Emulation of bash's PROMPT_DIRTRIM for other shells
+  #
+  # In $PWD, substitute $HOME with ~; if the remainder of the
+  # $PWD has more than two directory elements to display,
+  # abbreviate it with '...', e.g.
+  #
+  #   $HOME/dotfiles/polyglot/img
+  #
+  # will be displayed as
+  #
+  #   ~/.../polyglot/img
+  #
+  # Arguments
+  #  $1 Number of directory elements to display
+  ############################################################
+  _prompt_dirtrim() {
+    [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
+    dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
+    if [ "$dir_count" -le "$1" ]; then
+        # shellcheck disable=SC2088
+        case $PWD in
+          "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
+          *) printf '%s' "$PWD" ;;
+        esac
+    else
+      last_two_dirs=$(echo "${PWD#$HOME}" \
+        | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
+        | cut -d '/' -f-"$1" \
+        | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
+        # shellcheck disable=SC2088
+        case $PWD in
+          "$HOME"*) printf '~/.../%s' "$last_two_dirs" ;;
+          *) printf '.../%s' "$last_two_dirs" ;;
+        esac
+    fi
+  }
 
   if _is_ssh; then
     _POLYGLOT_HOSTNAME_STRING=$(hostname)
