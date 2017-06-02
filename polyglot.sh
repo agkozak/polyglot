@@ -90,6 +90,7 @@ _has_colors() {
 ###########################################################
 # shellcheck disable=SC2120
 _branch_status() {
+  [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
     0) ;;           # $ref contains the name of a checked-out branch.
@@ -106,6 +107,8 @@ _branch_status() {
 #   $1 if ksh93, escape ! as !!
 ###########################################################
 _branch_changes() {
+  [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
+
   git_status=$(git status 2>&1)
 
   symbols=''
