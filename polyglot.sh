@@ -41,12 +41,13 @@
 
 ############################################################
 # Display non-zero exit status
+# Arguments:
+#   $1 exit status of last command (always $?)
 ############################################################
 _exit_status() {
-  exit_status="$?"
-  case $exit_status in
+  case $1 in
     0) return ;;
-    *) printf '(%d) ' "$exit_status" ;;
+    *) printf '(%d) ' "$1" ;;
   esac
 }
 
@@ -274,9 +275,9 @@ elif [ -n "$BASH_VERSION" ]; then
   _prompt_command() {
     PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
     if _has_colors; then
-      PS1="\[\e[01;31m\]\$(_exit_status)\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_branch_status)\[\e[00m\] \\$ "
+      PS1="\[\e[01;31m\]\$(_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_branch_status)\[\e[00m\] \\$ "
     else
-      PS1="\$(_exit_status)\u$_POLYGLOT_HOSTNAME_STRING \w\$(_branch_status bash) \\$ "
+      PS1="\$(_exit_status \$?)\u$_POLYGLOT_HOSTNAME_STRING \w\$(_branch_status bash) \\$ "
     fi
   }
 
@@ -343,7 +344,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status) $ '
+  PS1='$(_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case $KSH_VERSION in
@@ -352,9 +353,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _has_colors; then
-          PS1=$'\E[31;1m$(_exit_status)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+          PS1=$'\E[31;1m$(_exit_status $?)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
         else
-          PS1='$(_exit_status)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status ksh93) \$ '
+          PS1='$(_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status ksh93) \$ '
         fi
         ;;
     esac
