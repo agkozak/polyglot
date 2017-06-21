@@ -182,19 +182,19 @@ if [ -n "$ZSH_VERSION" ]; then
     local abbreviated_path
     [[ $1 -ge 1 ]] || set 2
     case $PWD in
-      $HOME) printf '%s' '~' ;;
+      $HOME) print -n '~' ;;
       $HOME*)
-        abbreviated_path=$(print -P "%($(($1 + 2))~|.../%${1}~|%~)")
+        abbreviated_path=$(print -Pn "%($(($1 + 2))~|.../%${1}~|%~)")
         # shellcheck disable=SC2088
         case $abbreviated_path in
           '.../'*) abbreviated_path=$(printf '~/%s' "$abbreviated_path") ;;
         esac
         ;;
       *)
-        abbreviated_path=$(print -P "%($(($1 + 1))~|.../%${1}~|%~)")
+        abbreviated_path=$(print -Pn "%($(($1 + 1))~|.../%${1}~|%~)")
         ;;
     esac
-    printf '%s' "$abbreviated_path"
+    print -n "$abbreviated_path"
   }
 
   ###########################################################
@@ -215,8 +215,8 @@ if [ -n "$ZSH_VERSION" ]; then
   ###########################################################
   _zsh_vi_mode_indicator() {
     case $KEYMAP in
-      vicmd) printf '%s' ':' ;;
-      *) printf '%s' '%#' ;;
+      vicmd) print -n ':' ;;
+      *) print -n '%#' ;;
     esac
   }
 
