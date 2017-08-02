@@ -62,6 +62,7 @@ _is_ssh() {
       0)
         case $(ps -o comm= -p $PPID) in
           sshd|*/sshd) return 0 ;;
+          *) return 1 ;;
         esac
         ;;
       *) return 1 ;;
