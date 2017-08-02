@@ -111,7 +111,7 @@ _branch_status() {
 _branch_changes() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
 
-  git_status=$(git status 2>&1)
+  git_status=$(LC_ALL=C git status 2>&1)
 
   symbols=''
 
