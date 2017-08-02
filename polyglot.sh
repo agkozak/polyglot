@@ -62,6 +62,7 @@ _is_ssh() {
       0)
         case $(ps -o comm= -p $PPID) in
           sshd|*/sshd) return 0 ;;
+          *) return 1 ;;
         esac
         ;;
       *) return 1 ;;
@@ -110,7 +111,7 @@ _branch_status() {
 _branch_changes() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
 
-  git_status=$(git status 2>&1)
+  git_status=$(LC_ALL=C git status 2>&1)
 
   symbols=''
 
