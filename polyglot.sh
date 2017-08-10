@@ -44,7 +44,7 @@
 # Arguments:
 #   $1 exit status of last command (always $?)
 ############################################################
-_exit_status() {
+_polyglot_exit_status() {
   case $1 in
     0) return ;;
     *) printf '(%d) ' "$1" ;;
@@ -54,7 +54,7 @@ _exit_status() {
 ###########################################################
 # Is the user connected via SSH?
 ###########################################################
-_is_ssh() {
+_polyglot_is_ssh() {
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     return 0
   else
@@ -73,7 +73,7 @@ _is_ssh() {
 ###########################################################
 # Does the terminal support enough colors?
 ###########################################################
-_has_colors() {
+_polyglot_has_colors() {
   if [ "$_POLYGLOT_HAS_COLORS" ]; then
     return 0
   elif [ "$(tput colors)" -ge 8 ]; then
@@ -91,7 +91,7 @@ _has_colors() {
 #   $1 if ksh93, escape ! as !!
 ###########################################################
 # shellcheck disable=SC2120
-_branch_status() {
+_polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
   ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
@@ -100,7 +100,7 @@ _branch_status() {
     # Otherwise, see if HEAD is in detached state.
     *) ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
-  printf ' (%s%s)' "${ref#refs/heads/}" "$(_branch_changes "$1")"
+  printf ' (%s%s)' "${ref#refs/heads/}" "$(_polyglot_branch_changes "$1")"
 }
 
 ###########################################################
@@ -108,7 +108,7 @@ _branch_status() {
 # Arguments:
 #   $1 if ksh93, escape ! as !!
 ###########################################################
-_branch_changes() {
+_polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
 
   git_status=$(LC_ALL=C git status 2>&1)
@@ -146,7 +146,7 @@ _branch_changes() {
 ###########################################################
 # Tests to see if the current shell is busybox sh (ash)
 ###########################################################
-_is_busybox() {
+_polyglot_is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
     case $(exec 2> /dev/null; readlink "/proc/$$/exe") in
       */busybox) return 0 ;;
@@ -179,7 +179,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # Arguments
   #  $1 Number of directory elements to display
   ############################################################
-  _zsh_prompt_dirtrim() {
+  _polyglot_zsh_prompt_dirtrim() {
     local abbreviated_path
     [[ $1 -ge 1 ]] || set 2
     case $PWD in
@@ -205,16 +205,16 @@ if [ -n "$ZSH_VERSION" ]; then
   # 2) Calculates working branch and working copy status
   ###########################################################
   precmd() {
-    psvar[2]=$(_zsh_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)
+    psvar[2]=$(_polyglot_zsh_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)
     # shellcheck disable=SC2119
-    psvar[3]=$(_branch_status)
+    psvar[3]=$(_polyglot_branch_status)
   }
 
   ###########################################################
   # When the user enters vi command mode, the % or # in the
   # prompt changes into a colon
   ###########################################################
-  _zsh_vi_mode_indicator() {
+  _polyglot_zsh_vi_mode_indicator() {
     case $KEYMAP in
       vicmd) print -n ':' ;;
       *) print -n '%#' ;;
@@ -227,13 +227,13 @@ if [ -n "$ZSH_VERSION" ]; then
   # Underscores are used in this function's name to keep
   # dash from choking on hyphens
   ###########################################################
-  zle_keymap_select() {
+  _polyglot_zle_keymap_select() {
     zle reset-prompt
     zle -R
   }
 
-  zle -N zle_keymap_select
-  zle -A zle_keymap_select zle-keymap-select
+  zle -N _polyglot_zle_keymap_select
+  zle -A _polyglot_zle_keymap_select zle-keymap-select
 
   ###########################################################
   # Redraw prompt when terminal size changes
@@ -242,14 +242,14 @@ if [ -n "$ZSH_VERSION" ]; then
     zle && zle -R
   }
 
-  if _is_ssh; then
+  if _polyglot_is_ssh; then
     psvar[1]=$(print -P '@%m')
   else
     # shellcheck disable=SC2034
     psvar[1]=''
   fi
 
-  if _has_colors; then
+  if _polyglot_has_colors; then
     # Autoload zsh colors module if it hasn't been autoloaded already
     if ! whence -w colors > /dev/null 2>&1; then
       autoload -Uz colors
@@ -257,13 +257,13 @@ if [ -n "$ZSH_VERSION" ]; then
     fi
 
     # shellcheck disable=SC2154
-    PS1='%{$fg_bold[green]%}%n%1v%{$reset_color%} %{$fg_bold[blue]%}%2v%{$reset_color%}%{$fg[yellow]%}%3v%{$reset_color%} $(_zsh_vi_mode_indicator) '
+    PS1='%{$fg_bold[green]%}%n%1v%{$reset_color%} %{$fg_bold[blue]%}%2v%{$reset_color%}%{$fg[yellow]%}%3v%{$reset_color%} $(_polyglot_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
 
   else
-    PS1='%n%1v %2v%3v $(_zsh_vi_mode_indicator) '
+    PS1='%n%1v %2v%3v $(_polyglot_zsh_vi_mode_indicator) '
     # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
@@ -273,22 +273,22 @@ if [ -n "$ZSH_VERSION" ]; then
 #####################################################################
 elif [ -n "$BASH_VERSION" ]; then
 
-  _prompt_command() {
+  _polyglot_prompt_command() {
     PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
-    if _has_colors; then
-      PS1="\[\e[01;31m\]\$(_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_branch_status)\[\e[00m\] \\$ "
+    if _polyglot_has_colors; then
+      PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \\$ "
     else
-      PS1="\$(_exit_status \$?)\u$_POLYGLOT_HOSTNAME_STRING \w\$(_branch_status) \\$ "
+      PS1="\$(_polyglot_exit_status \$?)\u$_POLYGLOT_HOSTNAME_STRING \w\$(_polyglot_branch_status) \\$ "
     fi
   }
 
-  if _is_ssh; then
+  if _polyglot_is_ssh; then
     _POLYGLOT_HOSTNAME_STRING='@\h'
   else
     _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PROMPT_COMMAND='_prompt_command'
+  PROMPT_COMMAND='_polyglot_prompt_command'
 
   # vi command mode
   bind 'set show-mode-in-prompt'                      # Since bash 4.3
@@ -298,7 +298,7 @@ elif [ -n "$BASH_VERSION" ]; then
 #####################################################################
 # ksh93, mksh, pdksh, dash, busybox sh
 #####################################################################
-elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
+elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
 
   ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for other shells
@@ -316,7 +316,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
   # Arguments
   #  $1 Number of directory elements to display
   ############################################################
-  _prompt_dirtrim() {
+  _polyglot_prompt_dirtrim() {
     [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
     dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
     if [ "$dir_count" -le "$1" ]; then
@@ -338,14 +338,14 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
     fi
   }
 
-  if _is_ssh; then
+  if _polyglot_is_ssh; then
     _POLYGLOT_HOSTNAME_STRING=$(hostname)
     _POLYGLOT_HOSTNAME_STRING="@${_POLYGLOT_HOSTNAME_STRING%?${_POLYGLOT_HOSTNAME_STRING#*.}}"
   else
     _POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$(_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status) $ '
+  PS1='$(_polyglot_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case $KSH_VERSION in
@@ -353,10 +353,10 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _is_busybox; then
       *MIRBSD*|*'PD KSH'*) ;;
       # ksh93 handles color well, but requires escaping ! as !!
       *)
-        if _has_colors; then
-          PS1=$'\E[31;1m$(_exit_status $?)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_branch_status ksh93)\E[0m \$ '
+        if _polyglot_has_colors; then
+          PS1=$'\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_polyglot_branch_status ksh93)\E[0m \$ '
         else
-          PS1='$(_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_branch_status ksh93) \$ '
+          PS1='$(_polyglot_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status ksh93) \$ '
         fi
         ;;
     esac
