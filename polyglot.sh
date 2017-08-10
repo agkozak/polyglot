@@ -74,10 +74,10 @@ _polyglot_is_ssh() {
 # Does the terminal support enough colors?
 ###########################################################
 _polyglot_has_colors() {
-  if [ "$_POLYGLOT_HAS_COLORS" ]; then
+  if [ "$POLYGLOT_HAS_COLORS" ]; then
     return 0
   elif [ "$(tput colors)" -ge 8 ]; then
-    _POLYGLOT_HAS_COLORS=1
+    POLYGLOT_HAS_COLORS=1
     return 0
   else
     return 1
@@ -93,14 +93,14 @@ _polyglot_has_colors() {
 # shellcheck disable=SC2120
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
-  ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
+  polyglot_ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
     0) ;;           # $ref contains the name of a checked-out branch.
     128) return ;;  # No Git repository here.
     # Otherwise, see if HEAD is in detached state.
-    *) ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
+    *) polyglot_ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
-  printf ' (%s%s)' "${ref#refs/heads/}" "$(_polyglot_branch_changes "$1")"
+  printf ' (%s%s)' "${polyglot_ref#refs/heads/}" "$(_polyglot_branch_changes "$1")"
 }
 
 ###########################################################
@@ -111,36 +111,36 @@ _polyglot_branch_status() {
 _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
 
-  git_status=$(LC_ALL=C git status 2>&1)
+  polyglot_git_status=$(LC_ALL=C git status 2>&1)
 
-  symbols=''
+  polyglot_symbols=''
 
-  case $git_status in
-    *'renamed:'*) symbols=">${symbols}" ;;
+  case $polyglot_git_status in
+    *'renamed:'*) polyglot_symbols=">${polyglot_symbols}" ;;
   esac
-  case $git_status in
-    *'Your branch is ahead of'*) symbols="*${symbols}" ;;
+  case $polyglot_git_status in
+    *'Your branch is ahead of'*) polyglot_symbols="*${polyglot_symbols}" ;;
   esac
-  case $git_status in
-    *'new file:'*) symbols="+${symbols}" ;;
+  case $polyglot_git_status in
+    *'new file:'*) polyglot_symbols="+${polyglot_symbols}" ;;
   esac
-  case $git_status in
-    *'Untracked files'*) symbols="?${symbols}" ;;
+  case $polyglot_git_status in
+    *'Untracked files'*) polyglot_symbols="?${polyglot_symbols}" ;;
   esac
-  case $git_status in
-    *'deleted:'*) symbols="x${symbols}" ;;
+  case $polyglot_git_status in
+    *'deleted:'*) polyglot_symbols="x${polyglot_symbols}" ;;
   esac
-  case $git_status in
+  case $polyglot_git_status in
     *'modified:'*)
       if [ "$1" = 'ksh93' ]; then # In ksh93, a single `!` displays the command
-        symbols="!!${symbols}"    # number, while two exclamation points are
+        polyglot_symbols="!!${polyglot_symbols}"    # number, while two exclamation points are
       else                        # displayed as one exclamation point.
-        symbols="!${symbols}"
+        polyglot_symbols="!${polyglot_symbols}"
       fi
     ;;
   esac
 
-  [ "$symbols" ] && printf ' %s' "$symbols"
+  [ "$polyglot_symbols" ] && printf ' %s' "$polyglot_symbols"
 }
 
 ###########################################################
@@ -276,16 +276,16 @@ elif [ -n "$BASH_VERSION" ]; then
   _polyglot_prompt_command() {
     PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
     if _polyglot_has_colors; then
-      PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$_POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \\$ "
+      PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \\$ "
     else
-      PS1="\$(_polyglot_exit_status \$?)\u$_POLYGLOT_HOSTNAME_STRING \w\$(_polyglot_branch_status) \\$ "
+      PS1="\$(_polyglot_exit_status \$?)\u$POLYGLOT_HOSTNAME_STRING \w\$(_polyglot_branch_status) \\$ "
     fi
   }
 
   if _polyglot_is_ssh; then
-    _POLYGLOT_HOSTNAME_STRING='@\h'
+    POLYGLOT_HOSTNAME_STRING='@\h'
   else
-    _POLYGLOT_HOSTNAME_STRING=''
+    POLYGLOT_HOSTNAME_STRING=''
   fi
 
   PROMPT_COMMAND='_polyglot_prompt_command'
@@ -318,34 +318,34 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
   _polyglot_prompt_dirtrim() {
     [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
-    dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
-    if [ "$dir_count" -le "$1" ]; then
+    polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
+    if [ "$polyglot_dir_count" -le "$1" ]; then
         # shellcheck disable=SC2088
         case $PWD in
           "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
           *) printf '%s' "$PWD" ;;
         esac
     else
-      last_two_dirs=$(echo "${PWD#$HOME}" \
+      polyglot_last_two_dirs=$(echo "${PWD#$HOME}" \
         | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
         | cut -d '/' -f-"$1" \
         | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
         # shellcheck disable=SC2088
         case $PWD in
-          "$HOME"*) printf '~/.../%s' "$last_two_dirs" ;;
-          *) printf '.../%s' "$last_two_dirs" ;;
+          "$HOME"*) printf '~/.../%s' "$polyglot_last_two_dirs" ;;
+          *) printf '.../%s' "$polyglot_last_two_dirs" ;;
         esac
     fi
   }
 
   if _polyglot_is_ssh; then
-    _POLYGLOT_HOSTNAME_STRING=$(hostname)
-    _POLYGLOT_HOSTNAME_STRING="@${_POLYGLOT_HOSTNAME_STRING%?${_POLYGLOT_HOSTNAME_STRING#*.}}"
+    POLYGLOT_HOSTNAME_STRING=$(hostname)
+    POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%?${POLYGLOT_HOSTNAME_STRING#*.}}"
   else
-    _POLYGLOT_HOSTNAME_STRING=''
+    POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$(_polyglot_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status) $ '
+  PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status) $ '
 
   if [ -n "$KSH_VERSION" ]; then
     case $KSH_VERSION in
@@ -354,9 +354,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _polyglot_has_colors; then
-          PS1=$'\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$_POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_polyglot_branch_status ksh93)\E[0m \$ '
+          PS1=$'\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(_polyglot_branch_status ksh93)\E[0m \$ '
         else
-          PS1='$(_polyglot_exit_status $?)$LOGNAME$_POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status ksh93) \$ '
+          PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status ksh93) \$ '
         fi
         ;;
     esac
