@@ -368,4 +368,7 @@ else
   printf '%s\n' 'Polyglot Prompt does not support your shell.'
 fi
 
+# Clean up environment
+unset -f _polyglot_is_ssh _polyglot_is_busybox
+
 # vim: foldmethod=marker tabstop=2 expandtab
