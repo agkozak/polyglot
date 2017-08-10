@@ -132,9 +132,11 @@ _polyglot_branch_changes() {
   esac
   case $polyglot_git_status in
     *'modified:'*)
-      if [ "$1" = 'ksh93' ]; then # In ksh93, a single `!` displays the command
-        polyglot_symbols="!!${polyglot_symbols}"    # number, while two exclamation points are
-      else                        # displayed as one exclamation point.
+      # In ksh93, a single exclamation point displays the command number, while
+      # two exclamation points are displayed as one.
+      if [ "$1" = 'ksh93' ]; then
+        polyglot_symbols="!!${polyglot_symbols}"
+      else
         polyglot_symbols="!${polyglot_symbols}"
       fi
     ;;
