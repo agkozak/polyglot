@@ -320,7 +320,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
   _polyglot_prompt_dirtrim() {
     [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
-    polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c += NF - 1} END {print c}')
+    polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
     if [ "$polyglot_dir_count" -le "$1" ]; then
         # shellcheck disable=SC2088
         case $PWD in
@@ -329,9 +329,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         esac
     else
       polyglot_last_two_dirs=$(echo "${PWD#$HOME}" \
-        | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}' \
+        | awk '{for(i=length();i!=0;i--) x=(x substr($0,i,1))}{print x;x=""}' \
         | cut -d '/' -f-"$1" \
-        | awk '{ for(i=length();i!=0;i--) x=(x substr($0,i,1))  }{print x;x=""}')
+        | awk '{for(i=length();i!=0;i--) x=(x substr($0,i,1))}{print x;x=""}')
         # shellcheck disable=SC2088
         case $PWD in
           "$HOME"*) printf '~/.../%s' "$polyglot_last_two_dirs" ;;
