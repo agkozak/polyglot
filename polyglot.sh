@@ -74,14 +74,7 @@ _polyglot_is_ssh() {
 # Does the terminal support enough colors?
 ###########################################################
 _polyglot_has_colors() {
-  if [ "$POLYGLOT_HAS_COLORS" ]; then
-    return 0
-  elif [ "$(tput colors)" -ge 8 ]; then
-    POLYGLOT_HAS_COLORS=1
-    return 0
-  else
-    return 1
-  fi
+  [ "$(tput colors)" -ge 8 ]
 }
 
 ###########################################################
