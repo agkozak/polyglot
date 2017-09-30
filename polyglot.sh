@@ -55,7 +55,7 @@ _polyglot_exit_status() {
 # Is the user connected via SSH?
 ###########################################################
 _polyglot_is_ssh() {
-  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     return 0
   else
     case $EUID in
