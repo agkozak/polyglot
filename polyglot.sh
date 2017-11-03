@@ -337,9 +337,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
       # ksh93 handles color well, but requires escaping ! as !!
       *)
         if _polyglot_has_colors; then
-          PS1=$'\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo ${polyglot_branch_status//\!/\!!})\E[0m \$ '
+          PS1=$'\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM) \E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo ${polyglot_branch_status//\!/\!!})\E[0m \$ '
         else
-          PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(polyglot_branch_status=$(_polyglot_branch_status); echo ${polyglot_branch_status//\!/\!!}) \$ '
+          PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM) $(polyglot_branch_status=$(_polyglot_branch_status); echo ${polyglot_branch_status//\!/\!!}) \$ '
         fi
         ;;
     esac
