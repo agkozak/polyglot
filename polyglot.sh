@@ -80,8 +80,6 @@ _polyglot_has_colors() {
 ###########################################################
 # Display current branch name, followed by symbols
 # representing changes to the working copy
-# Arguments:
-#   $1 if ksh93, escape ! as !!
 ###########################################################
 # shellcheck disable=SC2120
 _polyglot_branch_status() {
@@ -93,13 +91,11 @@ _polyglot_branch_status() {
     # Otherwise, see if HEAD is in detached state.
     *) polyglot_ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
-  printf ' (%s%s)' "${polyglot_ref#refs/heads/}" "$(_polyglot_branch_changes "$1")"
+  printf ' (%s%s)' "${polyglot_ref#refs/heads/}" "$(_polyglot_branch_changes)"
 }
 
 ###########################################################
 # Display symbols representing changes to the working copy
-# Arguments:
-#   $1 if ksh93, escape ! as !!
 ###########################################################
 _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
