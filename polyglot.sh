@@ -164,7 +164,7 @@ if [ -n "$ZSH_VERSION" ]; then
   ############################################################
   _polyglot_zsh_prompt_dirtrim() {
     local abbreviated_path
-    [[ $1 -ge 1 ]] || set 2
+    (( $1 >= 1 )) || set 2
     case $PWD in
       $HOME) print -n '~' ;;
       $HOME*)
