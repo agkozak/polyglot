@@ -1,7 +1,7 @@
 ![Polyglot mascot](img/polyglot_mascot.png)
 # Polyglot Prompt
 
-[![License](https://img.shields.io/github/license/agkozak/polyglot.svg)](https://opensource.org/licenses/GPL-3.0)
+[![License](https://img.shields.io/github/license/agkozak/polyglot.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/agkozak/polyglot.svg)](https://github.com/agkozak/agkozak-zsh-theme/stargazers)
 
 **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox sh`(`ash`) that uses basic ASCII symbols (and color, when possible) to show:
