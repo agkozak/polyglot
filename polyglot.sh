@@ -308,7 +308,12 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_prompt_dirtrim() {
-    [ "$1" -ge 1 ] || set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
+    if [ "$1" ]; then
+      [ "$1" -ge 1 ] || set 2 # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0
+    else
+      set 2
+    fi
+
     polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
     if [ "$polyglot_dir_count" -le "$1" ]; then
         # shellcheck disable=SC2088
