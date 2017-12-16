@@ -42,8 +42,6 @@
 
 # shellcheck disable=SC2148
 
-[ -z "$POLYGLOT_PROMPT_DIRTRIM" ] && POLYGLOT_PROMPT_DIRTRIM=2
-
 ############################################################
 # Display non-zero exit status
 # Arguments:
@@ -168,8 +166,8 @@ if [ -n "$ZSH_VERSION" ]; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_zsh_prompt_dirtrim() {
+    [[ $1 -ge 1 ]] || set 2
     local abbreviated_path
-    (( $1 >= 1 )) || set 2
     case $PWD in
       $HOME) print -n '~' ;;
       $HOME*)
@@ -193,7 +191,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # 2) Calculates working branch and working copy status
   ###########################################################
   precmd() {
-    psvar[2]=$(_polyglot_zsh_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)
+    psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
@@ -262,7 +260,12 @@ if [ -n "$ZSH_VERSION" ]; then
 elif [ -n "$BASH_VERSION" ]; then
 
   _polyglot_prompt_command() {
-    PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
+    if [[ $POLYGLOT_PROMPT_DIRTRIM -ge 1 ]]; then
+      PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
+    else
+      PROMPT_DIRTRIM=2
+    fi
+
     if _polyglot_has_colors; then
       PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \\$ "
     else
@@ -305,7 +308,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_prompt_dirtrim() {
-    [ "$1" -lt 1 ] && set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
+    [ "$1" -ge 1 ] || set 2 # $POLYGLOT_PROMPT_DIRTRIM should not be less than 1
     polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
     if [ "$polyglot_dir_count" -le "$1" ]; then
         # shellcheck disable=SC2088
