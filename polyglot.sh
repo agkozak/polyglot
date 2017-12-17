@@ -166,7 +166,7 @@ if [ -n "$ZSH_VERSION" ]; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_zsh_prompt_dirtrim() {
-    [[ $1 -ge 1 ]] || set 2
+    [ $1 -ge 1 ] || set 2
     local abbreviated_path
     case $PWD in
       $HOME) print -n '~' ;;
@@ -260,7 +260,7 @@ if [ -n "$ZSH_VERSION" ]; then
 elif [ -n "$BASH_VERSION" ]; then
 
   _polyglot_prompt_command() {
-    if [[ $POLYGLOT_PROMPT_DIRTRIM -ge 1 ]]; then
+    if [ $POLYGLOT_PROMPT_DIRTRIM -ge 1 ]; then
       PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
     else
       PROMPT_DIRTRIM=2
