@@ -259,12 +259,14 @@ if [ -n "$ZSH_VERSION" ]; then
 #####################################################################
 elif [ -n "$BASH_VERSION" ]; then
 
+  ###########################################################
+  # Create the bash $PROMPT_COMMAND
+  #
+  # Arguments
+  #  $1 Number of directory elements to display
+  ###########################################################
   _polyglot_prompt_command() {
-    if [ -n "$POLYGLOT_PROMPT_DIRTRIM" ] && [ "$POLYGLOT_PROMPT_DIRTRIM" -ge 1 ]; then
-      PROMPT_DIRTRIM=$POLYGLOT_PROMPT_DIRTRIM
-    else
-      PROMPT_DIRTRIM=2
-    fi
+    [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
     if _polyglot_has_colors; then
       PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \\$ "
@@ -279,7 +281,7 @@ elif [ -n "$BASH_VERSION" ]; then
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PROMPT_COMMAND='_polyglot_prompt_command'
+  PROMPT_COMMAND='_polyglot_prompt_command $POLYGLOT_PROMPT_DIRTRIM'
 
   # vi command mode
   bind 'set show-mode-in-prompt'                      # Since bash 4.3
@@ -308,11 +310,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_prompt_dirtrim() {
-    if [ -n "$1" ]; then
-      [ "$1" -gt 0 ] || set 2 
-    else
-      set 2
-    fi
+    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
     polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
     if [ "$polyglot_dir_count" -le "$1" ]; then
