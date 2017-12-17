@@ -166,12 +166,7 @@ if [ -n "$ZSH_VERSION" ]; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_zsh_prompt_dirtrim() {
-    if [ -n "$1" ]; then
-      [ "$1" -ge 1 ] || set 2
-    else
-      set 2
-    fi
-
+    [ "$1" -gt 0 ] || set 2
     local abbreviated_path
     case $PWD in
       $HOME) print -n '~' ;;
@@ -313,8 +308,8 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   #  $1 Number of directory elements to display
   ############################################################
   _polyglot_prompt_dirtrim() {
-    if [ "$1" ]; then
-      [ "$1" -ge 1 ] || set 2 # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0
+    if [ -n "$1" ]; then
+      [ "$1" -gt 0 ] || set 2 
     else
       set 2
     fi
