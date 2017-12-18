@@ -359,7 +359,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   fi
 
 else
-  printf '%s\n' 'Polyglot Prompt does not support your shell.'
+  printf '%s\n' 'Polyglot Prompt does not support your shell.' >&2
 fi
 
 # Clean up environment
