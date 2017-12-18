@@ -162,8 +162,8 @@ if [ -n "$ZSH_VERSION" ]; then
   #
   #   ~/.../polyglot/img
   #
-  # Arguments
-  #  $1 Number of directory elements to display
+  # Arguments:
+  #   $1 Number of directory elements to display
   ############################################################
   _polyglot_zsh_prompt_dirtrim() {
     [ "$1" -gt 0 ] || set 2
@@ -262,16 +262,16 @@ elif [ -n "$BASH_VERSION" ]; then
   ###########################################################
   # Create the bash $PROMPT_COMMAND
   #
-  # Arguments
-  #  $1 Number of directory elements to display
+  # Arguments:
+  #   $1 Number of directory elements to display
   ###########################################################
   _polyglot_prompt_command() {
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
     if _polyglot_has_colors; then
-      PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \\$ "
+      PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;32m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
     else
-      PS1="\$(_polyglot_exit_status \$?)\u$POLYGLOT_HOSTNAME_STRING \w\$(_polyglot_branch_status) \\$ "
+      PS1="\$(_polyglot_exit_status \$?)\\u$POLYGLOT_HOSTNAME_STRING \\w\$(_polyglot_branch_status) \\$ "
     fi
   }
 
@@ -306,8 +306,8 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   #
   #   ~/.../polyglot/img
   #
-  # Arguments
-  #  $1 Number of directory elements to display
+  # Arguments:
+  #   $1 Number of directory elements to display
   ############################################################
   _polyglot_prompt_dirtrim() {
     #shellcheck disable=SC2015
