@@ -87,14 +87,14 @@ _polyglot_has_colors() {
 # shellcheck disable=SC2120
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
-  polyglot_ref=$(git symbolic-ref --quiet HEAD 2> /dev/null)
+  POLYGLOT_REF=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
     0) ;;           # $ref contains the name of a checked-out branch.
     128) return ;;  # No Git repository here.
     # Otherwise, see if HEAD is in detached state.
-    *) polyglot_ref=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
+    *) POLYGLOT_REF=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
-  printf ' (%s%s)' "${polyglot_ref#refs/heads/}" "$(_polyglot_branch_changes)"
+  printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes)"
 }
 
 ###########################################################
@@ -103,30 +103,30 @@ _polyglot_branch_status() {
 _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
 
-  polyglot_git_status=$(LC_ALL=C git status 2>&1)
+  POLYGLOT_GIT_STATUS=$(LC_ALL=C git status 2>&1)
 
-  polyglot_symbols=''
+  POLYGLOT_SYMBOLS=''
 
-  case $polyglot_git_status in
-    *'renamed:'*) polyglot_symbols=">${polyglot_symbols}" ;;
+  case $POLYGLOT_GIT_STATUS in
+    *'renamed:'*) POLYGLOT_SYMBOLS=">${POLYGLOT_SYMBOLS}" ;;
   esac
-  case $polyglot_git_status in
-    *'Your branch is ahead of'*) polyglot_symbols="*${polyglot_symbols}" ;;
+  case $POLYGLOT_GIT_STATUS in
+    *'Your branch is ahead of'*) POLYGLOT_SYMBOLS="*${POLYGLOT_SYMBOLS}" ;;
   esac
-  case $polyglot_git_status in
-    *'new file:'*) polyglot_symbols="+${polyglot_symbols}" ;;
+  case $POLYGLOT_GIT_STATUS in
+    *'new file:'*) POLYGLOT_SYMBOLS="+${POLYGLOT_SYMBOLS}" ;;
   esac
-  case $polyglot_git_status in
-    *'Untracked files'*) polyglot_symbols="?${polyglot_symbols}" ;;
+  case $POLYGLOT_GIT_STATUS in
+    *'Untracked files'*) POLYGLOT_SYMBOLS="?${POLYGLOT_SYMBOLS}" ;;
   esac
-  case $polyglot_git_status in
-    *'deleted:'*) polyglot_symbols="x${polyglot_symbols}" ;;
+  case $POLYGLOT_GIT_STATUS in
+    *'deleted:'*) POLYGLOT_SYMBOLS="x${POLYGLOT_SYMBOLS}" ;;
   esac
-  case $polyglot_git_status in
-    *'modified:'*) polyglot_symbols="!${polyglot_symbols}" ;;
+  case $POLYGLOT_GIT_STATUS in
+    *'modified:'*) POLYGLOT_SYMBOLS="!${POLYGLOT_SYMBOLS}" ;;
   esac
 
-  [ "$polyglot_symbols" ] && printf ' %s' "$polyglot_symbols"
+  [ "$POLYGLOT_SYMBOLS" ] && printf ' %s' "$POLYGLOT_SYMBOLS"
 }
 
 ###########################################################
@@ -313,22 +313,22 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     #shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    polyglot_dir_count=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
-    if [ "$polyglot_dir_count" -le "$1" ]; then
+    POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
+    if [ "$POLYGLOT_DIR_COUNT" -le "$1" ]; then
         # shellcheck disable=SC2088
         case $PWD in
           "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
           *) printf '%s' "$PWD" ;;
         esac
     else
-      polyglot_last_two_dirs=$(echo "${PWD#$HOME}" \
+      POLYGLOT_LAST_TWO_DIRS=$(echo "${PWD#$HOME}" \
         | awk '{for(i=length();i!=0;i--) x=(x substr($0,i,1))}{print x;x=""}' \
         | cut -d '/' -f-"$1" \
         | awk '{for(i=length();i!=0;i--) x=(x substr($0,i,1))}{print x;x=""}')
         # shellcheck disable=SC2088
         case $PWD in
-          "$HOME"*) printf '~/.../%s' "$polyglot_last_two_dirs" ;;
-          *) printf '.../%s' "$polyglot_last_two_dirs" ;;
+          "$HOME"*) printf '~/.../%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
+          *) printf '.../%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
         esac
     fi
   }
