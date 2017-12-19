@@ -324,7 +324,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     #shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" | awk -F/ '{c+=NF-1} END {print c}')
+    POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" | _polyglot_awk -F/ '{ c+=NF-1 } END { print c }')
     if [ "$POLYGLOT_DIR_COUNT" -le "$1" ]; then
         # shellcheck disable=SC2088
         case $PWD in
@@ -332,14 +332,14 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
           *) printf '%s' "$PWD" ;;
         esac
     else
-      POLYGLOT_LAST_TWO_DIRS=$(echo "${PWD#$HOME}" \
-      | _polyglot_awk -F/ -v prompt_dirtrim=$1 \
-      '{for(i=NF-prompt_dirtrim+1;i<=NF;i++)printf "/%s",$i}')
-        # shellcheck disable=SC2088
-        case $PWD in
-          "$HOME"*) printf '~/...%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
-          *) printf '...%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
-        esac
+      POLYGLOT_FINAL_DIRS=$(echo "${PWD#$HOME}" \
+        | _polyglot_awk -F/ -v prompt_dirtrim="$1" \
+        '{ for( i=NF-prompt_dirtrim+1;i<=NF;i++ ) printf "/%s",$i }')
+      # shellcheck disable=SC2088
+      case $PWD in
+        "$HOME"*) printf '~/...%s' "$POLYGLOT_FINAL_DIRS" ;;
+        *) printf '...%s' "$POLYGLOT_FINAL_DIRS" ;;
+      esac
     fi
   }
 
