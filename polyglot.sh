@@ -94,6 +94,7 @@ _polyglot_branch_status() {
     *) POLYGLOT_REF=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
   printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes)"
+  unset POLYGLOT_REF
 }
 
 ###########################################################
@@ -126,6 +127,8 @@ _polyglot_branch_changes() {
   esac
 
   [ "$POLYGLOT_SYMBOLS" ] && printf ' %s' "$POLYGLOT_SYMBOLS"
+
+  unset POLYGLOT_GIT_STATUS POLYGLOT_SYMBOLS
 }
 
 ###########################################################
@@ -333,6 +336,8 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         *) printf '...%s' "$POLYGLOT_FINAL_DIRS" ;;
       esac
     fi
+
+    unset POLYGLOT_DIR_COUNT POLYGLOT_FINAL_DIRS
   }
 
   if _polyglot_is_ssh; then
