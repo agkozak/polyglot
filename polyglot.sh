@@ -294,6 +294,17 @@ elif [ -n "$BASH_VERSION" ]; then
 elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
 
   ############################################################
+  # Use nawk on Solaris, system awk everywhere else
+  #
+  # Arguments:
+  #   $@ awk arguments
+  ############################################################
+  case $(uname -a) in
+    SunOS*) _polyglot_awk() { command nawk "$@"; } ;;
+    *) _polyglot_awk() { command awk "$@"; } ;;
+  esac
+
+  ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for other shells
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
@@ -321,14 +332,11 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
           *) printf '%s' "$PWD" ;;
         esac
     else
-      POLYGLOT_LAST_TWO_DIRS=$(echo "${PWD#$HOME}" \
-        | awk '{for(i=length();i!=0;i--) x=(x substr($0,i,1))}{print x;x=""}' \
-        | cut -d '/' -f-"$1" \
-        | awk '{for(i=length();i!=0;i--) x=(x substr($0,i,1))}{print x;x=""}')
+      POLYGLOT_LAST_TWO_DIRS=$(echo "${PWD#$HOME}" | _polyglot_awk -F/ -v prompt_dirtrim=$1 '{for(i=NF-prompt_dirtrim+1;i<=NF;i++)printf "/%s",$i}')
         # shellcheck disable=SC2088
         case $PWD in
-          "$HOME"*) printf '~/.../%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
-          *) printf '.../%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
+          "$HOME"*) printf '~/...%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
+          *) printf '...%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
         esac
     fi
   }
