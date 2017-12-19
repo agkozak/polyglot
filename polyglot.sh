@@ -171,12 +171,8 @@ if [ -n "$ZSH_VERSION" ]; then
     [ "$1" -gt 0 ] || set 2
     local abbreviated_path
     case $PWD in
-      $HOME) print -n '~' ;;
       $HOME*)
-        abbreviated_path=$(print -Pn "%($(($1 + 2))~|.../%${1}~|%~)")
-        case $abbreviated_path in
-          '.../'*) abbreviated_path=$(printf '~/%s' "$abbreviated_path") ;;
-        esac
+        abbreviated_path=$(print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)")
         ;;
       *)
         abbreviated_path=$(print -Pn "%($(($1 + 1))~|.../%${1}~|%~)")
