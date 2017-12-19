@@ -40,7 +40,7 @@
 # https://github.com/agkozak/polyglot
 #
 
-# shellcheck disable=SC2148
+# shellcheck disable=SC2034,SC2088,SC2148,SC2154
 
 ############################################################
 # Display non-zero exit status
@@ -84,7 +84,6 @@ _polyglot_has_colors() {
 # Display current branch name, followed by symbols
 # representing changes to the working copy
 ###########################################################
-# shellcheck disable=SC2120
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
   POLYGLOT_REF=$(git symbolic-ref --quiet HEAD 2> /dev/null)
@@ -172,7 +171,6 @@ if [ -n "$ZSH_VERSION" ]; then
       $HOME) print -n '~' ;;
       $HOME*)
         abbreviated_path=$(print -Pn "%($(($1 + 2))~|.../%${1}~|%~)")
-        # shellcheck disable=SC2088
         case $abbreviated_path in
           '.../'*) abbreviated_path=$(printf '~/%s' "$abbreviated_path") ;;
         esac
@@ -192,7 +190,6 @@ if [ -n "$ZSH_VERSION" ]; then
   ###########################################################
   precmd() {
     psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
-    # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
 
@@ -231,7 +228,6 @@ if [ -n "$ZSH_VERSION" ]; then
   if _polyglot_is_ssh; then
     psvar[1]=$(print -P '@%m')
   else
-    # shellcheck disable=SC2034
     psvar[1]=''
   fi
 
@@ -242,7 +238,6 @@ if [ -n "$ZSH_VERSION" ]; then
       colors
     fi
 
-    # shellcheck disable=SC2154
     PS1='%{$fg_bold[green]%}%n%1v%{$reset_color%} %{$fg_bold[blue]%}%2v%{$reset_color%}%{$fg[yellow]%}%3v%{$reset_color%} $(_polyglot_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
@@ -250,7 +245,6 @@ if [ -n "$ZSH_VERSION" ]; then
 
   else
     PS1='%n%1v %2v%3v $(_polyglot_zsh_vi_mode_indicator) '
-    # shellcheck disable=SC2034
     RPS1="%(?..(%?%))"
   fi
 
@@ -326,7 +320,6 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
 
     POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" | _polyglot_awk -F/ '{ c+=NF-1 } END { print c }')
     if [ "$POLYGLOT_DIR_COUNT" -le "$1" ]; then
-        # shellcheck disable=SC2088
         case $PWD in
           "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
           *) printf '%s' "$PWD" ;;
@@ -335,7 +328,6 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
       POLYGLOT_FINAL_DIRS=$(echo "${PWD#$HOME}" \
         | _polyglot_awk -F/ -v prompt_dirtrim="$1" \
         '{ for( i=NF-prompt_dirtrim+1;i<=NF;i++ ) printf "/%s",$i }')
-      # shellcheck disable=SC2088
       case $PWD in
         "$HOME"*) printf '~/...%s' "$POLYGLOT_FINAL_DIRS" ;;
         *) printf '...%s' "$POLYGLOT_FINAL_DIRS" ;;
@@ -361,7 +353,6 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         if _polyglot_has_colors; then
           PS1=$'\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!!}")\E[0m \$ '
         else
-          # shellcheck disable=SC2154
           PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!!}") \$ '
         fi
         ;;
