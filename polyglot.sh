@@ -317,7 +317,8 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     #shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" | _polyglot_awk -F/ '{ c+=NF-1 } END { print c }')
+    POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" \
+      | _polyglot_awk -F/ '{ c+=NF-1 } END { print c }')
     if [ "$POLYGLOT_DIR_COUNT" -le "$1" ]; then
         case $PWD in
           "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
