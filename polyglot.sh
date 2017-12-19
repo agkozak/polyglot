@@ -332,7 +332,9 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
           *) printf '%s' "$PWD" ;;
         esac
     else
-      POLYGLOT_LAST_TWO_DIRS=$(echo "${PWD#$HOME}" | _polyglot_awk -F/ -v prompt_dirtrim=$1 '{for(i=NF-prompt_dirtrim+1;i<=NF;i++)printf "/%s",$i}')
+      POLYGLOT_LAST_TWO_DIRS=$(echo "${PWD#$HOME}" \
+      | _polyglot_awk -F/ -v prompt_dirtrim=$1 \
+      '{for(i=NF-prompt_dirtrim+1;i<=NF;i++)printf "/%s",$i}')
         # shellcheck disable=SC2088
         case $PWD in
           "$HOME"*) printf '~/...%s' "$POLYGLOT_LAST_TWO_DIRS" ;;
