@@ -16,7 +16,7 @@
 #
 #   . /path/to/polyglot.sh
 #
-# Set $POLYGLOT_PROMPT_DIRTRIM to the number of directory items you would like
+# Set $POLYGLOT_PROMPT_DIRTRIM to the number of directory elements you would like
 # to have displayed in your prompt (the default is 2). For example,
 #
 # POLYGLOT_PROMPT_DIRTRIM=3
