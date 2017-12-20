@@ -26,6 +26,8 @@ In `bash`:
 
 ![`bash` line editing](img/bash-line-editing.png)
 
+See below for instructions on how to enable `vi` mode in your shell.
+
 Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
 
     . /path/to/polyglot.sh
@@ -83,3 +85,18 @@ If the exit status of the most recently executed command is other than zero (zer
 
 ![Exit status displayed in `zsh`, `bash`, and `ksh`](img/exit-status.png)
 
+## Enabling `vi` editing mode in `zsh` and `bash`
+
+The Polyglot Prompt does not enable `vi` editing mode for you. In `zsh`, you may add
+
+    bindkey -v
+
+to your `.zshrc`; for `bash`, either put
+
+    set-editing-mode vi
+
+in your `.inputrc` or
+
+    set -o vi
+
+in your `.bashrc`.

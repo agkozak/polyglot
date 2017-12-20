@@ -11,10 +11,23 @@
 # busybox sh
 #
 #
-# Source this file from a relevant dotfile (e.g. .zshrc, .bashrc, .kshrc,
-# .mkshrc, or .shrc) thus:
+# Source this file from a relevant dotfile (e.g. .zshrc, .bashrc, .shrc, .kshrc,
+# or .mkshrc) thus:
 #
 #   . /path/to/polyglot.sh
+#
+# Set $POLYGLOT_PROMPT_DIRTRIM to the number of directory items you would like
+# to have displayed in your prompt (the default is 2). For example,
+#
+# POLYGLOT_PROMPT_DIRTRIM=3
+#
+# results in
+#
+#   ~/foo/bar/bat/quux
+#
+# displaying as
+#
+#   ~/.../bar/bat/quux
 #
 #
 # Copyright 2017 Alexandros Kozak
@@ -36,6 +49,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
+#
 #
 # https://github.com/agkozak/polyglot
 #
@@ -88,9 +102,9 @@ _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
   POLYGLOT_REF=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
-    0) ;;           # $ref contains the name of a checked-out branch.
+    0) ;;           # $POLYGLOT_REF contains the name of a checked-out branch.
     128) return ;;  # No Git repository here.
-    # Otherwise, see if HEAD is in detached state.
+    # Otherwise, see if HEAD is in a detached state.
     *) POLYGLOT_REF=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
   printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes)"
@@ -168,6 +182,7 @@ if [ -n "$ZSH_VERSION" ]; then
   #   $1 Number of directory elements to display
   ############################################################
   _polyglot_zsh_prompt_dirtrim() {
+    # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ "$1" -gt 0 ] || set 2
     local abbreviated_path
     case $PWD in
@@ -183,9 +198,8 @@ if [ -n "$ZSH_VERSION" ]; then
 
   ###########################################################
   # Runs right before the prompt is displayed
-  #
-  # 1) Imitates bash's PROMPT_DIRTRIM behavior
-  # 2) Calculates working branch and working copy status
+  # Imitates bash's PROMPT_DIRTRIM behavior and calculates
+  # working branch and working copy status
   ###########################################################
   precmd() {
     psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
@@ -224,6 +238,7 @@ if [ -n "$ZSH_VERSION" ]; then
     zle && zle -R
   }
 
+  # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh; then
     psvar[1]=$(print -P '@%m')
   else
@@ -259,6 +274,7 @@ elif [ -n "$BASH_VERSION" ]; then
   #   $1 Number of directory elements to display
   ###########################################################
   _polyglot_prompt_command() {
+    # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
     if _polyglot_has_colors; then
@@ -268,6 +284,7 @@ elif [ -n "$BASH_VERSION" ]; then
     fi
   }
 
+  # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh; then
     POLYGLOT_HOSTNAME_STRING='@\h'
   else
@@ -303,6 +320,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   #   $1 Number of directory elements to display
   ############################################################
   _polyglot_prompt_dirtrim() {
+    # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     #shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
@@ -325,6 +343,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     unset POLYGLOT_DIR_COUNT POLYGLOT_FINAL_DIRS
   }
 
+  # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
     POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%?${POLYGLOT_HOSTNAME_STRING#*.}}"
