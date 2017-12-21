@@ -246,16 +246,10 @@ if [ -n "$ZSH_VERSION" ]; then
   fi
 
   if _polyglot_has_colors; then
-    # Autoload zsh colors module if it hasn't been autoloaded already
-    if ! whence -w colors > /dev/null 2>&1; then
-      autoload -Uz colors
-      colors
-    fi
-
-    PS1='%{$fg_bold[green]%}%n%1v%{$reset_color%} %{$fg_bold[blue]%}%2v%{$reset_color%}%{$fg[yellow]%}%3v%{$reset_color%} $(_polyglot_zsh_vi_mode_indicator) '
+    PS1='%B%F{green}%n%1v%%f%b %B%F{blue}%2v%%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
-    RPS1="%(?..%{$fg_bold[red]%}(%?%)%{$reset_color%})"
+    RPS1="%(?..%B%F{red}(%?%)%b%f)"
 
   else
     PS1='%n%1v %2v%3v $(_polyglot_zsh_vi_mode_indicator) '
