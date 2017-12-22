@@ -186,6 +186,7 @@ if [ -n "$ZSH_VERSION" ]; then
     [ "$1" -gt 0 ] || set 2
     local abbreviated_path
     case $PWD in
+      $HOME) print -n '~' ;;    # For TrueOS
       $HOME*)
         abbreviated_path=$(print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)")
         ;;
