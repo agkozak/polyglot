@@ -1,8 +1,18 @@
-![Polyglot mascot](img/polyglot_mascot.png)
-# Polyglot Prompt
+<p align="center">
+    <img src="img/polyglot_mascot.png" alt="Polyglot mascot">
+</p>
 
 [![License](https://img.shields.io/github/license/agkozak/polyglot.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/agkozak/polyglot.svg)](https://github.com/agkozak/agkozak-zsh-theme/stargazers)
+
+- [Polyglot Prompt](#polyglot-prompt)
+- [Local and Remote Sessions](#local-and-remote-sessions)
+- [Abbreviated Paths](#abbreviated-paths)
+- [Git Branch and Status](#git-branch-and-status)
+- [Exit Status](#exit-status)
+- [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
+
+# Polyglot Prompt
 
 **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox sh`(`ash`) that uses basic ASCII symbols (and color, when possible) to show:
 
@@ -26,7 +36,7 @@ In `bash`:
 
 ![`bash` line editing](img/bash-line-editing.png)
 
-See below for instructions on how to enable `vi` mode in your shell.
+[See below](#enabling-vi-editing-mode-in-zsh-and-bash) for instructions on how to enable `vi` mode in your shell.
 
 Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
 
