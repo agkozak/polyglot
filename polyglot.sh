@@ -154,6 +154,16 @@ _polyglot_is_busybox() {
   fi
 }
 
+###########################################################
+# Test to see if the current shell is pdksh
+###########################################################
+_polyglot_is_pdksh() {
+  case $KSH_VERSION in
+    *'PD KSH'*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 #####################################################################
 # zsh
 #####################################################################
@@ -300,12 +310,12 @@ elif [ -n "$BASH_VERSION" ]; then
   bind 'set vi-cmd-mode-string ":"'
 
 #####################################################################
-# ksh93, mksh, pdksh
+# ksh93 and mksh
 #####################################################################
 
-elif [ -n "$KSH_VERSION" ]; then
+elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
 ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for ksh/mksh/pdksh
+  # Emulation of bash's PROMPT_DIRTRIM for ksh/mksh
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
   # $PWD has more than a certain number of directory elements
@@ -363,7 +373,7 @@ elif [ -n "$KSH_VERSION" ]; then
 
   case $KSH_VERSION in
     # mksh handles color badly, so I'm avoiding it for now
-    *MIRBSD*|*'PD KSH'*)
+    *MIRBSD*)
       if ! _polyglot_is_superuser; then
         PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
       else # Superuser
@@ -391,9 +401,13 @@ elif [ -n "$KSH_VERSION" ]; then
       ;;
   esac
 
-elif [ "$0" = 'dash' ] || _polyglot_is_busybox; then
- ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for dash and busybox sh
+####################################################################
+# pdksh, dash, and busybox sh
+####################################################################
+
+elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
+  ############################################################
+  # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox sh
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
   # $PWD has more than a certain number of directory elements
