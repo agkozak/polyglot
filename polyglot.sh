@@ -372,4 +372,4 @@ fi
 # Clean up environment
 unset -f _polyglot_is_ssh _polyglot_is_busybox
 
-# vim: foldmethod=marker tabstop=2 expandtab
+# vim: ts=2:et:sts=2:sw=2
