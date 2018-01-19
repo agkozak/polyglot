@@ -202,7 +202,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # Imitates bash's PROMPT_DIRTRIM behavior and calculates
   # working branch and working copy status
   ###########################################################
-  precmd() {
+  _polyglot_precmd() {
     psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     psvar[3]=$(_polyglot_branch_status)
   }
@@ -238,6 +238,9 @@ if [ -n "$ZSH_VERSION" ]; then
   TRAPWINCH() {
     zle && zle -R
   }
+
+  autoload add-zsh-hook
+  add-zsh-hook precmd _polyglot_precmd
 
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh; then
