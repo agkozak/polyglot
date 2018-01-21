@@ -323,7 +323,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
     POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" \
-      | awk -F/ '{ c+=NF-1; print c }')
+      | awk -F/ '{ c=NF-1; print c }')
     if [ "$POLYGLOT_DIR_COUNT" -le "$1" ]; then
         case $PWD in
           "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
