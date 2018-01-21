@@ -319,26 +319,33 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
   _polyglot_prompt_dirtrim() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    #shellcheck disable=SC2015
+    # shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    POLYGLOT_DIR_COUNT=$(echo "${PWD#$HOME}" \
-      | awk -F/ '{ c=NF-1; print c }')
-    if [ "$POLYGLOT_DIR_COUNT" -le "$1" ]; then
-        case $PWD in
-          "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
-          *) printf '%s' "$PWD" ;;
-        esac
-    else
-      POLYGLOT_FINAL_DIRS=$(echo "${PWD#$HOME}" \
-        | awk -F/ '{ for( i=NF-'"$1"'+1;i<=NF;i++ ) printf "/%s",$i }')
+    # Calculate the part of $PWD that will be displayed in the prompt
+    POLYGLOT_ABBREVIATED_PATH="$(echo "${PWD#$HOME}" | awk -F/ '{
+      dir_count=NF-1;
+      if (dir_count <= '"$1"')
+        print $0;
+      else
+        for (i=NF-'"$1"'+1; i<=NF; i++) printf "/%s", $i;
+    }')"
+
+    # If the working directory has not been abbreviated, display it thus
+    if [ "$POLYGLOT_ABBREVIATED_PATH" = "${PWD#$HOME}" ]; then
       case $PWD in
-        "$HOME"*) printf '~/...%s' "$POLYGLOT_FINAL_DIRS" ;;
-        *) printf '...%s' "$POLYGLOT_FINAL_DIRS" ;;
+        "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
+        *) printf '%s' "$PWD" ;;
+      esac
+    # Otherwise include an ellipsis to show that abbreviation has taken place
+    else
+      case $PWD in
+        "$HOME"*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+        *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
       esac
     fi
 
-    unset POLYGLOT_DIR_COUNT POLYGLOT_FINAL_DIRS
+    unset POLYGLOT_ABBREVIATED_PATH
   }
 
   # Only display the $HOSTNAME for an ssh connection
