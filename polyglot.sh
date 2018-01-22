@@ -76,12 +76,13 @@ _polyglot_is_ssh() {
     return 0
   else
     case $EUID in
-      0)
-        case $(ps -o comm= -p $PPID) in
-          sshd|*/sshd) return 0 ;;
-          *) return 1 ;;
-        esac
-        ;;
+      # It can be exceedingly difficult to detect SSH connections when the user
+      # is running as a superuser, and one of the imperfect methods of doing so
+      # (examining the response of $(ps -o comm= -p $PPID)) does not work in
+      # busybox sh. For that reason, this function will always return true (and
+      # the prompt will display the hostname) for a superuser in the interests
+      # of providing useful information.
+      0) return 0 ;;  # Superuser
       *) return 1 ;;
     esac
   fi
