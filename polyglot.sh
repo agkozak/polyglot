@@ -297,12 +297,82 @@ elif [ -n "$BASH_VERSION" ]; then
   bind 'set vi-cmd-mode-string ":"'
 
 #####################################################################
-# ksh93, mksh, pdksh, dash, busybox sh
+# ksh93, mksh, pdksh
 #####################################################################
-elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
 
+elif [ -n "$KSH_VERSION" ]; then
+############################################################
+  # Emulation of bash's PROMPT_DIRTRIM for ksh/mksh/pdksh
+  #
+  # In $PWD, substitute $HOME with ~; if the remainder of the
+  # $PWD has more than two directory elements to display,
+  # abbreviate it with '...', e.g.
+  #
+  #   $HOME/dotfiles/polyglot/img
+  #
+  # will be displayed as
+  #
+  #   ~/.../polyglot/img
+  #
+  # Arguments:
+  #   $1 Number of directory elements to display
   ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for other shells
+  _polyglot_ksh_prompt_dirtrim() {
+    # shellcheck disable=SC2015
+    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+    
+    PWD_HOME="${PWD#$HOME}"
+    PWD_HOME_MINUS_SLASHES="${PWD_HOME//\/}"
+    DIR_COUNT="$((${#PWD_HOME} - ${#PWD_HOME_MINUS_SLASHES}))"
+
+    if [ "$DIR_COUNT" -le "$1" ]; then
+      case $PWD in
+        "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
+        *) printf '%s' "$PWD" ;;
+      esac
+    else
+      KSH_LOPPED_PATH="${PWD#$HOME}"
+      i=0
+      while [ "$i" -ne "$1" ]; do
+        KSH_LOPPED_PATH="${KSH_LOPPED_PATH%\/*}"
+        i="$((i+1))"
+      done
+
+      case $PWD in
+        "$HOME"*) printf '~/...%s' "${PWD_HOME#${KSH_LOPPED_PATH}}" ;;
+        *) printf '...%s' "${PWD#${KSH_LOPPED_PATH}}" ;;
+      esac
+    fi
+  }
+
+  # Only display the $HOSTNAME for an ssh connection
+  if _polyglot_is_ssh; then
+    POLYGLOT_HOSTNAME_STRING=$(hostname)
+    POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%?${POLYGLOT_HOSTNAME_STRING#*.}}"
+  else
+    POLYGLOT_HOSTNAME_STRING=''
+  fi
+
+  case $KSH_VERSION in
+    # mksh handles color badly, so I'm avoiding it for now
+    *MIRBSD*|*'PD KSH'*)
+      PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+      ;;
+    # ksh93 handles color well, but requires escaping ! as !!
+    *)
+      if _polyglot_has_colors; then
+        # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
+        # shellcheck disable=2016
+        PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
+      else
+        PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
+      fi
+      ;;
+  esac
+
+elif [ "$0" = 'dash' ] || _polyglot_is_busybox; then
+ ############################################################
+  # Emulation of bash's PROMPT_DIRTRIM for dash and busybox sh
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
   # $PWD has more than two directory elements to display,
@@ -356,24 +426,7 @@ elif [ -n "$KSH_VERSION" ] || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(_polyglot_branch_status) $ '
-
-  if [ -n "$KSH_VERSION" ]; then
-    case $KSH_VERSION in
-      # mksh handles color badly, so I'm avoiding it for now
-      *MIRBSD*|*'PD KSH'*) ;;
-      # ksh93 handles color well, but requires escaping ! as !!
-      *)
-        if _polyglot_has_colors; then
-          # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
-          # shellcheck disable=2016
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
-        else
-          PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim $POLYGLOT_PROMPT_DIRTRIM)$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
-        fi
-        ;;
-    esac
-  fi
+  PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
 
 else
   printf '%s\n' 'Polyglot Prompt does not support your shell.' >&2
