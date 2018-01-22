@@ -320,29 +320,34 @@ elif [ -n "$KSH_VERSION" ]; then
   _polyglot_ksh_prompt_dirtrim() {
     # shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
-    
-    PWD_HOME="${PWD#$HOME}"
-    PWD_HOME_MINUS_SLASHES="${PWD_HOME//\/}"
-    DIR_COUNT="$((${#PWD_HOME} - ${#PWD_HOME_MINUS_SLASHES}))"
 
-    if [ "$DIR_COUNT" -le "$1" ]; then
+    POLYGLOT_KSH_DIR="${PWD#$HOME}"
+    POLYGLOT_KSH_DIR_MINUS_SLASHES="${POLYGLOT_KSH_DIR//\/}"
+    POLYGLOT_KSH_DIR_COUNT="$((${#POLYGLOT_KSH_DIR} - ${#POLYGLOT_KSH_DIR_MINUS_SLASHES}))"
+
+    if [ "$POLYGLOT_KSH_DIR_COUNT" -le "$1" ]; then
       case $PWD in
         "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
     else
-      KSH_LOPPED_PATH="${PWD#$HOME}"
+      POLYGLOT_KSH_LOPPED_PATH="${PWD#$HOME}"
       i=0
       while [ "$i" -ne "$1" ]; do
-        KSH_LOPPED_PATH="${KSH_LOPPED_PATH%\/*}"
+        POLYGLOT_KSH_LOPPED_PATH="${POLYGLOT_KSH_LOPPED_PATH%\/*}"
         i="$((i+1))"
       done
 
       case $PWD in
-        "$HOME"*) printf '~/...%s' "${PWD_HOME#${KSH_LOPPED_PATH}}" ;;
-        *) printf '...%s' "${PWD#${KSH_LOPPED_PATH}}" ;;
+        "$HOME"*)
+          printf '~/...%s' "${POLYGLOT_KSH_DIR#${POLYGLOT_KSH_LOPPED_PATH}}"
+          ;;
+        *) printf '...%s' "${PWD#${POLYGLOT_KSH_LOPPED_PATH}}" ;;
       esac
     fi
+
+    unset POLYGLOT_KSH_DIR POLYGLOT_KSH_DIR_MINUS_SLASHES \
+      POLYGLOT_KSH_DIR_COUNT POLYGLOT_KSH_LOPPED_PATH i
   }
 
   # Only display the $HOSTNAME for an ssh connection
