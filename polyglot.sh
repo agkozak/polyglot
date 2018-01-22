@@ -276,11 +276,19 @@ elif [ -n "$BASH_VERSION" ]; then
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
-    if _polyglot_has_colors; then
-      PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;32m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
-    else
-      PS1="\$(_polyglot_exit_status \$?)\\u$POLYGLOT_HOSTNAME_STRING \\w\$(_polyglot_branch_status) \\$ "
-    fi
+    if [ "$EUID" != 0 ]; then
+      if _polyglot_has_colors; then
+        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;32m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+      else
+        PS1="\$(_polyglot_exit_status \$?)\\u$POLYGLOT_HOSTNAME_STRING \\w\$(_polyglot_branch_status) \\$ "
+      fi
+    else  # Superuser
+      if _polyglot_has_colors; then
+        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;42m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+      else
+        PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
+      fi
+    fi 
   }
 
   # Only display the $HOSTNAME for an ssh connection
