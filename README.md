@@ -2,7 +2,7 @@
     <img src="img/polyglot_mascot.png" alt="Polyglot mascot">
 </p>
 
-[![License](https://img.shields.io/github/license/agkozak/polyglot.svg)](https://opensource.org/licenses/MIT)
+[![License](img/mit_license.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/agkozak/polyglot.svg)](https://github.com/agkozak/agkozak-zsh-theme/stargazers)
 
 - [Polyglot Prompt](#polyglot-prompt)
