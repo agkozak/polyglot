@@ -276,7 +276,7 @@ elif [ -n "$BASH_VERSION" ]; then
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
-    if [ "$EUID" != 0 ]; then
+    if [ "$EUID" -ne 0 ]; then
       if _polyglot_has_colors; then
         PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;32m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
       else
@@ -370,7 +370,11 @@ elif [ -n "$KSH_VERSION" ]; then
   case $KSH_VERSION in
     # mksh handles color badly, so I'm avoiding it for now
     *MIRBSD*|*'PD KSH'*)
-      PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+      if [ "$EUID" -ne 0 ]; then
+        PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+      else
+        PS1='$(_polyglot_exit_status $?)$(tput rev)$LOGNAME$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+      fi
       ;;
     # ksh93 handles color well, but requires escaping ! as !!
     *)
