@@ -390,7 +390,7 @@ elif [ -n "$KSH_VERSION" ]; then
           # shellcheck disable=2016
           PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[42;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
         else
-          PS1='$(_polyglot_exit_status $?)$(tput rev)$LOGNAME$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
+          PS1="$(print '$(_polyglot_exit_status $?)\E[7m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ ')"
         fi
       fi 
       ;;
