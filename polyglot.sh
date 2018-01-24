@@ -251,7 +251,7 @@ if [ -n "$ZSH_VERSION" ]; then
   fi
 
   if _polyglot_has_colors; then
-    PS1='%(!.%S%F{green}.%B%F{green})%n%1v%(!.%f%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
+    PS1='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
 
     # The right prompt will show the exit code if it is not zero.
     RPS1="%(?..%B%F{red}(%?%)%b%f)"
@@ -284,7 +284,7 @@ elif [ -n "$BASH_VERSION" ]; then
       fi
     else  # Superuser
       if _polyglot_has_colors; then
-        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;42m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[7m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
       else
         PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
       fi
@@ -388,7 +388,7 @@ elif [ -n "$KSH_VERSION" ]; then
       else  # Superuser
         if _polyglot_has_colors; then
           # shellcheck disable=2016
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[42;1m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
         else
           PS1="$(print '$(_polyglot_exit_status $?)\E[7m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ ')"
         fi
