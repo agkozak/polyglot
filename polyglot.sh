@@ -370,7 +370,7 @@ elif [ -n "$KSH_VERSION" ]; then
   case $KSH_VERSION in
     # mksh handles color badly, so I'm avoiding it for now
     *MIRBSD*|*'PD KSH'*)
-      if [ "$EUID" -ne 0 ]; then
+      if [ "$(id -u)" -ne 0 ]; then
         PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
       else
         PS1='$(_polyglot_exit_status $?)$(tput rev)$LOGNAME$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
