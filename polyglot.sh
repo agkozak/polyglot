@@ -72,20 +72,14 @@ _polyglot_exit_status() {
 # Is the user connected via SSH?
 ###########################################################
 _polyglot_is_ssh() {
-  if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    return 0
-  else
-    case $EUID in
-      # It can be exceedingly difficult to detect SSH connections when the user
-      # is running as a superuser, and one of the imperfect methods of doing so
-      # (examining the response of $(ps -o comm= -p $PPID)) does not work in
-      # busybox sh. For that reason, this function will always return true (and
-      # the prompt will display the hostname) for a superuser in the interests
-      # of providing useful information.
-      0) return 0 ;;  # Superuser
-      *) return 1 ;;
-    esac
-  fi
+  [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]
+}
+
+###########################################################
+# Is the user a superuser?
+###########################################################
+_polyglot_is_superuser() {
+  [ "$(id -u)" -eq 0 ]
 }
 
 ###########################################################
@@ -243,8 +237,8 @@ if [ -n "$ZSH_VERSION" ]; then
   autoload add-zsh-hook
   add-zsh-hook precmd _polyglot_precmd
 
-  # Only display the $HOSTNAME for an ssh connection
-  if _polyglot_is_ssh; then
+  # Only display the $HOSTNAME for an ssh connection, except for a superuser
+  if _polyglot_is_ssh || _polyglot_is_superuser; then
     psvar[1]=$(print -P '@%m')
   else
     psvar[1]=''
@@ -276,7 +270,7 @@ elif [ -n "$BASH_VERSION" ]; then
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
-    if [ "$EUID" -ne 0 ]; then
+    if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
         PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;32m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
       else
@@ -284,9 +278,9 @@ elif [ -n "$BASH_VERSION" ]; then
       fi
     else  # Superuser
       if _polyglot_has_colors; then
-        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[7m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[7m\\]\\u@\h\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
       else
-        PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
+        PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u@\h\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
       fi
     fi 
   }
@@ -360,7 +354,7 @@ elif [ -n "$KSH_VERSION" ]; then
   }
 
   # Only display the $HOSTNAME for an ssh connection
-  if _polyglot_is_ssh; then
+  if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
     POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%?${POLYGLOT_HOSTNAME_STRING#*.}}"
   else
@@ -370,14 +364,15 @@ elif [ -n "$KSH_VERSION" ]; then
   case $KSH_VERSION in
     # mksh handles color badly, so I'm avoiding it for now
     *MIRBSD*|*'PD KSH'*)
-      if [ "$(id -u)" -ne 0 ]; then
+      if ! _polyglot_is_superuser; then
         PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
-      else
+      else # Superuser
         PS1='$(_polyglot_exit_status $?)$(tput rev)$LOGNAME$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
       fi
       ;;
     # ksh93 handles color well, but requires escaping ! as !!
-    *) if [ "$(id -u)" -ne 0  ]; then
+    *)
+      if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
           # shellcheck disable=2016
@@ -445,14 +440,14 @@ elif [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   }
 
   # Only display the $HOSTNAME for an ssh connection
-  if _polyglot_is_ssh; then
+  if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
     POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%?${POLYGLOT_HOSTNAME_STRING#*.}}"
   else
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  if [ "$(id -u)" -ne 0 ]; then
+  if ! _polyglot_is_superuser; then
     PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
   else  # Superuser
     PS1='$(_polyglot_exit_status $?)$(tput rev)$LOGNAME$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
