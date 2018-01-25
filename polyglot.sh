@@ -288,11 +288,11 @@ elif [ -n "$BASH_VERSION" ]; then
       fi
     else  # Superuser
       if _polyglot_has_colors; then
-        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[7m\\]\\u@\h\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[7m\\]\\u@\\h\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
       else
-        PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u@\h\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
+        PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u@\\h\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
       fi
-    fi 
+    fi
   }
 
   # Only display the $HOSTNAME for an ssh connection
@@ -315,7 +315,7 @@ elif [ -n "$BASH_VERSION" ]; then
 
 elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
 ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for ksh/mksh
+  # Emulation of bash's PROMPT_DIRTRIM for ksh and mksh
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
   # $PWD has more than a certain number of directory elements
@@ -335,7 +335,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
     POLYGLOT_KSH_DIR="${PWD#$HOME}"
-    POLYGLOT_KSH_DIR_MINUS_SLASHES="${POLYGLOT_KSH_DIR//\/}"
+    POLYGLOT_KSH_DIR_MINUS_SLASHES="${POLYGLOT_KSH_DIR//\//}"
     POLYGLOT_KSH_DIR_COUNT="$((${#POLYGLOT_KSH_DIR} - ${#POLYGLOT_KSH_DIR_MINUS_SLASHES}))"
 
     if [ "$POLYGLOT_KSH_DIR_COUNT" -le "$1" ]; then
@@ -395,9 +395,10 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           # shellcheck disable=2016
           PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
         else
+          # shellcheck disable=SC2016
           PS1="$(print '$(_polyglot_exit_status $?)\E[7m$LOGNAME$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ ')"
         fi
-      fi 
+      fi
       ;;
   esac
 
