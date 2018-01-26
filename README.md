@@ -50,6 +50,8 @@ When a session is local, only the username is shown; when it is remote over SSH 
 
 ![Local and remote sessions](img/local-and-remote-sessions.png)
 
+*Note: It is exceedingly difficult to determine with accuracy whether a superuser is connected over SSH or not. In the interests of providing useful and not misleading information, this prompt always displays both username and hostname for a superuser in reverse video.*
+
 ## Abbreviated Paths
 
 In all shells, by default Polyglot Prompt emulates the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`: a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need to be shown, only the last two are displayed, along with an ellipsis, so that
