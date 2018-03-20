@@ -314,7 +314,7 @@ elif [ -n "$BASH_VERSION" ]; then
 #####################################################################
 
 elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
-############################################################
+  ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for ksh and mksh
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
