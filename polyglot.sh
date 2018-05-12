@@ -254,6 +254,8 @@ if [ -n "$ZSH_VERSION" ]; then
     psvar[1]=''
   fi
 
+  unset RPS1  # Clean up detritus from previously loaded prompts
+
   if _polyglot_has_colors; then
     PS1='%(?..%B%F{red}(%?%)%b%f )%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
   else
