@@ -213,13 +213,19 @@ if [ -n "$ZSH_VERSION" ]; then
   }
 
   ###########################################################
-  # When the user enters vi command mode, the % or # in the
-  # prompt changes into a colon
+  # When in vi mode, the prompt will use a bash 4.3-style
+  # mode indicator at the beginning of the line -- '+' for
+  # insert mode, ':' for command mode.
   ###########################################################
   _polyglot_zsh_vi_mode_indicator() {
-    case $KEYMAP in
-      vicmd) print -n ':' ;;
-      *) print -n '%#' ;;
+    case $(bindkey -lL main) in
+      *viins*)
+        case $KEYMAP in
+          vicmd) print -n ':' ;;
+          *) print -n '+' ;;
+        esac
+        ;;
+      *) ;;
     esac
   }
 
@@ -257,9 +263,9 @@ if [ -n "$ZSH_VERSION" ]; then
   unset RPS1  # Clean up detritus from previously loaded prompts
 
   if _polyglot_has_colors; then
-    PS1='%(?..%B%F{red}(%?%)%b%f )%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
+    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..%B%F{red}(%?%)%b%f )%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f %# '
   else
-    PS1='%(?..(%?%) )%(!.%S.)%n%1v%(!.%s.) %2v%3v $(_polyglot_zsh_vi_mode_indicator) '
+    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..(%?%) )%(!.%S.)%n%1v%(!.%s.) %2v%3v $(_polyglot_zsh_vi_mode_indicator) %# '
   fi
 
 #####################################################################
