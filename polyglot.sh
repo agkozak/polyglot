@@ -255,14 +255,9 @@ if [ -n "$ZSH_VERSION" ]; then
   fi
 
   if _polyglot_has_colors; then
-    PS1='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
-
-    # The right prompt will show the exit code if it is not zero.
-    RPS1="%(?..%B%F{red}(%?%)%b%f)"
-
+    PS1='%(?..%B%F{red}(%?%)%b%f )%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f $(_polyglot_zsh_vi_mode_indicator) '
   else
-    PS1='%(!.%S.)%n%1v%(!.%s.) %2v%3v $(_polyglot_zsh_vi_mode_indicator) '
-    RPS1="%(?..(%?%))"
+    PS1='%(?..(%?%) )%(!.%S.)%n%1v%(!.%s.) %2v%3v $(_polyglot_zsh_vi_mode_indicator) '
   fi
 
 #####################################################################
