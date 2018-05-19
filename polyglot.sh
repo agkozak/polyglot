@@ -308,10 +308,11 @@ elif [ -n "$BASH_VERSION" ]; then
   PROMPT_COMMAND='_polyglot_prompt_command $POLYGLOT_PROMPT_DIRTRIM'
 
   # vi command mode
-  bind 'set show-mode-in-prompt'                      # Since bash 4.3
-  bind 'set vi-ins-mode-string "+"'
-  bind 'set vi-cmd-mode-string ":"'
-
+  if [ -z "$INSIDE_EMACS" ]; then     # Line editing not enabled in Emacs shell
+    bind 'set show-mode-in-prompt'                      # Since bash 4.3
+    bind 'set vi-ins-mode-string "+"'
+    bind 'set vi-cmd-mode-string ":"'
+  fi
 #####################################################################
 # ksh93 and mksh
 #####################################################################
