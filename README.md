@@ -5,16 +5,9 @@
 [![License](img/mit_license.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/agkozak/polyglot.svg)](https://github.com/agkozak/agkozak-zsh-theme/stargazers)
 
-- [Polyglot Prompt](#polyglot-prompt)
-- [Local and Remote Sessions](#local-and-remote-sessions)
-- [Abbreviated Paths](#abbreviated-paths)
-- [Git Branch and Status](#git-branch-and-status)
-- [Exit Status](#exit-status)
-- [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
-
 # Polyglot Prompt
 
-**Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox sh`(`ash`) that uses basic ASCII symbols (and color, when possible) to show:
+**Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox sh` (`ash`) that uses basic ASCII symbols (and color, when possible) to show:
 
 * the username
 * whether a session is local or remote over SSH
@@ -22,19 +15,26 @@
 * the Git branch and status
 * the exit status of the last command, if it was not zero
 
-![Simple prompt example](img/simple-prompt-example.png)
+![Polyglot Prompt demo](img/demo.gif)
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Local and Remote Sessions](#local-and-remote-sessions)
+- [Abbreviated Paths](#abbreviated-paths)
+- [Git Branch and Status](#git-branch-and-status)
+- [Exit Status](#exit-status)
+- [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
+
+## Introduction
 
 The central functions of the prompt are the same in all supported shells:
 
 ![Polyglot working in several shells](img/polyglot-with-several-shells.png)
 
-Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates when the user is in `vi` line editing command mode. In `zsh`:
+Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates when the user is in `vi` line editing command mode:
 
 ![`zsh` line editing](img/zsh-line-editing.png)
-
-In `bash`:
-
-![`bash` line editing](img/bash-line-editing.png)
 
 [See below](#enabling-vi-editing-mode-in-zsh-and-bash) for instructions on how to enable `vi` mode in your shell.
 
@@ -76,6 +76,8 @@ If you would like to display a different number of directory elements in your Po
 
     POLYGLOT_PROMPT_DIRTRIM=4     # Or whatever number you like
 
+![POLYGLOT_PROMPT_DIRTRIM examples](img/POLYGLOT_PROMPT_DIRTRIM_examples.png)
+
 ## Git Branch and Status
 
 If the current directory contains a Git repository, Polyglot Prompt displays the name of the working branch, along with some symbols to show changes to its status:
@@ -93,7 +95,7 @@ Renamed | >
 
 ## Exit Status
 
-If the exit status of the most recently executed command is other than zero (zero indicating success), the exit status will be displayed in the right prompt of `zsh` but to the left of the main prompt in all other shells (because they lack a right prompt):
+If the exit status of the most recently executed command is other than zero (zero indicating success), the exit status will be displayed to the left of the prompt:
 
 ![Exit status displayed in `zsh`, `bash`, and `ksh`](img/exit-status.png)
 
