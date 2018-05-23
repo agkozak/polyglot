@@ -19,24 +19,27 @@
 
 ## Table of Contents
 
-- [Introduction](#introduction)
+- [Basics](#basics)
+- [Installation](#installation)
 - [Local and Remote Sessions](#local-and-remote-sessions)
 - [Abbreviated Paths](#abbreviated-paths)
 - [Git Branch and Status](#git-branch-and-status)
 - [Exit Status](#exit-status)
 - [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
 
-## Introduction
+## Basics
 
 The central functions of the prompt are the same in all supported shells:
 
 ![Polyglot working in several shells](img/polyglot-with-several-shells.png)
 
-Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates when the user is in `vi` line editing command mode:
+Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates `vi` insert mode with a `+`, and command mode with a `:`, at the beginning of the prompt:
 
 ![`zsh` line editing](img/zsh-line-editing.png)
 
 [See below](#enabling-vi-editing-mode-in-zsh-and-bash) for instructions on how to enable `vi` mode in your shell.
+
+## Installation
 
 Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
 
