@@ -380,7 +380,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
     # mksh handles color badly, so I'm avoiding it for now
     *MIRBSD*)
       if ! _polyglot_is_superuser; then
-        PS1='$(_polyglot_exit_status $?)$LOGNAME$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+        PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
       else # Superuser
         PS1='$(_polyglot_exit_status $?)$(tput rev)$LOGNAME$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
       fi
