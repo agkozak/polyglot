@@ -200,10 +200,10 @@ if [ -n "$ZSH_VERSION" ]; then
     case $PWD in
       $HOME) print -n '~' ;;    # For TrueOS
       $HOME*)
-        abbreviated_path=$(print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)")
+        print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)"
         ;;
       *)
-        abbreviated_path=$(print -Pn "%($(($1 + 1))~|.../%${1}~|%~)")
+        print -Pn "%($(($1 + 1))~|.../%${1}~|%~)"
         ;;
     esac
     print -n "$abbreviated_path"
