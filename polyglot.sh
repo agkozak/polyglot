@@ -135,6 +135,12 @@ _polyglot_branch_changes() {
   case $POLYGLOT_GIT_STATUS in
     *'modified:'*) POLYGLOT_SYMBOLS="!${POLYGLOT_SYMBOLS}" ;;
   esac
+  case $POLYGLOT_GIT_STATUS in
+    *'behind'*) POLYGLOT_SYMBOLS="&${POLYGLOT_SYMBOLS}" ;;
+  esac
+  case $POLYGLOT_GIT_STATUS in
+    *'diverged'*) POLYGLOT_SYMBOLS="&*${POLYGLOT_SYMBOLS}" ;;
+  esac
 
   [ "$POLYGLOT_SYMBOLS" ] && printf ' %s' "$POLYGLOT_SYMBOLS"
 
