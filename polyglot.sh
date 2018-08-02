@@ -103,7 +103,11 @@ _polyglot_branch_status() {
     # Otherwise, see if HEAD is in a detached state.
     *) POLYGLOT_REF=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
-  printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes)"
+
+  if [ -n "$POLYGLOT_REF" ]; then
+    printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes)"
+  fi
+
   unset POLYGLOT_REF
 }
 
