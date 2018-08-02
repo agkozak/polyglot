@@ -89,12 +89,14 @@ If the current directory contains a Git repository, Polyglot Prompt displays the
 
 Git Status | Symbol
 --- | ---
-Modified | !
-Deleted | x
-Untracked | ?
-New file(s) | +
+Diverged | &*
+Behind | &
 Ahead | \*
+New file(s) | +
+Deleted | x
+Modified | !
 Renamed | >
+Untracked | ?
 
 ## Exit Status
 
