@@ -201,7 +201,6 @@ if [ -n "$ZSH_VERSION" ]; then
   _polyglot_zsh_prompt_dirtrim() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ "$1" -gt 0 ] || set 2
-    local abbreviated_path
     case $PWD in
       $HOME) print -n '~' ;;    # For TrueOS
       $HOME*)
