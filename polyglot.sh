@@ -95,7 +95,8 @@ _polyglot_has_colors() {
 # representing changes to the working copy
 ###########################################################
 _polyglot_branch_status() {
-  [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
+  [ -n "$ZSH_VERSION" ] && \
+    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR &> /dev/null
   POLYGLOT_REF=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
     0) ;;           # $POLYGLOT_REF contains the name of a checked-out branch.
@@ -115,7 +116,8 @@ _polyglot_branch_status() {
 # Display symbols representing changes to the working copy
 ###########################################################
 _polyglot_branch_changes() {
-  [ -n "$ZSH_VERSION" ] && setopt NO_WARN_CREATE_GLOBAL
+  [ -n "$ZSH_VERSION" ] && \
+    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR &> /dev/null
 
   POLYGLOT_GIT_STATUS=$(LC_ALL=C git status 2>&1)
 
