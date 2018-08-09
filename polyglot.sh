@@ -54,7 +54,7 @@
 # https://github.com/agkozak/polyglot
 #
 
-# shellcheck disable=SC2034,SC2088,SC2148,SC2154
+# shellcheck disable=SC1117,SC2034,SC2088,SC2148,SC2154
 
 ############################################################
 # Display non-zero exit status
@@ -203,12 +203,8 @@ if [ -n "$ZSH_VERSION" ]; then
     [ "$1" -gt 0 ] || set 2
     case $PWD in
       $HOME) print -n '~' ;;    # For TrueOS
-      $HOME*)
-        print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)"
-        ;;
-      *)
-        print -Pn "%($(($1 + 1))~|.../%${1}~|%~)"
-        ;;
+      $HOME*) print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)" ;;
+      *) print -Pn "%($(($1 + 1))~|.../%${1}~|%~)" ;;
     esac
   }
 
@@ -295,15 +291,15 @@ elif [ -n "$BASH_VERSION" ]; then
 
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
-        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[01;32m\\]\\u$POLYGLOT_HOSTNAME_STRING\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+        PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \$ "
       else
-        PS1="\$(_polyglot_exit_status \$?)\\u$POLYGLOT_HOSTNAME_STRING \\w\$(_polyglot_branch_status) \\$ "
+        PS1="\$(_polyglot_exit_status \$?)\u$POLYGLOT_HOSTNAME_STRING \w\$(_polyglot_branch_status) \$ "
       fi
     else  # Superuser
       if _polyglot_has_colors; then
-        PS1="\\[\\e[01;31m\\]\$(_polyglot_exit_status \$?)\\[\\e[00m\\]\\[\\e[7m\\]\\u@\\h\\[\\e[00m\\] \\[\\e[01;34m\\]\\w\\[\\e[m\\e[0;33m\\]\$(_polyglot_branch_status)\\[\\e[00m\\] \\$ "
+        PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[7m\]\u@\h\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \$ "
       else
-        PS1="\$(_polyglot_exit_status \$?)\\[\\e[7m\\]\\u@\\h\\[\\e[0m\\] \\w\$(_polyglot_branch_status) \\$ "
+        PS1="\$(_polyglot_exit_status \$?)\[\e[7m\]\u@\h\[\e[0m\] \w\$(_polyglot_branch_status) \$ "
       fi
     fi
   }
