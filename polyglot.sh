@@ -96,7 +96,7 @@ _polyglot_has_colors() {
 ###########################################################
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && \
-    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR &> /dev/null
+    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
   POLYGLOT_REF=$(git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
     0) ;;           # $POLYGLOT_REF contains the name of a checked-out branch.
@@ -117,7 +117,7 @@ _polyglot_branch_status() {
 ###########################################################
 _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && \
-    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR &> /dev/null
+    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
 
   POLYGLOT_GIT_STATUS=$(LC_ALL=C git status 2>&1)
 
@@ -147,7 +147,6 @@ _polyglot_branch_changes() {
   case $POLYGLOT_GIT_STATUS in
     *'Untracked files'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}?" ;;
   esac
-
 
   [ "$POLYGLOT_SYMBOLS" ] && printf ' %s' "$POLYGLOT_SYMBOLS"
 
@@ -485,6 +484,6 @@ else
 fi
 
 # Clean up environment
-unset -f _polyglot_is_ssh _polyglot_is_busybox
+unset -f _polyglot_is_ssh _polyglot_is_busybox _polyglot_is_pdksh
 
 # vim: ts=2:et:sts=2:sw=2
