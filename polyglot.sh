@@ -392,12 +392,14 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
       x=$(print \\001)
       if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
+          # shellcheck disable=SC2016
           PS1="$x$(print "\\r$x\E[31;1m$x$(_polyglot_exit_status $?)$x\E[0m\E[32;1m$x${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$x\E[0m$x $x\E[34;1m$x$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$x\E[0m\E[33m$x$( print '$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status}")')$x\E[0m$x \$ ")"
         else
           PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
         fi
       else # Superuser
         if _polyglot_has_colors; then
+          # shellcheck disable=SC2016
           PS1="$x$(print "\\r$x\E[31;1m$x$(_polyglot_exit_status $?)$x\E[0m\E[7m$x${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$x\E[0m$x $x\E[34;1m$x$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$x\E[0m\E[33m$x$(print '$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status}")')$x\E[0m$x \$ ")"
         else
           PS1='$(_polyglot_exit_status $?)$(tput rev)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
