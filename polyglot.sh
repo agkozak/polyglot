@@ -382,17 +382,34 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
+  # Note: mksh and ksh93 require escaping the ! Git symbol as !! to prevent it
+  # from displaying the history line number.
+
   case $KSH_VERSION in
-    # mksh handles color badly, so I'm avoiding it for now
     *MIRBSD*)
+      # To know how long the prompt is, and thus to know how far it is to the
+      # edge of the screen, mksh requires an otherwise unused character (in this
+      # case \\001) followed by a carriage return at the beginning of the
+      # prompt, which is then used to mark off escape sequences as zero-length.
+      # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
+      x=$(print \\001)
       if ! _polyglot_is_superuser; then
-        PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+        if _polyglot_has_colors; then
+          PS1="$x$(print "\\r$x\E[31;1m$x$(_polyglot_exit_status $?)$x\E[0m\E[32;1m$x${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$x\E[0m$x $x\E[34;1m$x$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$x\E[0m\E[33m$x$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")$x\E[0m$x \$ ")"
+        else
+          PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+        fi
       else # Superuser
-        PS1='$(_polyglot_exit_status $?)$(tput rev)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+        if _polyglot_has_colors; then
+          PS1="$x$(print "\\r$x\E[31;1m$x$(_polyglot_exit_status $?)$x\E[0m\E[7m$x${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$x\E[0m$x $x\E[34;1m$x$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$x\E[0m\E[33m$x$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")$x\E[0m$x \$ ")"
+        else
+          PS1='$(_polyglot_exit_status $?)$(tput rev)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+        fi
       fi
+      unset x
       ;;
-    # ksh93 handles color well, but requires escaping ! as !!
     *)
+      # ksh93 is better at calculating prompt length and wrapping
       if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
