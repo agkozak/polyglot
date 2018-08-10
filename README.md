@@ -17,6 +17,8 @@
 
 ![Polyglot Prompt demo](img/demo.gif)
 
+*Note: There is now support for color in `mksh`.*
+
 ## Table of Contents
 
 - [Basics](#basics)
