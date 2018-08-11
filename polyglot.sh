@@ -298,21 +298,21 @@ elif [ -n "$BASH_VERSION" ]; then
 
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
-        PS1="\[\e[31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
-        PS1+="\[\e[32m\]\u$(echo -n '$POLYGLOT_HOSTNAME_STRING')\[\e[0m\] "
-        PS1+="\[\e[34m\]\w\[\e[0m\]"
+        PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
+        PS1+="\[\e[01;32m\]\u$(echo -n "$POLYGLOT_HOSTNAME_STRING")\[\e[0m\] "
+        PS1+="\[\e[01;34m\]\w\[\e[0m\]"
         PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
       else
         PS1="\$(_polyglot_exit_status \$?)"
-        PS1+="\u$(echo -n '$POLYGLOT_HOSTNAME_STRING') "
+        PS1+="\u$(echo -n "$POLYGLOT_HOSTNAME_STRING") "
         PS1+="\w"
         PS1+="\$(_polyglot_branch_status) \$ "
       fi
     else  # Superuser
       if _polyglot_has_colors; then
-        PS1="\[\e[31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
+        PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
-        PS1+="\[\e[34m\]\w\[\e[0m\]"
+        PS1+="\[\e[01;34m\]\w\[\e[0m\]"
         PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
       else
         PS1="\$(_polyglot_exit_status \$?)"
@@ -460,7 +460,11 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
         if _polyglot_has_colors; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
           # shellcheck disable=2016
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
+          PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
+          PS1+='\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
+          PS1+='\E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
+          PS1+='\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ '
+          PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}'
@@ -470,9 +474,17 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
         fi
       else  # Superuser
         if _polyglot_has_colors; then
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ ')"
+          PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
+          PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
+          PS1+='\E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
+          PS1+='\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ '
+          PS1=$(print "$PS1")
         else
-          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ ')"
+          PS1='$(_polyglot_exit_status $?)'
+          PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
+          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
+          PS1=$(print "$PS1")
         fi
       fi
       ;;
