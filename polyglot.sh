@@ -467,8 +467,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
-          PS1+='${LOGNAME:-$(logname)}'
-          PS1+='$POLYGLOT_HOSTNAME_STRING '
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
         fi
@@ -556,6 +555,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
       PS1='\001\r\001\033[31;1m\001$(_polyglot_exit_status $?)\001\033[0m\033[32;1m\001${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\001\033[0m\001 \001\033[34;1m\001$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\001\033[0m\033[33m\001$(_polyglot_branch_status)\001\033[0m\001 \$ '
       PS1=$(print "$PS1")
     else
+      # shellcheck disable=SC2025
       PS1='\001\r\001\033[31;1m\001$(_polyglot_exit_status $?)\001\033[0m\033[7m\001${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\001\033[0m\001 \001\033[34;1m\001$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\001\033[0m\033[33m\001$(_polyglot_branch_status)\001\033[0m\001 \$ '
       PS1=$(print "$PS1")
     fi
