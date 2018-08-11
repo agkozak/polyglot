@@ -493,8 +493,10 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   if _polyglot_is_pdksh && _polyglot_has_colors; then
     x=$(print \\001)
     if ! _polyglot_is_superuser; then
+      # shellcheck disable=SC2016
       PS1="$x$(print "\\r$x\033[31;1m$x$(print '$(_polyglot_exit_status $?)')$x\033[0m\033[32;1m$x${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$x\033[0m$x $x\033[34;1m$x$(print '$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")')$x\033[0m\033[33m$x$( print '$(_polyglot_branch_status)')$x\033[0m$x \$ ")"
     else
+      # shellcheck disable=SC2016
       PS1="$x$(print "\\r$x\033[31;1m$x$(print '$(_polyglot_exit_status $?)')$x\033[0m\033[7m$x${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$x\033[0m$x $x\033[34;1m$x$(print '$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")')$x\033[0m\033[33m$x$(print '$(_polyglot_branch_status)')$x\033[0m$x \$ ")"
     fi
   else
