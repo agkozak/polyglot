@@ -383,8 +383,13 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
   fi
 
   case $KSH_VERSION in
-    # mksh handles color badly, so I'm avoiding it for now
     *MIRBSD*)
+      # To know how long the prompt is, and thus to know how far it is to the
+      # edge of the screen, mksh requires an otherwise unused character (in this
+      # case \\001) followed by a carriage return at the beginning of the
+      # prompt, which is then used to mark off escape sequences as zero-length.
+      # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
+      x=$(print \\001)
       if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
           # shellcheck disable=SC2016
@@ -400,9 +405,11 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           PS1='$(_polyglot_exit_status $?)$(tput rev)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
         fi
       fi
+      unset x
       ;;
-    # ksh93 handles color well, but requires escaping ! as !!
     *)
+      # ksh93 is better at calculating prompt length and wrapping, but requires
+      # escaping ! as !! to prevent display of history line
       if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
