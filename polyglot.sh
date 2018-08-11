@@ -407,10 +407,20 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
       # case \\001) followed by a carriage return at the beginning of the
       # prompt, which is then used to mark off escape sequences as zero-length.
       # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
-      x=$(print \\001)
       if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
-          PS1="$x$(print "\\r$x\E[31;1m$x$(print '$(_polyglot_exit_status $?)')$x\E[0m\E[32;1m$x$(print '${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING')$x\E[0m$x $x\E[34;1m$x$(print '$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")')$x\E[0m\E[33m$x$( print '$(_polyglot_branch_status)')$x\E[0m$x \$ ")"
+          PS1=$(print "\\001\\r\\001\E[31;1m\\001")
+          PS1+='$(_polyglot_exit_status $?)'
+          PS1+=$(print "\\001\E[0m\E[32;1m\\001")
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=' '
+          PS1+=$(print "\\001\E[34;1m\\001")
+          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+=$(print "\\001\E[0m\E[33m\\001")
+          PS1+='$(_polyglot_branch_status)'
+          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=' \$ '
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
@@ -419,16 +429,29 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
         fi
       else # Superuser
         if _polyglot_has_colors; then
-          PS1="$x$(print "\\r$x\E[31;1m$x$(print '$(_polyglot_exit_status $?)')$x\E[0m\E[7m$x$(print '${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING')$x\E[0m$x $x\E[34;1m$x$(print '$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")')$x\E[0m\E[33m$x$(print '$(_polyglot_branch_status)')$x\E[0m$x \$ ")"
-        else
-          PS1="$x$(print \\r)"
+          PS1=$(print "\\001\\r\\001\E[31;1m\\001")
           PS1+='$(_polyglot_exit_status $?)'
-          PS1+="$x$(print "\E[7m")$x$(print '${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING')$x$(print "\E[0m]")$x "
+          PS1+=$(print "\\001\E[0m\E[7m\\001")
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=' '
+          PS1+=$(print "\\001\E[34;1m\\001")
+          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+=$(print "\\001\E[0m\E[33m\\001")
+          PS1+='$(_polyglot_branch_status)'
+          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=' \$ '
+        else
+          PS1=$(print "\\001\\r")
+          PS1+='$(_polyglot_exit_status $?)'
+          PS1+=$(print "\\001\E[7m\\001")
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=' '
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status) $ '
         fi
       fi
-      unset x
       ;;
     *)
       # ksh93 is better at calculating prompt length and wrapping, but requires
