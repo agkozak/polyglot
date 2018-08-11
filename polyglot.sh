@@ -404,22 +404,22 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
     *MIRBSD*)
       # To know how long the prompt is, and thus to know how far it is to the
       # edge of the screen, mksh requires an otherwise unused character (in this
-      # case \\001) followed by a carriage return at the beginning of the
+      # case \001) followed by a carriage return at the beginning of the
       # prompt, which is then used to mark off escape sequences as zero-length.
       # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
       if ! _polyglot_is_superuser; then
         if _polyglot_has_colors; then
-          PS1=$(print "\\001\\r\\001\E[31;1m\\001")
+          PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
-          PS1+=$(print "\\001\E[0m\E[32;1m\\001")
+          PS1+=$(print "\001\E[0m\E[32;1m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=$(print "\001\E[0m\001")
           PS1+=' '
-          PS1+=$(print "\\001\E[34;1m\\001")
+          PS1+=$(print "\001\E[34;1m\001")
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+=$(print "\\001\E[0m\E[33m\\001")
+          PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status)'
-          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=$(print "\001\E[0m\001")
           PS1+=' \$ '
         else
           PS1='$(_polyglot_exit_status $?)'
@@ -429,24 +429,24 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
         fi
       else # Superuser
         if _polyglot_has_colors; then
-          PS1=$(print "\\001\\r\\001\E[31;1m\\001")
+          PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
-          PS1+=$(print "\\001\E[0m\E[7m\\001")
+          PS1+=$(print "\001\E[0m\E[7m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=$(print "\001\E[0m\001")
           PS1+=' '
-          PS1+=$(print "\\001\E[34;1m\\001")
+          PS1+=$(print "\001\E[34;1m\001")
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+=$(print "\\001\E[0m\E[33m\\001")
+          PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status)'
-          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=$(print "\001\E[0m\001")
           PS1+=' \$ '
         else
-          PS1=$(print "\\001\\r")
+          PS1=$(print "\001\r")
           PS1+='$(_polyglot_exit_status $?)'
-          PS1+=$(print "\\001\E[7m\\001")
+          PS1+=$(print "\001\E[7m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-          PS1+=$(print "\\001\E[0m\\001")
+          PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status) $ '
