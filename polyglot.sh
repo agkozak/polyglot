@@ -80,7 +80,7 @@ _polyglot_is_ssh() {
 # Is the user a superuser?
 ###########################################################
 _polyglot_is_superuser() {
-  [ "${EUID:-$(id -u)}" -eq 0 ]
+  [ ${EUID:-$(id -u)} -eq 0 ]
 }
 
 ###########################################################
@@ -158,7 +158,7 @@ _polyglot_branch_changes() {
 ###########################################################
 _polyglot_is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
-    case $(exec 2> /dev/null; readlink "/proc/$$/exe") in
+    case $(exec 2> /dev/null; readlink /proc/$$/exe) in
       */busybox) return 0 ;;
       *) return 1 ;;
     esac
@@ -363,25 +363,25 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
     # shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    POLYGLOT_KSH_DIR="${PWD#$HOME}"
-    POLYGLOT_KSH_DIR_MINUS_SLASHES="${POLYGLOT_KSH_DIR//\//}"
-    POLYGLOT_KSH_DIR_COUNT="$((${#POLYGLOT_KSH_DIR} - ${#POLYGLOT_KSH_DIR_MINUS_SLASHES}))"
+    POLYGLOT_KSH_DIR=${PWD#$HOME}
+    POLYGLOT_KSH_DIR_MINUS_SLASHES=${POLYGLOT_KSH_DIR//\//}
+    POLYGLOT_KSH_DIR_COUNT=$((${#POLYGLOT_KSH_DIR} - ${#POLYGLOT_KSH_DIR_MINUS_SLASHES}))
 
     if [ "$POLYGLOT_KSH_DIR_COUNT" -le "$1" ]; then
       case $PWD in
-        "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
+        ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
     else
-      POLYGLOT_KSH_LOPPED_PATH="${PWD#$HOME}"
+      POLYGLOT_KSH_LOPPED_PATH=${PWD#$HOME}
       i=0
       while [ "$i" -ne "$1" ]; do
-        POLYGLOT_KSH_LOPPED_PATH="${POLYGLOT_KSH_LOPPED_PATH%\/*}"
-        i="$((i+1))"
+        POLYGLOT_KSH_LOPPED_PATH=${POLYGLOT_KSH_LOPPED_PATH%\/*}
+        i=$((i+1))
       done
 
       case $PWD in
-        "$HOME"*)
+        ${HOME}*)
           printf '~/...%s' "${POLYGLOT_KSH_DIR#${POLYGLOT_KSH_LOPPED_PATH}}"
           ;;
         *) printf '...%s' "${PWD#${POLYGLOT_KSH_LOPPED_PATH}}" ;;
@@ -517,24 +517,24 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
     # Calculate the part of $PWD that will be displayed in the prompt
-    POLYGLOT_ABBREVIATED_PATH="$(echo "${PWD#$HOME}" | awk -F/ '{
+    POLYGLOT_ABBREVIATED_PATH=$(echo "${PWD#$HOME}" | awk -F/ '{
       dir_count=NF-1;
       if (dir_count <= '"$1"')
         print $0;
       else
         for (i=NF-'"$1"'+1; i<=NF; i++) printf "/%s", $i;
-    }')"
+    }')
 
     # If the working directory has not been abbreviated, display it thus
     if [ "$POLYGLOT_ABBREVIATED_PATH" = "${PWD#$HOME}" ]; then
       case $PWD in
-        "$HOME"*) printf '~%s' "${PWD#$HOME}" ;;
+        ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
     # Otherwise include an ellipsis to show that abbreviation has taken place
     else
       case $PWD in
-        "$HOME"*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+        ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
         *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
       esac
     fi
