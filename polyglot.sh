@@ -270,9 +270,15 @@ if [ -n "$ZSH_VERSION" ]; then
   unset RPROMPT               # Clean up detritus from previously loaded prompts
 
   if _polyglot_has_colors; then
-    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..%B%F{red}(%?%)%b%f )%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) %B%F{blue}%2v%f%b%F{yellow}%3v%f %# '
+    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..%B%F{red}(%?%)%b%f )'
+    PS1+='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) '
+    PS1+='%B%F{blue}%2v%f%b'
+    PS1+='%F{yellow}%3v%f %# '
   else
-    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..(%?%) )%(!.%S.)%n%1v%(!.%s.) %2v%3v $(_polyglot_zsh_vi_mode_indicator) %# '
+    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..(%?%) )'
+    PS1+='%(!.%S.)%n%1v%(!.%s.) '
+    PS1+='%2v'
+    PS1+='%3v %# '
   fi
 
 #####################################################################
@@ -292,9 +298,15 @@ elif [ -n "$BASH_VERSION" ]; then
 
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
-        PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[00m\]\[\e[01;32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[00m\] \[\e[01;34m\]\w\[\e[m\e[0;33m\]\$(_polyglot_branch_status)\[\e[00m\] \$ "
+        PS1="\[\e[31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
+        PS1+="\[\e[32m\]\u$POLYGLOT_HOSTNAME_STRING\[\e[0m\] "
+        PS1+="\[\e[34m\]\w\[\e[0m\]"
+        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
       else
-        PS1="\$(_polyglot_exit_status \$?)\u$POLYGLOT_HOSTNAME_STRING \w\$(_polyglot_branch_status) \$ "
+        PS1="\$(_polyglot_exit_status \$?)"
+        PS1+="\u$POLYGLOT_HOSTNAME_STRING "
+        PS1+="\w"
+        PS1+="\$(_polyglot_branch_status) \$ "
       fi
     else  # Superuser
       if _polyglot_has_colors; then
