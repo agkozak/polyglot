@@ -8,7 +8,7 @@
 # Polyglot Prompt
 #
 # A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, dash, and
-# busybox sh
+# busybox ash
 #
 #
 # Source this file from a relevant dotfile (e.g. .zshrc, .bashrc, .shrc, .kshrc,
@@ -93,6 +93,9 @@ _polyglot_has_colors() {
 ###########################################################
 # Display current branch name, followed by symbols
 # representing changes to the working copy
+#
+# Arguments:
+#   $1  If ksh, escape ! as !!
 ###########################################################
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && \
@@ -106,7 +109,7 @@ _polyglot_branch_status() {
   esac
 
   if [ -n "$POLYGLOT_REF" ]; then
-    printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes)"
+    printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes "$1")"
   fi
 
   unset POLYGLOT_REF
@@ -114,6 +117,9 @@ _polyglot_branch_status() {
 
 ###########################################################
 # Display symbols representing changes to the working copy
+#
+# Arguments:
+#   $1  If ksh, escape ! as !!
 ###########################################################
 _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && \
@@ -139,7 +145,13 @@ _polyglot_branch_changes() {
     *'deleted:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}x" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'modified:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!" ;;
+    *'modified:'*)
+      if [ "$1" = 'ksh' ]; then
+        POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!!"
+      else
+        POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!"
+      fi
+      ;;
   esac
   case $POLYGLOT_GIT_STATUS in
     *'renamed:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}>" ;;
@@ -154,7 +166,7 @@ _polyglot_branch_changes() {
 }
 
 ###########################################################
-# Tests to see if the current shell is busybox sh (ash)
+# Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
   if command -v readlink > /dev/null 2>&1; then
@@ -463,26 +475,26 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
           PS1+='\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
           PS1+='\E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
-          PS1+='\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ '
+          PS1+='\E[33m$(_polyglot_branch_status ksh)\E[0m \$ '
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+='$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
+          PS1+='$(_polyglot_branch_status ksh) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors; then
           PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
           PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
           PS1+='\E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
-          PS1+='\E[33m$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}")\E[0m \$ '
+          PS1+='\E[33m$(_polyglot_branch_status ksh)\E[0m \$ '
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
           PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+='$(polyglot_branch_status=$(_polyglot_branch_status); echo "${polyglot_branch_status//\!/\!\!}") \$ '
+          PS1+='$(_polyglot_branch_status ksh) \$ '
           PS1=$(print "$PS1")
         fi
       fi
@@ -490,12 +502,12 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
   esac
 
 ####################################################################
-# pdksh, dash, and busybox sh
+# pdksh, dash, and busybox ash
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox sh
+  # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
   #
   # In $PWD, substitute $HOME with ~; if the remainder of the
   # $PWD has more than a certain number of directory elements
