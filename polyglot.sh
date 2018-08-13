@@ -229,6 +229,7 @@ if [ -n "$ZSH_VERSION" ]; then
   ###########################################################
   _polyglot_precmd() {
     psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
+    # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
 
