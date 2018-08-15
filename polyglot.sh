@@ -97,6 +97,7 @@ _polyglot_has_colors() {
 # Arguments:
 #   $1  If ksh, escape ! as !!
 ###########################################################
+# shellcheck disable=SC2120
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
@@ -228,6 +229,7 @@ if [ -n "$ZSH_VERSION" ]; then
   ###########################################################
   _polyglot_precmd() {
     psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
+    # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
 
