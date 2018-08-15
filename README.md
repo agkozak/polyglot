@@ -91,7 +91,7 @@ If the current directory contains a Git repository, Polyglot Prompt displays the
 
 Git Status | Symbol
 --- | ---
-Diverged | &*
+Diverged | &\*
 Behind | &
 Ahead | \*
 New file(s) | +
