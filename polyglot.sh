@@ -190,37 +190,59 @@ _polyglot_is_pdksh() {
   esac
 }
 
+############################################################
+# Emulation of bash's PROMPT_DIRTRIM for zsh, ksh, and mksh
+#
+# In $PWD, substitute $HOME with ~; if the remainder of the
+# $PWD has more than a certain number of directory elements
+# to display (default: 2), abbreviate it with '...', e.g.
+#
+#   $HOME/dotfiles/polyglot/img
+#
+# will be displayed as
+#
+#   ~/.../polyglot/img
+#
+# Arguments:
+#   $1 Number of directory elements to display
+############################################################
+_polyglot_ksh_prompt_dirtrim() {
+  # shellcheck disable=SC2015
+  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+
+  typeset dir dir_minus_slashes dir_count
+  dir=${PWD#$HOME}
+  dir_minus_slashes=${dir//\//}
+  dir_count=$((${#dir} - ${#dir_minus_slashes}))
+
+  if [ "$dir_count" -le "$1" ]; then
+    case $PWD in
+      ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
+      *) printf '%s' "$PWD" ;;
+    esac
+  else
+    typeset lopped_path i
+    lopped_path=${PWD#$HOME}
+    i=0
+    while [ "$i" -ne "$1" ]; do
+      lopped_path=${lopped_path%\/*}
+      i=$((i+1))
+    done
+
+    case $PWD in
+      ${HOME}*)
+        printf '~/...%s' "${dir#${lopped_path}}"
+        ;;
+      *) printf '...%s' "${PWD#${lopped_path}}" ;;
+    esac
+  fi
+}
+
 #####################################################################
 # zsh
 #####################################################################
 if [ -n "$ZSH_VERSION" ]; then
   setopt PROMPT_SUBST
-
-  ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for zsh
-  #
-  # In $PWD, substitute $HOME with ~; if the remainder of the
-  # $PWD has more than a certain number of directory elements
-  # to display (default: 2), abbreviate it with '...', e.g.
-  #
-  #   $HOME/dotfiles/polyglot/img
-  #
-  # will be displayed as
-  #
-  #   ~/.../polyglot/img
-  #
-  # Arguments:
-  #   $1 Number of directory elements to display
-  ############################################################
-  _polyglot_zsh_prompt_dirtrim() {
-    # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    [ "$1" -gt 0 ] || set 2
-    case $PWD in
-      $HOME) print -n '~' ;;    # For TrueOS
-      $HOME*) print -Pn "%($(($1 + 2))~|~/.../%${1}~|%~)" ;;
-      *) print -Pn "%($(($1 + 1))~|.../%${1}~|%~)" ;;
-    esac
-  }
 
   ###########################################################
   # Runs right before the prompt is displayed
@@ -228,7 +250,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # working branch and working copy status
   ###########################################################
   _polyglot_precmd() {
-    psvar[2]=$(_polyglot_zsh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
+    psvar[2]=$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
@@ -357,55 +379,6 @@ elif [ -n "$BASH_VERSION" ]; then
 #####################################################################
 
 elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
-  ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for ksh and mksh
-  #
-  # In $PWD, substitute $HOME with ~; if the remainder of the
-  # $PWD has more than a certain number of directory elements
-  # to display (default: 2), abbreviate it with '...', e.g.
-  #
-  #   $HOME/dotfiles/polyglot/img
-  #
-  # will be displayed as
-  #
-  #   ~/.../polyglot/img
-  #
-  # Arguments:
-  #   $1 Number of directory elements to display
-  ############################################################
-  _polyglot_ksh_prompt_dirtrim() {
-    # shellcheck disable=SC2015
-    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
-
-    POLYGLOT_KSH_DIR=${PWD#$HOME}
-    POLYGLOT_KSH_DIR_MINUS_SLASHES=${POLYGLOT_KSH_DIR//\//}
-    POLYGLOT_KSH_DIR_COUNT=$((${#POLYGLOT_KSH_DIR} - ${#POLYGLOT_KSH_DIR_MINUS_SLASHES}))
-
-    if [ "$POLYGLOT_KSH_DIR_COUNT" -le "$1" ]; then
-      case $PWD in
-        ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
-        *) printf '%s' "$PWD" ;;
-      esac
-    else
-      POLYGLOT_KSH_LOPPED_PATH=${PWD#$HOME}
-      i=0
-      while [ "$i" -ne "$1" ]; do
-        POLYGLOT_KSH_LOPPED_PATH=${POLYGLOT_KSH_LOPPED_PATH%\/*}
-        i=$((i+1))
-      done
-
-      case $PWD in
-        ${HOME}*)
-          printf '~/...%s' "${POLYGLOT_KSH_DIR#${POLYGLOT_KSH_LOPPED_PATH}}"
-          ;;
-        *) printf '...%s' "${PWD#${POLYGLOT_KSH_LOPPED_PATH}}" ;;
-      esac
-    fi
-
-    unset POLYGLOT_KSH_DIR POLYGLOT_KSH_DIR_MINUS_SLASHES \
-      POLYGLOT_KSH_DIR_COUNT POLYGLOT_KSH_LOPPED_PATH i
-  }
-
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
