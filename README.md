@@ -3,6 +3,7 @@
 </p>
 
 [![License](img/mit_license.svg)](https://opensource.org/licenses/MIT)
+[![GitHub tag](https://img.shields.io/github/tag/agkozak/polyglot.svg)](https://GitHub.com/agkozak/polyglot/tags/)
 [![GitHub Stars](https://img.shields.io/github/stars/agkozak/polyglot.svg)](https://github.com/agkozak/agkozak-zsh-theme/stargazers)
 
 # Polyglot Prompt
