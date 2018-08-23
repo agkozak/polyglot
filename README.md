@@ -18,7 +18,7 @@
 
 ![Polyglot Prompt demo](img/demo.gif)
 
-*Note: There is now support for color in `mksh` and `pdksh`.*
+*Note: There is now support for color in `mksh`.*
 
 ## Table of Contents
 

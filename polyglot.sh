@@ -536,22 +536,10 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  if _polyglot_is_pdksh && _polyglot_has_colors; then
-    if ! _polyglot_is_superuser; then
-      # shellcheck disable=SC2025
-      PS1='\001\r\001\033[31;1m\001$(_polyglot_exit_status $?)\001\033[0m\033[32;1m\001${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\001\033[0m\001 \001\033[34;1m\001$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\001\033[0m\033[33m\001$(_polyglot_branch_status)\001\033[0m\001 \$ '
-      PS1=$(print "$PS1")
-    else
-      # shellcheck disable=SC2025
-      PS1='\001\r\001\033[31;1m\001$(_polyglot_exit_status $?)\001\033[0m\033[7m\001${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\001\033[0m\001 \001\033[34;1m\001$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\001\033[0m\033[33m\001$(_polyglot_branch_status)\001\033[0m\001 \$ '
-      PS1=$(print "$PS1")
-    fi
-  else
-    if ! _polyglot_is_superuser; then
-      PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
-    else  # Superuser
-      PS1='$(_polyglot_exit_status $?)$(tput rev)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING$(tput sgr0) $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
-    fi
+  if ! _polyglot_is_superuser; then
+    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+  else  # Superuser
+    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
   fi
 
 else
