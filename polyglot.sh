@@ -87,7 +87,17 @@ _polyglot_is_superuser() {
 # Does the terminal support enough colors?
 ###########################################################
 _polyglot_has_colors() {
-  [ "$(tput colors)" -ge 8 ]
+  case $(uname) in
+    *BSD*|DragonFly*) POLYGLOT_TERM_COLORS=$(tput Co) ;;
+    *) POLYGLOT_TERM_COLORS=$(tput colors) ;;
+  esac
+  if [ "${POLYGLOT_TERM_COLORS:-0}" -ge 8 ]; then
+    unset POLYGLOT_TERM_COLORS
+    return 0
+  else
+    unset POLYGLOT_TERM_COLORS
+    return 1
+  fi
 }
 
 ###########################################################
