@@ -549,7 +549,18 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   if ! _polyglot_is_superuser; then
     PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
   else  # Superuser
-    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+    case $(uname) in
+      *BSD*|DragonFly*)
+        POLYGLOT_REV=$(tput mr)
+        POLYGLOT_RESET=$(tput me)
+        ;;
+      *)
+        POLYGLOT_REV=$(tput rev)
+        POLYGLOT_RESET=$(tput sgr0)
+        ;;
+    esac
+
+    PS1='$(_polyglot_exit_status $?)${POLYGLOT_REV}${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING${POLYGLOT_RESET} $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
   fi
 
 else
