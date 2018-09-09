@@ -206,7 +206,12 @@ _polyglot_is_busybox() {
 ###########################################################
 _polyglot_is_pdksh() {
   case $KSH_VERSION in
-    *'PD KSH'*) return 0 ;;
+    *'PD KSH'*)
+      case $(uname -s) in
+        OpenBSD) POLYGLOT_KSH_BANG=ksh ;;
+      esac
+      return 0
+      ;;
     *) return 1 ;;
   esac
 }
@@ -558,7 +563,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   fi
 
   if ! _polyglot_is_superuser; then
-    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
   else  # Superuser
     case $(uname) in
       *BSD*|DragonFly*)
@@ -571,7 +576,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         ;;
     esac
 
-    PS1='$(_polyglot_exit_status $?)${POLYGLOT_REV}${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING${POLYGLOT_RESET} $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status) $ '
+    PS1='$(_polyglot_exit_status $?)${POLYGLOT_REV}${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING${POLYGLOT_RESET} $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
   fi
 
 else
