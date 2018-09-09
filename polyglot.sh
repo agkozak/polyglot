@@ -91,8 +91,8 @@ _polyglot_has_colors() {
     *-256color) POLYGLOT_TERM_COLORS=256 ;;
     vt100|dumb) POLYGLOT_TERM_COLORS=-1 ;;
     *)
-      case $(uname) in
-        *BSD*|DragonFly*) POLYGLOT_TERM_COLORS=$(tput Co) ;;
+      case $(uname -s) in
+        FreeBSD) POLYGLOT_TERM_COLORS=$(tput Co) ;;
         *) POLYGLOT_TERM_COLORS=$(tput colors) ;;
       esac
       ;;
