@@ -238,8 +238,8 @@ _polyglot_ksh_prompt_dirtrim() {
 
   typeset dir dir_minus_slashes dir_count
   dir=${PWD#$HOME}
-  # The following is a bad substitution in many versions of pdksh and must be
-  # hidden from it
+  # This code is not relevant to pdksh, but that does not mean it will not see
+  # it; obfuscate to avoid the report of a bad substitution.
   dir_minus_slashes=$(eval echo '${dir//\//}')
   dir_count=$((${#dir} - ${#dir_minus_slashes}))
 
