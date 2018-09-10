@@ -216,53 +216,53 @@ _polyglot_is_pdksh() {
   esac
 }
 
-if ! _polyglot_is_pdksh; then
-  ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for zsh, ksh, and mksh
-  #
-  # In $PWD, substitute $HOME with ~; if the remainder of the
-  # $PWD has more than a certain number of directory elements
-  # to display (default: 2), abbreviate it with '...', e.g.
-  #
-  #   $HOME/dotfiles/polyglot/img
-  #
-  # will be displayed as
-  #
-  #   ~/.../polyglot/img
-  #
-  # Arguments:
-  #   $1 Number of directory elements to display
-  ############################################################
-  _polyglot_ksh_prompt_dirtrim() {
-    # shellcheck disable=SC2015
-    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+############################################################
+# Emulation of bash's PROMPT_DIRTRIM for zsh, ksh, and mksh
+#
+# In $PWD, substitute $HOME with ~; if the remainder of the
+# $PWD has more than a certain number of directory elements
+# to display (default: 2), abbreviate it with '...', e.g.
+#
+#   $HOME/dotfiles/polyglot/img
+#
+# will be displayed as
+#
+#   ~/.../polyglot/img
+#
+# Arguments:
+#   $1 Number of directory elements to display
+############################################################
+_polyglot_ksh_prompt_dirtrim() {
+  # shellcheck disable=SC2015
+  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    typeset dir dir_minus_slashes dir_count
-    dir=${PWD#$HOME}
-    dir_minus_slashes=${dir//\//}
-    dir_count=$((${#dir} - ${#dir_minus_slashes}))
+  typeset dir dir_minus_slashes dir_count
+  dir=${PWD#$HOME}
+  dir_minus_slashes=${dir//\//}
+  dir_count=$((${#dir} - ${#dir_minus_slashes}))
 
-    if [ "$dir_count" -le "$1" ]; then
-      case $PWD in
-        ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
-        *) printf '%s' "$PWD" ;;
-      esac
-    else
-      typeset lopped_path i
-      lopped_path=${PWD#$HOME}
-      i=0
-      while [ "$i" -ne "$1" ]; do
-        lopped_path=${lopped_path%\/*}
-        i=$((i+1))
-      done
+  if [ "$dir_count" -le "$1" ]; then
+    case $PWD in
+      ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
+      *) printf '%s' "$PWD" ;;
+    esac
+  else
+    typeset lopped_path i
+    lopped_path=${PWD#$HOME}
+    i=0
+    while [ "$i" -ne "$1" ]; do
+      lopped_path=${lopped_path%\/*}
+      i=$((i+1))
+    done
 
-      case $PWD in
-        ${HOME}*) printf '~/...%s' "${dir#${lopped_path}}" ;;
-        *) printf '...%s' "${PWD#${lopped_path}}" ;;
-      esac
-    fi
-  }
-fi
+    case $PWD in
+      ${HOME}*)
+        printf '~/...%s' "${dir#${lopped_path}}"
+        ;;
+      *) printf '...%s' "${PWD#${lopped_path}}" ;;
+    esac
+  fi
+}
 
 #####################################################################
 # zsh
