@@ -232,14 +232,14 @@ _polyglot_is_pdksh() {
 # Arguments:
 #   $1 Number of directory elements to display
 ############################################################
-_polyglot_ksh_prompt_dirtrim() {
+_polyglot_ksh93_prompt_dirtrim() {
   # shellcheck disable=SC2015
   [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
   typeset dir dir_minus_slashes dir_count
   dir=${PWD#$HOME}
-  # This code is not relevant to pdksh, but that does not mean it will not see
-  # it; obfuscate to avoid the report of a bad substitution.
+  # The following line is not relevant to pdksh, but that does not mean it will
+  # not see it; obfuscate to avoid the report of a bad substitution.
   dir_minus_slashes=$(eval echo '${dir//\//}')
   dir_count=$((${#dir} - ${#dir_minus_slashes}))
 
@@ -278,7 +278,7 @@ if [ -n "$ZSH_VERSION" ]; then
   # working branch and working copy status
   ###########################################################
   _polyglot_precmd() {
-    psvar[2]=$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
+    psvar[2]=$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
@@ -431,7 +431,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+=$(print "\001\E[34;1m\001")
-          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status)'
           PS1+=$(print "\001\E[0m\001")
@@ -439,7 +439,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
-          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status) $ '
         fi
       else # Superuser
@@ -451,7 +451,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+=$(print "\001\E[34;1m\001")
-          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status)'
           PS1+=$(print "\001\E[0m\001")
@@ -463,7 +463,7 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
-          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status) $ '
         fi
       fi
@@ -477,26 +477,26 @@ elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
           # shellcheck disable=2016
           PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
           PS1+='\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
-          PS1+='\E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
+          PS1+='\E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
           PS1+='\E[33m$(_polyglot_branch_status ksh)\E[0m \$ '
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
-          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status ksh) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors; then
           PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
           PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
-          PS1+='\E[34;1m$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
+          PS1+='\E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
           PS1+='\E[33m$(_polyglot_branch_status ksh)\E[0m \$ '
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
-          PS1+='$(_polyglot_ksh_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status ksh) \$ '
           PS1=$(print "$PS1")
         fi
