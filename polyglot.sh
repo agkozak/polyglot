@@ -269,7 +269,7 @@ _polyglot_ksh93_prompt_dirtrim() {
 #####################################################################
 # zsh
 #####################################################################
-if [ -n "$ZSH_VERSION" ]; then
+if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ]; then
   setopt PROMPT_SUBST
 
   ###########################################################
@@ -406,7 +406,7 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93 and mksh
 #####################################################################
 
-elif [ -n "$KSH_VERSION" ] && ! _polyglot_is_pdksh ; then
+elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; then
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
