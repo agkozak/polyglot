@@ -271,7 +271,9 @@ _polyglot_ksh93_prompt_dirtrim() {
 #####################################################################
 
 # Make sure that ZSH is not emulating ksh or bash
-if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] && [ "$0" != 'bash' ]; then
+if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
+  && [ "$0" != 'bash' ] && [ "$0" != 'sh' ]; then
+
   setopt PROMPT_SUBST
 
   ###########################################################
