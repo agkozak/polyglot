@@ -269,7 +269,9 @@ _polyglot_ksh93_prompt_dirtrim() {
 #####################################################################
 # zsh
 #####################################################################
-if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ]; then
+
+# Make sure that ZSH is not emulating ksh or bash
+if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] && [ "$0" != 'bash' ]; then
   setopt PROMPT_SUBST
 
   ###########################################################
@@ -403,7 +405,7 @@ elif [ -n "$BASH_VERSION" ]; then
     bind 'set vi-cmd-mode-string ":"'
   fi
 #####################################################################
-# ksh93 and mksh
+# ksh93, mksh, and zsh in ksh and bash emulation mode
 #####################################################################
 
 elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; then
@@ -469,6 +471,12 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
       fi
       ;;
     *)
+      # zsh emulating bash will use this routine as well, so
+      case $0 in
+        bash) POLYGLOT_KSH_BANG='' ;;
+        *) POLYGLOT_KSH_BANG='!!' ;;
+      esac
+
       # ksh93 is better at calculating prompt length and wrapping, but requires
       # escaping ! as !! to prevent display of history line
       if ! _polyglot_is_superuser; then
@@ -478,26 +486,26 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
           PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
           PS1+='\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
           PS1+='\E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
-          PS1+='\E[33m$(_polyglot_branch_status ksh)\E[0m \$ '
+          PS1+='\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ '
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
           PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+='$(_polyglot_branch_status ksh) \$ '
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors; then
           PS1='\E[31;1m$(_polyglot_exit_status $?)\E[0m'
           PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
           PS1+='\E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m'
-          PS1+='\E[33m$(_polyglot_branch_status ksh)\E[0m \$ '
+          PS1+='\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ '
           PS1=$(print "$PS1")
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m '
           PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+='$(_polyglot_branch_status ksh) \$ '
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
           PS1=$(print "$PS1")
         fi
       fi
