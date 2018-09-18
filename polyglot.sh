@@ -480,7 +480,7 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
   fi
 
 ####################################################################
-# pdksh, dash, and busybox ash
+# pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
