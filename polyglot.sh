@@ -434,7 +434,8 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
   # prompt, which is then used to mark off escape sequences as zero-length.
   # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
   if ! _polyglot_is_superuser; then
-    if _polyglot_has_colors; then
+    # zsh emulating bash or ksh doesn't appear to handle colors well
+    if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
       PS1=$(print "\001\r\001\E[31;1m\001")
       PS1+='$(_polyglot_exit_status $?)'
       PS1+=$(print "\001\E[0m\E[32;1m\001")
@@ -454,7 +455,7 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
       PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
     fi
   else # Superuser
-    if _polyglot_has_colors; then
+    if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
       PS1=$(print "\001\r\001\E[31;1m\001")
       PS1+='$(_polyglot_exit_status $?)'
       PS1+=$(print "\001\E[0m\E[7m\001")
