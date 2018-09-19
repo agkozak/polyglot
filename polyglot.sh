@@ -430,7 +430,7 @@ elif [ -n "$BASH_VERSION" ]; then
     bind 'set vi-cmd-mode-string ":"'
   fi
 #####################################################################
-# ksh93, mksh, and zsh in ksh and bash emulation mode
+# ksh93, mksh, and zsh in bash, ksh, and sh emulation mode
 #####################################################################
 
 elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
@@ -443,7 +443,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  if [ "$0" = bash ]; then
+  if [ "$0" = 'bash' ] || [ "$0" = 'sh' ]; then
     POLYGLOT_KSH_BANG=''
   else
     case $KSH_VERSION in
@@ -461,7 +461,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
       # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
       if ! _polyglot_is_superuser; then
         # zsh emulating bash or ksh doesn't appear to handle colors well
-        if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
+        if _polyglot_has_colors; then
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
           PS1+=$(print "\001\E[0m\E[32;1m\001")
@@ -481,7 +481,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
         fi
       else # Superuser
-        if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
+        if _polyglot_has_colors; then
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
           PS1+=$(print "\001\E[0m\E[7m\001")
@@ -508,7 +508,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
       ;;
     *)
       if ! _polyglot_is_superuser; then
-        if _polyglot_has_colors; then
+        if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
           # shellcheck disable=2016
           PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
@@ -516,7 +516,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else  # Superuser
-        if _polyglot_has_colors; then
+        if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # shellcheck disable=2016
           PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
         else
