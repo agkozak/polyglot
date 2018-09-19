@@ -528,7 +528,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
   esac
 
 ####################################################################
-# dtksh, pdksh, dash, busybox ash, and zsh in sh emulation mode
+# pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
