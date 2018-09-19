@@ -77,10 +77,20 @@ _polyglot_is_ssh() {
 }
 
 ###########################################################
+# Provide the effective user ID
+###########################################################
+_polyglot_euid() {
+  case ${POLYGLOT_UNAME:-$(uname)} in
+    SunOS) /usr/xpg4/bin/id -u ;;
+    *) id -u ;;
+  esac
+}
+
+###########################################################
 # Is the user a superuser?
 ###########################################################
 _polyglot_is_superuser() {
-  [ ${EUID:-$(id -u)} -eq 0 ]
+  [ ${EUID:-$(_polyglot_euid)} -eq 0 ]
 }
 
 ###########################################################
@@ -212,6 +222,17 @@ _polyglot_is_pdksh() {
       esac
       return 0
       ;;
+    *) return 1 ;;
+  esac
+}
+
+###########################################################
+# Test to see if the currect shell is dtksh (Desktop Korn
+# Shell).
+###########################################################
+_polyglot_is_dtksh() {
+  case $0 in
+    *dtksh) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -481,10 +502,11 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
   fi
 
 ####################################################################
-# pdksh, dash, busybox ash, and zsh in sh emulation mode
+# dtksh, pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
-elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
+elif _polyglot_is_dtksh || _polyglot_is_pdksh || [ "$0" = 'dash' ] \
+  || _polyglot_is_busybox; then
   ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
   #
@@ -506,8 +528,14 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     # shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
+    # Account for Solaris 10 root accounts, where $HOME is /
+    case $HOME in
+      /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;
+      *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
+    esac
+
     # Calculate the part of $PWD that will be displayed in the prompt
-    POLYGLOT_ABBREVIATED_PATH=$(echo "${PWD#$HOME}" | awk -F/ '{
+    POLYGLOT_ABBREVIATED_PATH=$(echo "$POLYGLOT_PWD_MINUS_HOME" | awk -F/ '{
       dir_count=NF-1;
       if (dir_count <= '"$1"')
         print $0;
@@ -516,9 +544,10 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     }')
 
     # If the working directory has not been abbreviated, display it thus
-    if [ "$POLYGLOT_ABBREVIATED_PATH" = "${PWD#$HOME}" ]; then
+    if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
       case $PWD in
-        ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
+        ${HOME}) printf '%s' '~' ;; # Or else, when HOME is /, ~/ is printed
+        ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
     # Otherwise include an ellipsis to show that abbreviation has taken place
@@ -529,7 +558,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
       esac
     fi
 
-    unset POLYGLOT_ABBREVIATED_PATH
+    unset POLYGLOT_PWD_MINUS_HOME POLYGLOT_ABBREVIATED_PATH
   }
 
   # Only display the $HOSTNAME for an ssh connection
