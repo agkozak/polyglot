@@ -258,7 +258,10 @@ _polyglot_ksh93_prompt_dirtrim() {
   [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
   typeset dir dir_minus_slashes dir_count
-  dir=${PWD#$HOME}
+  case $HOME in
+    /) dir=$PWD ;;
+    *) dir=${PWD#$HOME} ;;
+  esac
   # The following line is not relevant to pdksh, but that does not mean it will
   # not see it; obfuscate to avoid the report of a bad substitution.
   dir_minus_slashes=$(eval echo '${dir//\//}')
@@ -266,12 +269,13 @@ _polyglot_ksh93_prompt_dirtrim() {
 
   if [ "$dir_count" -le "$1" ]; then
     case $PWD in
-      ${HOME}*) printf '~%s' "${PWD#$HOME}" ;;
+      ${HOME}) printf '%s' '~' ;; # Just in case $HOME is /
+      ${HOME}*) printf '~%s' "$dir" ;;
       *) printf '%s' "$PWD" ;;
     esac
   else
     typeset lopped_path i
-    lopped_path=${PWD#$HOME}
+    lopped_path=$dir
     i=0
     while [ "$i" -ne "$1" ]; do
       lopped_path=${lopped_path%\/*}
@@ -279,9 +283,7 @@ _polyglot_ksh93_prompt_dirtrim() {
     done
 
     case $PWD in
-      ${HOME}*)
-        printf '~/...%s' "${dir#${lopped_path}}"
-        ;;
+      ${HOME}*) printf '~/...%s' "${dir#${lopped_path}}" ;;
       *) printf '...%s' "${PWD#${lopped_path}}" ;;
     esac
   fi
@@ -431,7 +433,8 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93, mksh, and zsh in ksh and bash emulation mode
 #####################################################################
 
-elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; then
+elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
+  && ! _polyglot_is_pdksh ; then
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
@@ -449,64 +452,86 @@ elif [ -n "$KSH_VERSION" ] || [ -n "$ZSH_VERSION" ] && ! _polyglot_is_pdksh ; th
     esac
   fi
 
-  # To know how long the prompt is, and thus to know how far it is to the
-  # edge of the screen, mksh requires an otherwise unused character (in this
-  # case \001) followed by a carriage return at the beginning of the
-  # prompt, which is then used to mark off escape sequences as zero-length.
-  # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
-  if ! _polyglot_is_superuser; then
-    # zsh emulating bash or ksh doesn't appear to handle colors well
-    if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
-      PS1=$(print "\001\r\001\E[31;1m\001")
-      PS1+='$(_polyglot_exit_status $?)'
-      PS1+=$(print "\001\E[0m\E[32;1m\001")
-      PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-      PS1+=$(print "\001\E[0m\001")
-      PS1+=' '
-      PS1+=$(print "\001\E[34;1m\001")
-      PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-      PS1+=$(print "\001\E[0m\E[33m\001")
-      PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
-      PS1+=$(print "\001\E[0m\001")
-      PS1+=' \$ '
-    else
-      PS1='$(_polyglot_exit_status $?)'
-      PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
-      PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-      PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
-    fi
-  else # Superuser
-    if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
-      PS1=$(print "\001\r\001\E[31;1m\001")
-      PS1+='$(_polyglot_exit_status $?)'
-      PS1+=$(print "\001\E[0m\E[7m\001")
-      PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-      PS1+=$(print "\001\E[0m\001")
-      PS1+=' '
-      PS1+=$(print "\001\E[34;1m\001")
-      PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-      PS1+=$(print "\001\E[0m\E[33m\001")
-      PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
-      PS1+=$(print "\001\E[0m\001")
-      PS1+=' \$ '
-    else
-      PS1=$(print "\001\r")
-      PS1+='$(_polyglot_exit_status $?)'
-      PS1+=$(print "\001\E[7m\001")
-      PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-      PS1+=$(print "\001\E[0m\001")
-      PS1+=' '
-      PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-      PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
-    fi
-  fi
+  case $KSH_VERSION in
+    *MIRBSD*)
+      # To know how long the prompt is, and thus to know how far it is to the
+      # edge of the screen, mksh requires an otherwise unused character (in this
+      # case \001) followed by a carriage return at the beginning of the
+      # prompt, which is then used to mark off escape sequences as zero-length.
+      # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
+      if ! _polyglot_is_superuser; then
+        # zsh emulating bash or ksh doesn't appear to handle colors well
+        if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
+          PS1=$(print "\001\r\001\E[31;1m\001")
+          PS1+='$(_polyglot_exit_status $?)'
+          PS1+=$(print "\001\E[0m\E[32;1m\001")
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+          PS1+=$(print "\001\E[0m\001")
+          PS1+=' '
+          PS1+=$(print "\001\E[34;1m\001")
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+=$(print "\001\E[0m\E[33m\001")
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
+          PS1+=$(print "\001\E[0m\001")
+          PS1+=' \$ '
+        else
+          PS1='$(_polyglot_exit_status $?)'
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
+        fi
+      else # Superuser
+        if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
+          PS1=$(print "\001\r\001\E[31;1m\001")
+          PS1+='$(_polyglot_exit_status $?)'
+          PS1+=$(print "\001\E[0m\E[7m\001")
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+          PS1+=$(print "\001\E[0m\001")
+          PS1+=' '
+          PS1+=$(print "\001\E[34;1m\001")
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+=$(print "\001\E[0m\E[33m\001")
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
+          PS1+=$(print "\001\E[0m\001")
+          PS1+=' \$ '
+        else
+          PS1=$(print "\001\r")
+          PS1+='$(_polyglot_exit_status $?)'
+          PS1+=$(print "\001\E[7m\001")
+          PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+          PS1+=$(print "\001\E[0m\001")
+          PS1+=' '
+          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
+        fi
+      fi
+      ;;
+    *)
+      if ! _polyglot_is_superuser; then
+        if _polyglot_has_colors; then
+          # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
+          # shellcheck disable=2016
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
+        else
+          PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
+        fi
+      else  # Superuser
+        if _polyglot_has_colors; then
+          # shellcheck disable=2016
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
+        else
+          # shellcheck disable=SC2016
+          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ ')"
+        fi
+      fi
+      ;;
+  esac
 
 ####################################################################
 # dtksh, pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
-elif _polyglot_is_dtksh || _polyglot_is_pdksh || [ "$0" = 'dash' ] \
-  || _polyglot_is_busybox; then
+elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
   #
@@ -591,6 +616,7 @@ else
 fi
 
 # Clean up environment
-unset -f _polyglot_is_ssh _polyglot_is_busybox _polyglot_is_pdksh
+unset -f _polyglot_is_ssh _polyglot_is_busybox _polyglot_is_dtksh \
+  _polyglot_is_pdksh
 
 # vim: ts=2:et:sts=2:sw=2
