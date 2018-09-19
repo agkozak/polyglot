@@ -80,7 +80,7 @@ _polyglot_is_ssh() {
 # Provide the effective user ID
 ###########################################################
 _polyglot_euid() {
-  case ${POLYGLOT_UNAME:-$(uname)} in
+  case ${POLYGLOT_UNAME:=$(uname)} in
     SunOS) /usr/xpg4/bin/id -u ;;
     *) id -u ;;
   esac
@@ -101,7 +101,7 @@ _polyglot_has_colors() {
     *-256color) POLYGLOT_TERM_COLORS=256 ;;
     vt100|dumb) POLYGLOT_TERM_COLORS=-1 ;;
     *)
-      case ${POLYGLOT_UNAME:-$(uname -s)} in
+      case ${POLYGLOT_UNAME:=$(uname -s)} in
         FreeBSD|DragonFly) POLYGLOT_TERM_COLORS=$(tput Co) ;;
         *) POLYGLOT_TERM_COLORS=$(tput colors) ;;
       esac
@@ -217,7 +217,7 @@ _polyglot_is_busybox() {
 _polyglot_is_pdksh() {
   case $KSH_VERSION in
     *'PD KSH'*)
-      case ${POLYGLOT_UNAME:-$(uname -s)} in
+      case ${POLYGLOT_UNAME:=$(uname -s)} in
         OpenBSD) POLYGLOT_KSH_BANG=ksh ;;
       esac
       return 0
@@ -597,7 +597,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   if ! _polyglot_is_superuser; then
     PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
   else  # Superuser
-    case ${POLYGLOT_UNAME:-$(uname -s)} in
+    case ${POLYGLOT_UNAME:=$(uname -s)} in
       FreeBSD*|DragonFly*)
         POLYGLOT_REV=$(tput mr)
         POLYGLOT_RESET=$(tput me)
