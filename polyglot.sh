@@ -80,7 +80,7 @@ _polyglot_is_ssh() {
 # Provide the effective user ID
 ###########################################################
 _polyglot_euid() {
-  case ${POLYGLOT_UNAME:=$(uname)} in
+  case ${POLYGLOT_UNAME:=$(uname -s)} in
     SunOS) /usr/xpg4/bin/id -u ;;
     *) id -u ;;
   esac
