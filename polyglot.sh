@@ -259,7 +259,7 @@ _polyglot_ksh93_prompt_dirtrim() {
 
   typeset dir dir_minus_slashes dir_count
   case $HOME in
-    /) dir=$PWD ;;
+    /) dir=$PWD ;;                                  # In case root's $HOME is /
     *) dir=${PWD#$HOME} ;;
   esac
   # The following line is not relevant to pdksh, but that does not mean it will
@@ -269,7 +269,7 @@ _polyglot_ksh93_prompt_dirtrim() {
 
   if [ "$dir_count" -le "$1" ]; then
     case $PWD in
-      ${HOME}) printf '%s' '~' ;; # Just in case $HOME is /
+      ${HOME}) printf '%s' '~' ;;                   # In case root's $HOME is /
       ${HOME}*) printf '~%s' "$dir" ;;
       *) printf '%s' "$PWD" ;;
     esac
@@ -460,7 +460,6 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
       # prompt, which is then used to mark off escape sequences as zero-length.
       # See https://www.mirbsd.org/htman/i386/man1/mksh.htm
       if ! _polyglot_is_superuser; then
-        # zsh emulating bash or ksh doesn't appear to handle colors well
         if _polyglot_has_colors; then
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
@@ -508,6 +507,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
       ;;
     *)
       if ! _polyglot_is_superuser; then
+        # zsh emulating other shells doesn't handle colors well
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
           # shellcheck disable=2016
@@ -553,9 +553,8 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     # shellcheck disable=SC2015
     [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-    # Account for Solaris 10 root accounts, where $HOME is /
     case $HOME in
-      /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;
+      /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
       *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
     esac
 
@@ -571,7 +570,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     # If the working directory has not been abbreviated, display it thus
     if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
       case $PWD in
-        ${HOME}) printf '%s' '~' ;; # Or else, when HOME is /, ~/ is printed
+        ${HOME}) printf '%s' '~' ;;   # Or else, when $HOME is /, ~/ is printed
         ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
