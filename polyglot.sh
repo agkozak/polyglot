@@ -404,12 +404,12 @@ elif [ -n "$BASH_VERSION" ]; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         PS1+="\[\e[01;34m\]\w\[\e[0m\]"
-        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
+        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] # "
       else
         PS1="\$(_polyglot_exit_status \$?)"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         PS1+="\w"
-        PS1+="\$(_polyglot_branch_status) \$ "
+        PS1+="\$(_polyglot_branch_status) # "
       fi
     fi
   }
@@ -477,7 +477,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
           PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else # Superuser
         if _polyglot_has_colors; then
@@ -492,7 +492,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
           PS1+=$(print "\001\E[0m\001")
-          PS1+=' \$ '
+          PS1+=' # '
         else
           PS1=$(print "\001\r")
           PS1+='$(_polyglot_exit_status $?)'
@@ -501,7 +501,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
+          PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
         fi
       fi
       ;;
@@ -518,10 +518,10 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
       else  # Superuser
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # shellcheck disable=2016
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m # ')"
         else
           # shellcheck disable=SC2016
-          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ ')"
+          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
         fi
       fi
       ;;
@@ -594,7 +594,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   fi
 
   if ! _polyglot_is_superuser; then
-    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
+    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
   else  # Superuser
     case ${POLYGLOT_UNAME:=$(uname -s)} in
       FreeBSD*|DragonFly*)
@@ -607,7 +607,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         ;;
     esac
 
-    PS1='$(_polyglot_exit_status $?)${POLYGLOT_REV}${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING${POLYGLOT_RESET} $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) $ '
+    PS1='$(_polyglot_exit_status $?)${POLYGLOT_REV}${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING${POLYGLOT_RESET} $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
   fi
 
 else
