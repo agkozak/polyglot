@@ -56,6 +56,12 @@
 
 # shellcheck disable=SC1117,SC2016,SC2034,SC2088,SC2148,SC2154
 
+# Only run in interactive shells
+case $- in
+  *i*) ;;
+  *) exit ;;
+esac
+
 ############################################################
 # Display non-zero exit status
 #
