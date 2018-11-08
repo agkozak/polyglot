@@ -317,29 +317,17 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   }
 
   ###########################################################
-  # When in vi mode, the prompt will use a bash 4.3-style
-  # mode indicator at the beginning of the line -- '+' for
-  # insert mode, ':' for command mode.
-  ###########################################################
-  _polyglot_zsh_vi_mode_indicator() {
-    case $(bindkey -lL main) in
-      *viins*)
-        case $KEYMAP in
-          vicmd) print -n ':' ;;
-          *) print -n '+' ;;
-        esac
-        ;;
-      *) ;;
-    esac
-  }
-
-  ###########################################################
   # Redraw the prompt when the vi mode changes
+  #
+  # Whn in vi mode, the prompt will use a bash 4.3-style
+  # mode indicator at the beginniing of the line: '+' for
+  # insert mode; ':' for command mode
   #
   # Underscores are used in this function's name to keep
   # dash from choking on hyphens
   ###########################################################
   _polyglot_zle_keymap_select() {
+    [ "$KEYMAP" = 'vicmd' ] && psvar[4]='vicmd' || psvar[4]=''
     zle reset-prompt
     zle -R
   }
@@ -367,12 +355,12 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   unset RPROMPT               # Clean up detritus from previously loaded prompts
 
   if _polyglot_has_colors; then
-    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..%B%F{red}(%?%)%b%f )'
+    PS1='%(4V.:.+)%(?..%B%F{red}(%?%)%b%f )'
     PS1+='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) '
     PS1+='%B%F{blue}%2v%f%b'
     PS1+='%F{yellow}%3v%f %# '
   else
-    PS1='$(_polyglot_zsh_vi_mode_indicator)%(?..(%?%) )'
+    PS1='%(4V.:.+)%(?..(%?%) )'
     PS1+='%(!.%S.)%n%1v%(!.%s.) '
     PS1+='%2v'
     PS1+='%3v %# '
