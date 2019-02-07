@@ -625,9 +625,8 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   else  # Superuser
 
     ##########################################################
-    # Tests to see if shell is pdksh, and if so, if the
-    # terminal is the system console, which displays color in
-    # pdksh badly.
+    # Tests to see if the terminal is the DragonFly BSD system
+    # console, which displays color in pdksh badly.
     ##########################################################
     _polyglot_is_dragonfly_console() {
       case ${POLYGLOT_UNAME:=$(uname -s)} in
