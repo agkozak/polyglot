@@ -16,8 +16,8 @@
 #
 #   . /path/to/polyglot.sh
 #
-# Set $POLYGLOT_PROMPT_DIRTRIM to the number of directory elements you would like
-# to have displayed in your prompt (the default is 2). For example,
+# Set $POLYGLOT_PROMPT_DIRTRIM to the number of directory elements you would
+# like to have displayed in your prompt (the default is 2). For example,
 #
 # POLYGLOT_PROMPT_DIRTRIM=3
 #
@@ -30,7 +30,7 @@
 #   ~/.../bar/bat/quux
 #
 #
-# Copyright 2017-2018 Alexandros Kozak
+# Copyright 2017-2019 Alexandros Kozak
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -103,6 +103,13 @@ _polyglot_is_superuser() {
 # Does the terminal support enough colors?
 ###########################################################
 _polyglot_has_colors() {
+  # The DragonFly BSD system console has trouble displaying colors in pdksh
+  case ${POLYGLOT_UNAME:=$(uname -s)} in
+    DragonFly)
+      case $(who am i) in *ttyv*) return 1 ;; esac
+      ;;
+  esac
+
   case $TERM in
     *-256color) POLYGLOT_TERM_COLORS=256 ;;
     vt100|dumb) POLYGLOT_TERM_COLORS=-1 ;;
@@ -587,9 +594,53 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  if ! _polyglot_is_superuser; then
+  # A non-printable character (Ctrl-Q) for delimiting escape sequences in pdksh
+  POLYGLOT_NP="\021"
+
+  if _polyglot_is_pdksh && _polyglot_has_colors; then
+
+    PS1=$(print "$POLYGLOT_NP\r")
+    case $POLYGLOT_UNAME in
+      NetBSD*|OpenBSD*) PS1=$PS1$(print "$POLYGLOT_NP") ;;
+    esac
+    PS1=$PS1$(print "\033[31;1m$POLYGLOT_NP")
+    PS1=$PS1'$(_polyglot_exit_status $?)'
+    if ! _polyglot_is_superuser; then
+      PS1=$PS1$(print "$POLYGLOT_NP\033[0m\033[32;1m$POLYGLOT_NP")
+    else
+      PS1=$PS1$(print "$POLYGLOT_NP\033[0m\033[7m$POLYGLOT_NP")
+    fi
+    PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+    PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
+    PS1=$PS1' '
+    PS1=$PS1$(print "$POLYGLOT_NP\033[34;1m$POLYGLOT_NP")
+    PS1=$PS1'$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+    PS1=$PS1$(print "$POLYGLOT_NP\033[0m\033[33m$POLYGLOT_NP")
+    PS1=$PS1'$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
+    PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
+    PS1=$PS1' \$ '
+
+  elif ! _polyglot_is_superuser; then
     PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
   else  # Superuser
+
+    ##########################################################
+    # Tests to see if shell is pdksh, and if so, if the
+    # terminal is the system console, which displays color in
+    # pdksh badly.
+    ##########################################################
+    _polyglot_is_dragonfly_console() {
+      case ${POLYGLOT_UNAME:=$(uname -s)} in
+        DragonFly)
+          case $(who am i) in
+            *ttyv*) return 0 ;;
+            *) return 1 ;;
+          esac
+          ;;
+        *) return 1 ;;
+      esac
+    }
+
     case ${POLYGLOT_UNAME:=$(uname -s)} in
       FreeBSD*|DragonFly*)
         POLYGLOT_REV=$(tput mr)
@@ -601,7 +652,21 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         ;;
     esac
 
-    PS1='$(_polyglot_exit_status $?)${POLYGLOT_REV}${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING${POLYGLOT_RESET} $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
+    PS1=
+    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$(print "$POLYGLOT_NP\r")
+    PS1=$PS1'$(_polyglot_exit_status $?)'
+    if _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console; then
+      case $POLYGLOT_UNAME in
+        NetBSD|OpenBSD) PS1="$PS1$(print "$POLYGLOT_NP")" ;;
+      esac
+    fi
+    ! _polyglot_is_dragonfly_console && PS1="$PS1${POLYGLOT_REV}"
+    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
+    PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
+    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
+    ! _polyglot_is_dragonfly_console && PS1="$PS1${POLYGLOT_RESET}"
+    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
+    PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
   fi
 
 else
