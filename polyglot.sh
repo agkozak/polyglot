@@ -170,22 +170,22 @@ _polyglot_branch_changes() {
   POLYGLOT_SYMBOLS=''
 
   case $POLYGLOT_GIT_STATUS in
-    *'diverged'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&*" ;;
+    *' have diverged,'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&*" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'behind'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&" ;;
+    *'Your branch is behind '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'Your branch is ahead of'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}*" ;;
+    *'Your branch is ahead of '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}*" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'new file:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}+" ;;
+    *'new file:   '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}+" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'deleted:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}x" ;;
+    *'deleted:    '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}x" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'modified:'*)
+    *'modified:   '*)
       if [ "$1" = 'ksh' ]; then
         POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!!"
       else
@@ -194,10 +194,10 @@ _polyglot_branch_changes() {
       ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'renamed:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}>" ;;
+    *'renamed:    '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}>" ;;
   esac
   case $POLYGLOT_GIT_STATUS in
-    *'Untracked files'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}?" ;;
+    *'Untracked files:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}?" ;;
   esac
 
   [ "$POLYGLOT_SYMBOLS" ] && printf ' %s' "$POLYGLOT_SYMBOLS"
