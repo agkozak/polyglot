@@ -114,10 +114,14 @@ _polyglot_has_colors() {
     *-256color) POLYGLOT_TERM_COLORS=256 ;;
     vt100|dumb) POLYGLOT_TERM_COLORS=-1 ;;
     *)
-      case ${POLYGLOT_UNAME:=$(uname -s)} in
-        FreeBSD|DragonFly) POLYGLOT_TERM_COLORS=$(tput Co) ;;
-        *) POLYGLOT_TERM_COLORS=$(tput colors) ;;
-      esac
+      if command -v tput > /dev/null 2>&1; then
+        case ${POLYGLOT_UNAME:=$(uname -s)} in
+          FreeBSD|DragonFly) POLYGLOT_TERM_COLORS=$(tput Co) ;;
+          *) POLYGLOT_TERM_COLORS=$(tput colors) ;;
+        esac
+      else
+        POLYGLOT_TERM_COLORS=-1
+      fi
       ;;
   esac
   if [ "${POLYGLOT_TERM_COLORS:-0}" -ge 8 ]; then
@@ -210,7 +214,7 @@ _polyglot_branch_changes() {
 ###########################################################
 _polyglot_is_busybox() {
   case $0 in
-    ash|sh)
+    ash|-ash|sh)
       if command -v readlink > /dev/null 2>&1; then
         case $(exec 2> /dev/null; readlink /proc/$$/exe) in
           */busybox) return 0 ;;
@@ -640,17 +644,6 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
       esac
     }
 
-    case ${POLYGLOT_UNAME:=$(uname -s)} in
-      FreeBSD*|DragonFly*)
-        POLYGLOT_REV=$(tput mr)
-        POLYGLOT_RESET=$(tput me)
-        ;;
-      *)
-        POLYGLOT_REV=$(tput rev)
-        POLYGLOT_RESET=$(tput sgr0)
-        ;;
-    esac
-
     PS1=
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$(print "$POLYGLOT_NP\r")
     PS1=$PS1'$(_polyglot_exit_status $?)'
@@ -659,11 +652,11 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         NetBSD|OpenBSD) PS1="$PS1$(print "$POLYGLOT_NP")" ;;
       esac
     fi
-    ! _polyglot_is_dragonfly_console && PS1="$PS1${POLYGLOT_REV}"
+    ! _polyglot_is_dragonfly_console && PS1="$PS1\033[7m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
-    ! _polyglot_is_dragonfly_console && PS1="$PS1${POLYGLOT_RESET}"
+    ! _polyglot_is_dragonfly_console && PS1="$PS1\033[0m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
   fi
