@@ -144,12 +144,12 @@ _polyglot_has_colors() {
 _polyglot_branch_status() {
   [ -n "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
-  POLYGLOT_REF=$(git symbolic-ref --quiet HEAD 2> /dev/null)
+  POLYGLOT_REF=$(env git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
     0) ;;           # $POLYGLOT_REF contains the name of a checked-out branch.
     128) return ;;  # No Git repository here.
     # Otherwise, see if HEAD is in a detached state.
-    *) POLYGLOT_REF=$(git rev-parse --short HEAD 2> /dev/null) || return ;;
+    *) POLYGLOT_REF=$(env git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
 
   if [ -n "$POLYGLOT_REF" ]; then
@@ -169,7 +169,7 @@ _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
 
-  POLYGLOT_GIT_STATUS=$(LC_ALL=C git status 2>&1)
+  POLYGLOT_GIT_STATUS=$(LC_ALL=C env git status 2>&1)
 
   POLYGLOT_SYMBOLS=''
 
