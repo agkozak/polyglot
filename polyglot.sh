@@ -206,6 +206,48 @@ _polyglot_branch_changes() {
 }
 
 ###########################################################
+# Checks if kube_ps1 is installed
+###########################################################
+_polyglot_kube_ps1_installed() {
+  type _kube_ps1_update_cache &>/dev/null
+  [ $? -eq 0 ]
+}
+
+###########################################################
+# Displays the Kubernetes current context in Bash
+###########################################################
+_polyglot_kube_context_bash() {
+  _kube_ps1_update_cache
+  KUBE_PS1_CTX_COLOR=yellow
+  POLYGLOT_KUBE_CTX=$(kube_ps1)
+  if [ -n "$POLYGLOT_KUBE_CTX" ]; then
+    if _polyglot_has_colors; then
+      printf '\e[01m%s\e[0m\n' "$POLYGLOT_KUBE_CTX"
+    else
+      printf '%s\n' "$POLYGLOT_KUBE_CTX"
+    fi
+  fi
+  unset KUBE_PS1_CTX_COLOR POLYGLOT_KUBE_CTX
+}
+
+###########################################################
+# Displays the Kubernetes current context in Zsh
+###########################################################
+_polyglot_kube_context_zsh() {
+  _kube_ps1_update_cache
+  KUBE_PS1_CTX_COLOR=yellow
+  POLYGLOT_KUBE_CTX=$(kube_ps1)
+  if [ -n "$POLYGLOT_KUBE_CTX" ]; then
+    if _polyglot_has_colors; then
+      print -P "%B$POLYGLOT_KUBE_CTX%b"
+    else
+      print "$POLYGLOT_KUBE_CTX"
+    fi
+  fi
+  unset KUBE_PS1_CTX_COLOR POLYGLOT_KUBE_CTX
+}
+
+###########################################################
 # Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
@@ -351,6 +393,9 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
 
   autoload add-zsh-hook
   add-zsh-hook precmd _polyglot_precmd
+  if _polyglot_kube_ps1_installed; then
+      add-zsh-hook precmd _polyglot_kube_context_zsh
+  fi
 
   # Only display the $HOSTNAME for an ssh connection, except for a superuser
   if _polyglot_is_ssh || _polyglot_is_superuser; then
@@ -387,6 +432,10 @@ elif [ -n "$BASH_VERSION" ]; then
   _polyglot_prompt_command() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
+
+    if _polyglot_kube_ps1_installed; then
+      _polyglot_kube_context_bash
+    fi
 
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
