@@ -216,35 +216,32 @@ _polyglot_kube_ps1_installed() {
 ###########################################################
 # Displays the Kubernetes current context in Bash
 ###########################################################
-_polyglot_kube_context_bash() {
-  _kube_ps1_update_cache
-  KUBE_PS1_CTX_COLOR=yellow
-  POLYGLOT_KUBE_CTX=$(kube_ps1)
-  if [ -n "$POLYGLOT_KUBE_CTX" ]; then
+_polyglot_kube_ps1_bash_precmd() {
+  _kube_ps1_update_cache # Required, otherwise ctx and namespace are not updated
+  local kube_ps1=$(KUBE_PS1_CTX_COLOR=yellow kube_ps1)
+  if [ -n "$kube_ps1" ]; then
     if _polyglot_has_colors; then
-      printf '\e[01m%s\e[0m\n' "$POLYGLOT_KUBE_CTX"
+      printf '\e[01m%s\e[0m\n' "$kube_ps1"
     else
-      printf '%s\n' "$POLYGLOT_KUBE_CTX"
+      printf '%s\n' "$kube_ps1"
     fi
   fi
-  unset KUBE_PS1_CTX_COLOR POLYGLOT_KUBE_CTX
 }
 
 ###########################################################
 # Displays the Kubernetes current context in Zsh
 ###########################################################
-_polyglot_kube_context_zsh() {
-  _kube_ps1_update_cache
-  KUBE_PS1_CTX_COLOR=yellow
-  POLYGLOT_KUBE_CTX=$(kube_ps1)
-  if [ -n "$POLYGLOT_KUBE_CTX" ]; then
+_polyglot_kube_ps1_zsh_precmd() {
+  # If kube-ps1 is installed, the _kube_ps1_update_cache is already
+  # registered as a precmd, so there is no need to call it here again
+  local kube_ps1=$(KUBE_PS1_CTX_COLOR=yellow kube_ps1)
+  if [ -n "$kube_ps1" ]; then
     if _polyglot_has_colors; then
-      print -P "%B$POLYGLOT_KUBE_CTX%b"
+      print -P "%B$kube_ps1%b"
     else
-      print "$POLYGLOT_KUBE_CTX"
+      print "$kube_ps1"
     fi
   fi
-  unset KUBE_PS1_CTX_COLOR POLYGLOT_KUBE_CTX
 }
 
 ###########################################################
@@ -394,7 +391,7 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   autoload add-zsh-hook
   add-zsh-hook precmd _polyglot_precmd
   if _polyglot_kube_ps1_installed; then
-      add-zsh-hook precmd _polyglot_kube_context_zsh
+      add-zsh-hook precmd _polyglot_kube_ps1_zsh_precmd
   fi
 
   # Only display the $HOSTNAME for an ssh connection, except for a superuser
@@ -433,10 +430,6 @@ elif [ -n "$BASH_VERSION" ]; then
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
     [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
-    if _polyglot_kube_ps1_installed; then
-      _polyglot_kube_context_bash
-    fi
-
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
@@ -472,6 +465,10 @@ elif [ -n "$BASH_VERSION" ]; then
   fi
 
   PROMPT_COMMAND='_polyglot_prompt_command $POLYGLOT_PROMPT_DIRTRIM'
+  if _polyglot_kube_ps1_installed; then
+    PROMPT_COMMAND="_polyglot_kube_ps1_bash_precmd;$PROMPT_COMMAND"
+  fi
+
 
   # vi command mode
   if [ "$TERM" != 'dumb' ]; then     # Line editing not enabled in Emacs shell
