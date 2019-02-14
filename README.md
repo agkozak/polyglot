@@ -29,6 +29,7 @@
 - [Git Branch and Status](#git-branch-and-status)
 - [Exit Status](#exit-status)
 - [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
+- [Kubernetes integration](#kubernetes-integration)
 
 ## Basics
 
@@ -122,3 +123,11 @@ in your `.inputrc` or
     set -o vi
 
 in your `.bashrc`.
+
+## Kubernetes integration
+
+Polyglot also integrates with [kube-ps1](https://github.com/jonmosco/kube-ps1). If you are a Kubernetes user and have it installed, you will already see it in the Polyglot prompt.
+
+In order to let Polyglot know that `kube-ps1` is installed, **it must be loaded before Polyglot**.
+
+![Kubernetes integration](img/kubernetes.png)
