@@ -5,8 +5,10 @@ if ! type kube_ps1 &> /dev/null; then
   echo 'polyglot-kube-ps1: Load jonmosco/kube-ps1.' >&2 && return 1
 fi
 
-KUBE_PS1_SYMBOL_ENABLE='false'
-KUBE_PS1_CTX_COLOR='yellow'
+# Do not show the unicode Kubernetes symbol and use yellow, unless there is an existing
+# explicit configuration
+KUBE_PS1_SYMBOL_ENABLE=${KUBE_PS1_SYMBOL_ENABLE:-false}
+KUBE_PS1_CTX_COLOR=${KUBE_PS1_CTX_COLOR:-yellow}
 
 if [[ -n $ZSH_VERSION ]]; then
 
@@ -31,7 +33,6 @@ elif [[ -n $BASH_VERSION ]]; then
     local kube_ps1=$(kube_ps1)
     if [ -n "$kube_ps1" ]; then
       if _polyglot_has_colors; then
-        printf '\e[01m%s\e[0m\n' "$kube_ps1"
         PS1="\033[1m\]$kube_ps1\[\033[0m\]\n"$PS1
       else
         PS1="$kube_ps1"$PS1
@@ -40,7 +41,7 @@ elif [[ -n $BASH_VERSION ]]; then
   }
 
   if [[ $PROMPT_COMMAND != *_polyglot_kube_ps1_prompt_command* ]]; then
-    PROMPT_COMMAND+='_polyglot_kube_ps1_prompt_command'
+    PROMPT_COMMAND+=';_polyglot_kube_ps1_prompt_command'
   fi
 
 fi

@@ -126,8 +126,10 @@ in your `.bashrc`.
 
 ## Kubernetes integration
 
-Polyglot also integrates with [kube-ps1](https://github.com/jonmosco/kube-ps1). If you are a Kubernetes user and have it installed, you will already see it in the Polyglot prompt.
+Polyglot also integrates with [kube-ps1](https://github.com/jonmosco/kube-ps1).
 
-In order to let Polyglot know that `kube-ps1` is installed, **it must be loaded before Polyglot**.
+This is currently supported in `bash` and `zsh`. To enable the `kube-ps1` addon you just need to source it after having loaded the `kube-ps1` and `polyglot.sh` files in the corresponding *rc* file:
+
+    . /path/to/polyglot/addons/polyglot-kube-ps1.sh
 
 ![Kubernetes integration](img/kubernetes.png)
