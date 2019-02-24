@@ -213,7 +213,7 @@ _polyglot_branch_changes() {
 # Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
-  case $0 in
+  case $(basename $0) in
     ash|-ash|sh)
       if command -v readlink > /dev/null 2>&1; then
         case $(exec 2> /dev/null; readlink /proc/$$/exe) in
