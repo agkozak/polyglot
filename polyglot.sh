@@ -353,6 +353,9 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
     zle && zle -R
   }
 
+  # TODO: add-zsh-hook was added in ZSH v4.3.4. It would be nice to be
+  # compatible with even earlier versions of ZSH, but that seems to require
+  # use of array syntax that is incompatible with ash.
   autoload add-zsh-hook
   add-zsh-hook precmd _polyglot_precmd
 
