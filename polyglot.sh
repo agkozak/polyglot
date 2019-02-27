@@ -353,10 +353,8 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
     zle && zle -R
   }
 
-  # Only add _polyglot_precmd to $precmd_functions once
-  [[ -n ${precmd_functions[(r)_polyglot_precmd]} ]] || {
-    precmd_functions[$(($#precmd_functions+1))]=_polyglot_precmd
-  }
+  autoload add-zsh-hook
+  add-zsh-hook precmd _polyglot_precmd
 
   # Only display the $HOSTNAME for an ssh connection, except for a superuser
   if _polyglot_is_ssh || _polyglot_is_superuser; then
