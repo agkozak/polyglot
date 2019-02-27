@@ -110,7 +110,7 @@ If the exit status of the most recently executed command is other than zero (zer
 
 ## Kubernetes Integration
 
-If you are using Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt using the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
+If you are using Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt with the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
 
 ## Enabling `vi` editing mode in `zsh` and `bash`
 
