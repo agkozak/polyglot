@@ -8,7 +8,7 @@
 
 # Polyglot Prompt
 
-**Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox ash` that uses basic ASCII symbols (and color, when possible) to show:
+The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox ash` that uses basic ASCII symbols (and color, when possible) to show:
 
 * the username
 * whether a session is local or remote over SSH
@@ -37,7 +37,7 @@ The central functions of the prompt are the same in all supported shells:
 
 ![Polyglot working in several shells](img/polyglot-with-several-shells.png)
 
-Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates `vi` insert mode with a `+`, and command mode with a `:`, at the beginning of the prompt:
+Additionally, in `zsh` and in `bash` v4.3 and higher, the Polyglot Prompt indicates `vi` insert mode with a `+`, and command mode with a `:`, at the beginning of the prompt:
 
 ![`zsh` line editing](img/zsh-line-editing.png)
 
@@ -45,7 +45,7 @@ Additionally, in `zsh` and in `bash` v4.3 and higher, Polyglot Prompt indicates 
 
 ## Installation
 
-Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
+The Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
 
     . /path/to/polyglot.sh
 
@@ -61,7 +61,7 @@ When a session is local, only the username is shown; when it is remote over SSH 
 
 ## Abbreviated Paths
 
-In all shells, by default Polyglot Prompt emulates the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`: a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need to be shown, only the last two are displayed, along with an ellipsis, so that
+In all shells, by default the Polyglot Prompt emulates the behavior that `bash` uses when `PROMPT_DIRTRIM` is set to `2`: a tilde (`~`) is prepended if the working directory is under the user's home directory, and then if more than two directory elements need to be shown, only the last two are displayed, along with an ellipsis, so that
 
     /home/pi/src/neovim/config
 
@@ -87,7 +87,7 @@ If you would like to display a different number of directory elements in your Po
 
 ## Git Branch and Status
 
-If the current directory contains a Git repository, Polyglot Prompt displays the name of the working branch, along with some symbols to show changes to its status:
+If the current directory contains a Git repository, the Polyglot Prompt displays the name of the working branch, along with some symbols to show changes to its status:
 
 ![Git examples](img/git-examples.png)
 
@@ -110,7 +110,7 @@ If the exit status of the most recently executed command is other than zero (zer
 
 ## Kubernetes Integration
 
-If you are using Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt with the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
+If you are using the Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt with the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
 
 ## Enabling `vi` editing mode in `zsh` and `bash`
 
