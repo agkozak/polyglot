@@ -28,6 +28,7 @@
 - [Abbreviated Paths](#abbreviated-paths)
 - [Git Branch and Status](#git-branch-and-status)
 - [Exit Status](#exit-status)
+- [Kubernetes Integration](#kubernetes-integration)
 - [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
 
 ## Basics
@@ -106,6 +107,10 @@ Untracked | ?
 If the exit status of the most recently executed command is other than zero (zero indicating success), the exit status will be displayed to the left of the prompt:
 
 ![Exit status displayed in `zsh`, `bash`, and `ksh`](img/exit-status.png)
+
+## Kubernetes Integration
+
+If you are using Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt using the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
 
 ## Enabling `vi` editing mode in `zsh` and `bash`
 
