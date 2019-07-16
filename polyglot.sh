@@ -169,7 +169,7 @@ _polyglot_branch_changes() {
   [ -n "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
 
-  POLYGLOT_GIT_STATUS=$(LC_ALL=C env git status 2>&1)
+  POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status 2>&1)
 
   POLYGLOT_SYMBOLS=''
 
