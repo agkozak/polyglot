@@ -54,7 +54,7 @@
 # https://github.com/agkozak/polyglot
 #
 
-# shellcheck disable=SC1117,SC2016,SC2034,SC2088,SC2148,SC2154
+# shellcheck disable=SC2016,SC2034,SC2088
 
 # Only run in interactive shells
 case $- in
@@ -213,7 +213,7 @@ _polyglot_branch_changes() {
 # Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
-  case $(basename $0) in
+  case $(basename "$0") in
     ash|-ash|sh)
       if command -v readlink > /dev/null 2>&1; then
         case $(exec 2> /dev/null; readlink /proc/$$/exe) in
@@ -271,8 +271,11 @@ _polyglot_is_dtksh() {
 #   $1 Number of directory elements to display
 ############################################################
 _polyglot_ksh93_prompt_dirtrim() {
-  # shellcheck disable=SC2015
-  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+  if [ -n "$1" ]; then
+    [ "$1" -gt 0 ]
+  else
+    set 2
+  fi
 
   typeset dir dir_minus_slashes dir_count
   case $HOME in
@@ -323,7 +326,6 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   ###########################################################
   _polyglot_precmd() {
     psvar[2]=$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
-    # shellcheck disable=SC2119
     psvar[3]=$(_polyglot_branch_status)
   }
 
@@ -518,17 +520,14 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
         # zsh emulating other shells doesn't handle colors well
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
-          # shellcheck disable=2016
           PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
         else
           PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
-          # shellcheck disable=2016
           PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m # ')"
         else
-          # shellcheck disable=SC2016
           PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
         fi
       fi
@@ -558,8 +557,11 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
   _polyglot_prompt_dirtrim() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    # shellcheck disable=SC2015
-    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+    if [ -n "$1" ]; then
+      [ "$1" -gt 0 ]
+    else
+      set 2
+    fi
 
     case $HOME in
       /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
@@ -655,10 +657,12 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
         NetBSD|OpenBSD) PS1="$PS1$(print "$POLYGLOT_NP")" ;;
       esac
     fi
+    # shellcheck disable=SC2025
     ! _polyglot_is_dragonfly_console && PS1="$PS1\033[7m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
+    # shellcheck disable=SC2025
     ! _polyglot_is_dragonfly_console && PS1="$PS1\033[0m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
