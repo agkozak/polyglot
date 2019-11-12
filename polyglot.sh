@@ -290,11 +290,7 @@ _polyglot_is_dtksh() {
 #   $1 Number of directory elements to display
 ############################################################
 _polyglot_ksh93_prompt_dirtrim() {
-  if [ -n "$1" ]; then
-    [ "$1" -gt 0 ]
-  else
-    set 2
-  fi
+  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
   typeset dir dir_minus_slashes dir_count
   case $HOME in
@@ -576,11 +572,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   ############################################################
   _polyglot_prompt_dirtrim() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    if [ -n "$1" ]; then
-      [ "$1" -gt 0 ]
-    else
-      set 2
-    fi
+    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
     case $HOME in
       /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
