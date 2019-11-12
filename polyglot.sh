@@ -562,6 +562,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
   # $2 The path to shorten
   ##########################################################
   _polyglot_abbreviate_path() {
+    [ "$PWD" = "$HOME" ] && return
     [ "$PWD" = '/' ] && printf '%s' '/' && return
 
     POLYGLOT_ABBREVIATE_TO="$1"
