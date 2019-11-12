@@ -554,6 +554,38 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
+
+  ##########################################################
+  # Abbreviate ${PWD#$HOME} down to a set number of elements
+  #
+  # $1 Number of directory elements to display
+  # $2 The path to shorten
+  ##########################################################
+  _polyglot_abbreviate_path() {
+    [ "$PWD" = '/' ] && printf '%s' '/' && return
+
+    POLYGLOT_ABBREVIATE_TO="$1"
+    shift
+
+    POLYGLOT_OLD_IFS="$IFS"
+    IFS='/'
+    # shellcheck disable=SC2086
+    set -- $1
+    shift
+
+    while [ $# -gt "$POLYGLOT_ABBREVIATE_TO" ]; do
+      shift
+    done
+
+    while [ $# -ne 0 ]; do
+      printf '/%s' "$1"
+      shift
+    done
+
+    IFS="$POLYGLOT_OLD_IFS"
+    unset POLYGLOT_ABBREVIATE_TO POLYGLOT_OLD_IFS
+  }
+
   ############################################################
   # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
   #
@@ -580,13 +612,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
     esac
 
     # Calculate the part of $PWD that will be displayed in the prompt
-    POLYGLOT_ABBREVIATED_PATH=$(echo "$POLYGLOT_PWD_MINUS_HOME" | awk -F/ '{
-      dir_count=NF-1;
-      if (dir_count <= '"$1"')
-        print $0;
-      else
-        for (i=NF-'"$1"'+1; i<=NF; i++) printf "/%s", $i;
-    }')
+   POLYGLOT_ABBREVIATED_PATH="$(_polyglot_abbreviate_path "$1" "$POLYGLOT_PWD_MINUS_HOME")"
 
     # If the working directory has not been abbreviated, display it thus
     if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
