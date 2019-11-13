@@ -172,12 +172,14 @@ _polyglot_prompt_dirtrim() {
   POLYGLOT_OLD_IFS="$IFS"
   IFS='/'
   set -- $POLYGLOT_PWD_MINUS_HOME
-  shift
+  shift                                  # Discard empty first field preceding /
 
+  # Discard path elements > $POLYGLOT_PROMPT_DIRTRIM
   while [ $# -gt "$POLYGLOT_DIRTRIM_ELEMENTS" ]; do
     shift
   done
 
+  # Reassemble the remaining path elements with slashes
   while [ $# -ne 0 ]; do
     POLYGLOT_ABBREVIATED_PATH="${POLYGLOT_ABBREVIATED_PATH}/$1"
     shift
