@@ -133,40 +133,8 @@ _polyglot_has_colors() {
   fi
 }
 
-##########################################################
-# Abbreviate ${PWD#$HOME} down to a set number of elements
-#
-# $1 Number of directory elements to display
-# $2 The path to shorten
-##########################################################
-_polyglot_abbreviate_path() {
-  # Necessary for set -- $1 to work in zsh
-  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
-
-  POLYGLOT_ABBREVIATE_TO="$1"
-  shift
-
-  POLYGLOT_OLD_IFS="$IFS"
-  IFS='/'
-  # shellcheck disable=SC2086
-  set -- $1
-  shift
-
-  while [ $# -gt "$POLYGLOT_ABBREVIATE_TO" ]; do
-    shift
-  done
-
-  while [ $# -ne 0 ]; do
-    printf '/%s' "$1"
-    shift
-  done
-
-  IFS="$POLYGLOT_OLD_IFS"
-  unset POLYGLOT_ABBREVIATE_TO POLYGLOT_OLD_IFS
-}
-
 ############################################################
-# Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
+# Emulation of bash's PROMPT_DIRTRIM for all other shells
 #
 # In $PWD, substitute $HOME with ~; if the remainder of the
 # $PWD has more than a certain number of directory elements
@@ -182,8 +150,15 @@ _polyglot_abbreviate_path() {
 #   $1 Number of directory elements to display
 ############################################################
 _polyglot_prompt_dirtrim() {
+  # Necessary for set -- $1 to undergo field separation in zsh
+  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
+
   # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+  if [ -n "$1" ] && [ "$1" -gt 0 ]; then
+    POLYGLOT_DIRTRIM_ELEMENTS="$1"
+  else
+    POLYGLOT_DIRTRIM_ELEMENTS=2
+  fi
 
   [ "$PWD" = '/' ] && printf '%s' '/' && return
   [ "$PWD" = "$HOME" ] && printf '%s' '~' && return
@@ -194,7 +169,21 @@ _polyglot_prompt_dirtrim() {
   esac
 
   # Calculate the part of $PWD that will be displayed in the prompt
- POLYGLOT_ABBREVIATED_PATH="$(_polyglot_abbreviate_path "$1" "$POLYGLOT_PWD_MINUS_HOME")"
+  POLYGLOT_OLD_IFS="$IFS"
+  IFS='/'
+  set -- $POLYGLOT_PWD_MINUS_HOME
+  shift
+
+  while [ $# -gt "$POLYGLOT_DIRTRIM_ELEMENTS" ]; do
+    shift
+  done
+
+  while [ $# -ne 0 ]; do
+    POLYGLOT_ABBREVIATED_PATH="${POLYGLOT_ABBREVIATED_PATH}/$1"
+    shift
+  done
+
+  IFS="$POLYGLOT_OLD_IFS"
 
   # If the working directory has not been abbreviated, display it thus
   if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
@@ -218,7 +207,8 @@ _polyglot_prompt_dirtrim() {
     fi
   fi
 
-  unset POLYGLOT_PWD_MINUS_HOME POLYGLOT_ABBREVIATED_PATH
+  unset POLYGLOT_DIRTRIM_ELEMENTS POLYGLOT_PWD_MINUS_HOME POLYGLOT_OLD_IFS \
+    POLYGLOT_ABBREVIATED_PATH
 }
 
 ###########################################################
