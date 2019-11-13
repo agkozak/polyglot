@@ -141,7 +141,7 @@ _polyglot_has_colors() {
 ##########################################################
 _polyglot_abbreviate_path() {
   # Necessary for set -- $1 to work in zsh
-  [ -n "$ZSH_VERSION" ] && setopt SH_WORD_SPLIT
+  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
 
   [ "$PWD" = "$HOME" ] && return
   [ "$PWD" = '/' ] && printf '%s' '/' && return
