@@ -133,6 +133,87 @@ _polyglot_has_colors() {
   fi
 }
 
+##########################################################
+# Abbreviate ${PWD#$HOME} down to a set number of elements
+#
+# $1 Number of directory elements to display
+# $2 The path to shorten
+##########################################################
+_polyglot_abbreviate_path() {
+  # Necessary for set -- $1 to work in zsh
+  [ -n "$ZSH_VERSION" ] && setopt SH_WORD_SPLIT
+
+  [ "$PWD" = "$HOME" ] && return
+  [ "$PWD" = '/' ] && printf '%s' '/' && return
+
+  POLYGLOT_ABBREVIATE_TO="$1"
+  shift
+
+  POLYGLOT_OLD_IFS="$IFS"
+  IFS='/'
+  # shellcheck disable=SC2086
+  set -- $1
+  shift
+
+  while [ $# -gt "$POLYGLOT_ABBREVIATE_TO" ]; do
+    shift
+  done
+
+  while [ $# -ne 0 ]; do
+    printf '/%s' "$1"
+    shift
+  done
+
+  IFS="$POLYGLOT_OLD_IFS"
+  unset POLYGLOT_ABBREVIATE_TO POLYGLOT_OLD_IFS
+}
+
+############################################################
+# Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
+#
+# In $PWD, substitute $HOME with ~; if the remainder of the
+# $PWD has more than a certain number of directory elements
+# to display (default: 2), abbreviate it with '...', e.g.
+#
+#   $HOME/dotfiles/polyglot/img
+#
+# will be displayed as
+#
+#   ~/.../polyglot/img
+#
+# Arguments:
+#   $1 Number of directory elements to display
+############################################################
+_polyglot_prompt_dirtrim() {
+  # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
+  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
+
+  case $HOME in
+    /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
+    *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
+  esac
+
+  # Calculate the part of $PWD that will be displayed in the prompt
+ POLYGLOT_ABBREVIATED_PATH="$(_polyglot_abbreviate_path "$1" "$POLYGLOT_PWD_MINUS_HOME")"
+
+  # If the working directory has not been abbreviated, display it thus
+  if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
+    case $PWD in
+      ${HOME}) printf '%s' '~' ;;   # Or else, when $HOME is /, ~/ is printed
+      ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
+      *) printf '%s' "$PWD" ;;
+    esac
+  # Otherwise include an ellipsis to show that abbreviation has taken place
+  else
+    case $PWD in
+      ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+      *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+    esac
+  fi
+
+  unset POLYGLOT_PWD_MINUS_HOME POLYGLOT_ABBREVIATED_PATH
+}
+
 ###########################################################
 # Display current branch name, followed by symbols
 # representing changes to the working copy
@@ -227,7 +308,6 @@ _polyglot_basename() {
   unset POLYGLOT_BASENAME_DIR
 }
 
-
 ###########################################################
 # Tests to see if the current shell is busybox ash
 ###########################################################
@@ -273,57 +353,6 @@ _polyglot_is_dtksh() {
   esac
 }
 
-############################################################
-# Emulation of bash's PROMPT_DIRTRIM for zsh, ksh, and mksh
-#
-# In $PWD, substitute $HOME with ~; if the remainder of the
-# $PWD has more than a certain number of directory elements
-# to display (default: 2), abbreviate it with '...', e.g.
-#
-#   $HOME/dotfiles/polyglot/img
-#
-# will be displayed as
-#
-#   ~/.../polyglot/img
-#
-# Arguments:
-#   $1 Number of directory elements to display
-############################################################
-_polyglot_ksh93_prompt_dirtrim() {
-  [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
-
-  typeset dir dir_minus_slashes dir_count
-  case $HOME in
-    /) dir=$PWD ;;                                  # In case root's $HOME is /
-    *) dir=${PWD#$HOME} ;;
-  esac
-  # The following line is not relevant to pdksh, but that does not mean it will
-  # not see it; obfuscate to avoid the report of a bad substitution.
-  dir_minus_slashes=$(eval echo '${dir//\//}')
-  dir_count=$((${#dir} - ${#dir_minus_slashes}))
-
-  if [ "$dir_count" -le "$1" ]; then
-    case $PWD in
-      ${HOME}) printf '%s' '~' ;;                   # In case root's $HOME is /
-      ${HOME}*) printf '~%s' "$dir" ;;
-      *) printf '%s' "$PWD" ;;
-    esac
-  else
-    typeset lopped_path i
-    lopped_path=$dir
-    i=0
-    while [ "$i" -ne "$1" ]; do
-      lopped_path=${lopped_path%\/*}
-      i=$((i+1))
-    done
-
-    case $PWD in
-      ${HOME}*) printf '~/...%s' "${dir#${lopped_path}}" ;;
-      *) printf '...%s' "${PWD#${lopped_path}}" ;;
-    esac
-  fi
-}
-
 #####################################################################
 # zsh
 #####################################################################
@@ -340,7 +369,7 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   # working branch and working copy status
   ###########################################################
   _polyglot_precmd() {
-    psvar[2]=$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
+    psvar[2]=$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     psvar[3]=$(_polyglot_branch_status)
   }
 
@@ -493,7 +522,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+=$(print "\001\E[34;1m\001")
-          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
           PS1+=$(print "\001\E[0m\001")
@@ -501,7 +530,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
         else
           PS1='$(_polyglot_exit_status $?)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
-          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else # Superuser
@@ -513,7 +542,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+=$(print "\001\E[34;1m\001")
-          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
           PS1+=$(print "\001\E[0m\001")
@@ -525,7 +554,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
-          PS1+='$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
+          PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
         fi
       fi
@@ -535,15 +564,15 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
         # zsh emulating other shells doesn't handle colors well
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
         else
-          PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
+          PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m # ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m # ')"
         else
-          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_ksh93_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
+          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
         fi
       fi
       ;;
@@ -554,84 +583,6 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
-
-  ##########################################################
-  # Abbreviate ${PWD#$HOME} down to a set number of elements
-  #
-  # $1 Number of directory elements to display
-  # $2 The path to shorten
-  ##########################################################
-  _polyglot_abbreviate_path() {
-    [ "$PWD" = "$HOME" ] && return
-    [ "$PWD" = '/' ] && printf '%s' '/' && return
-
-    POLYGLOT_ABBREVIATE_TO="$1"
-    shift
-
-    POLYGLOT_OLD_IFS="$IFS"
-    IFS='/'
-    # shellcheck disable=SC2086
-    set -- $1
-    shift
-
-    while [ $# -gt "$POLYGLOT_ABBREVIATE_TO" ]; do
-      shift
-    done
-
-    while [ $# -ne 0 ]; do
-      printf '/%s' "$1"
-      shift
-    done
-
-    IFS="$POLYGLOT_OLD_IFS"
-    unset POLYGLOT_ABBREVIATE_TO POLYGLOT_OLD_IFS
-  }
-
-  ############################################################
-  # Emulation of bash's PROMPT_DIRTRIM for pdksh, dash, and busybox ash
-  #
-  # In $PWD, substitute $HOME with ~; if the remainder of the
-  # $PWD has more than a certain number of directory elements
-  # to display (default: 2), abbreviate it with '...', e.g.
-  #
-  #   $HOME/dotfiles/polyglot/img
-  #
-  # will be displayed as
-  #
-  #   ~/.../polyglot/img
-  #
-  # Arguments:
-  #   $1 Number of directory elements to display
-  ############################################################
-  _polyglot_prompt_dirtrim() {
-    # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
-
-    case $HOME in
-      /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
-      *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
-    esac
-
-    # Calculate the part of $PWD that will be displayed in the prompt
-   POLYGLOT_ABBREVIATED_PATH="$(_polyglot_abbreviate_path "$1" "$POLYGLOT_PWD_MINUS_HOME")"
-
-    # If the working directory has not been abbreviated, display it thus
-    if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
-      case $PWD in
-        ${HOME}) printf '%s' '~' ;;   # Or else, when $HOME is /, ~/ is printed
-        ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
-        *) printf '%s' "$PWD" ;;
-      esac
-    # Otherwise include an ellipsis to show that abbreviation has taken place
-    else
-      case $PWD in
-        ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-        *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-      esac
-    fi
-
-    unset POLYGLOT_PWD_MINUS_HOME POLYGLOT_ABBREVIATED_PATH
-  }
 
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
