@@ -188,6 +188,13 @@ _polyglot_prompt_dirtrim() {
   # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
   [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
+  if [ "$PWD" = "$HOME" ]; then
+    case $HOME in
+      /) printf '%s' '/' && return ;;
+      *) printf '%s' '~' && return ;;
+    esac
+  fi
+
   case $HOME in
     /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
     *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
@@ -202,7 +209,6 @@ _polyglot_prompt_dirtrim() {
       printf '%s' "$PWD"
     else
       case $PWD in
-        ${HOME}) printf '%s' '~' ;;   # Or else, when $HOME is /, ~/ is printed
         ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
         *) printf '%s' "$PWD" ;;
       esac
@@ -210,10 +216,7 @@ _polyglot_prompt_dirtrim() {
   # Otherwise include an ellipsis to show that abbreviation has taken place
   else
     if [ "$HOME" = '/' ]; then
-      case $PWD in
-        ${HOME}) printf '%s' '/' ;;
-        *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-      esac
+      printf '...%s' "$POLYGLOT_ABBREVIATED_PATH"
     else
       case $PWD in
         ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
