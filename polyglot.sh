@@ -171,6 +171,7 @@ _polyglot_prompt_dirtrim() {
   # Calculate the part of $PWD that will be displayed in the prompt
   POLYGLOT_OLD_IFS="$IFS"
   IFS='/'
+  # shellcheck disable=SC2086
   set -- $POLYGLOT_PWD_MINUS_HOME
   shift                                  # Discard empty first field preceding /
 
