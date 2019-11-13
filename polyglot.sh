@@ -198,17 +198,28 @@ _polyglot_prompt_dirtrim() {
 
   # If the working directory has not been abbreviated, display it thus
   if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
-    case $PWD in
-      ${HOME}) printf '%s' '~' ;;   # Or else, when $HOME is /, ~/ is printed
-      ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
-      *) printf '%s' "$PWD" ;;
-    esac
+    if [ "$HOME" = '/' ]; then
+      printf '%s' "$PWD"
+    else
+      case $PWD in
+        ${HOME}) printf '%s' '~' ;;   # Or else, when $HOME is /, ~/ is printed
+        ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
+        *) printf '%s' "$PWD" ;;
+      esac
+    fi
   # Otherwise include an ellipsis to show that abbreviation has taken place
   else
-    case $PWD in
-      ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-      *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-    esac
+    if [ "$HOME" = '/' ]; then
+      case $PWD in
+        ${HOME}) printf '%s' '/' ;;
+        *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+      esac
+    else
+      case $PWD in
+        ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+        *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+      esac
+    fi
   fi
 
   unset POLYGLOT_PWD_MINUS_HOME POLYGLOT_ABBREVIATED_PATH
