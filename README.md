@@ -85,6 +85,8 @@ If you would like to display a different number of directory elements in your Po
 
 ![POLYGLOT_PROMPT_DIRTRIM examples](img/POLYGLOT_PROMPT_DIRTRIM_examples.png)
 
+Setting `POLYGLOT_PROMPT_DIRTRIM=0` disables path abbreviation, although `$HOME` will still be displayed as `~`.
+
 ## Git Branch and Status
 
 If the current directory contains a Git repository, the Polyglot Prompt displays the name of the working branch, along with some symbols to show changes to its status:

@@ -146,6 +146,9 @@ _polyglot_has_colors() {
 #
 #   ~/.../polyglot/img
 #
+# If $1 is 0, no abbreviation will occur other than that
+# $HOME will be displayed as ~.
+#
 # Arguments:
 #   $1 Number of directory elements to display
 ############################################################
@@ -154,7 +157,7 @@ _polyglot_prompt_dirtrim() {
   [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
 
   # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-  if [ -n "$1" ] && [ "$1" -gt 0 ]; then
+  if [ -n "$1" ]; then
     POLYGLOT_DIRTRIM_ELEMENTS="$1"
   else
     POLYGLOT_DIRTRIM_ELEMENTS=2
@@ -168,45 +171,53 @@ _polyglot_prompt_dirtrim() {
     *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
   esac
 
-  # Calculate the part of $PWD that will be displayed in the prompt
-  POLYGLOT_OLD_IFS="$IFS"
-  IFS='/'
-  # shellcheck disable=SC2086
-  set -- $POLYGLOT_PWD_MINUS_HOME
-  shift                                  # Discard empty first field preceding /
-
-  # Discard path elements > $POLYGLOT_PROMPT_DIRTRIM
-  while [ $# -gt "$POLYGLOT_DIRTRIM_ELEMENTS" ]; do
-    shift
-  done
-
-  # Reassemble the remaining path elements with slashes
-  while [ $# -ne 0 ]; do
-    POLYGLOT_ABBREVIATED_PATH="${POLYGLOT_ABBREVIATED_PATH}/$1"
-    shift
-  done
-
-  IFS="$POLYGLOT_OLD_IFS"
-
-  # If the working directory has not been abbreviated, display it thus
-  if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
-    if [ "$HOME" = '/' ]; then
-      printf '%s' "$PWD"
-    else
-      case $PWD in
-        ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
-        *) printf '%s' "$PWD" ;;
-      esac
-    fi
-  # Otherwise include an ellipsis to show that abbreviation has taken place
+  if [ "$POLYGLOT_DIRTRIM_ELEMENTS" = 0 ]; then
+    [ "$HOME" = '/' ] && printf '%s' "$PWD" && return
+    case $PWD in
+      ${HOME}*) printf '~%s' "$POLYGLOT_PWD_MINUS_HOME" ;;
+      *) printf '%s' "$PWD" ;;
+    esac
   else
-    if [ "$HOME" = '/' ]; then
-      printf '...%s' "$POLYGLOT_ABBREVIATED_PATH"
+    # Calculate the part of $PWD that will be displayed in the prompt
+    POLYGLOT_OLD_IFS="$IFS"
+    IFS='/'
+    # shellcheck disable=SC2086
+    set -- $POLYGLOT_PWD_MINUS_HOME
+    shift                                  # Discard empty first field preceding /
+
+    # Discard path elements > $POLYGLOT_PROMPT_DIRTRIM
+    while [ $# -gt "$POLYGLOT_DIRTRIM_ELEMENTS" ]; do
+      shift
+    done
+
+    # Reassemble the remaining path elements with slashes
+    while [ $# -ne 0 ]; do
+      POLYGLOT_ABBREVIATED_PATH="${POLYGLOT_ABBREVIATED_PATH}/$1"
+      shift
+    done
+
+    IFS="$POLYGLOT_OLD_IFS"
+
+    # If the working directory has not been abbreviated, display it thus
+    if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
+      if [ "$HOME" = '/' ]; then
+        printf '%s' "$PWD"
+      else
+        case $PWD in
+          ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
+          *) printf '%s' "$PWD" ;;
+        esac
+      fi
+    # Otherwise include an ellipsis to show that abbreviation has taken place
     else
-      case $PWD in
-        ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-        *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-      esac
+      if [ "$HOME" = '/' ]; then
+        printf '...%s' "$POLYGLOT_ABBREVIATED_PATH"
+      else
+        case $PWD in
+          ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+          *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
+        esac
+      fi
     fi
   fi
 
@@ -434,12 +445,16 @@ elif [ -n "$BASH_VERSION" ]; then
   ###########################################################
   # Create the bash $PROMPT_COMMAND
   #
+  # If $1 is 0, bash's PROMPT_DIRTRIM abbreviations will be
+  # disabled; the only abbreviation that will occur is that
+  # $HOME will be displayed as ~.
+  #
   # Arguments:
   #   $1 Number of directory elements to display
   ###########################################################
   _polyglot_prompt_command() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    [ -n "$1" ] && [ "$1" -gt 0 ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
+    [ -n "$1" ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
