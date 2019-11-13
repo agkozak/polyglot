@@ -143,9 +143,6 @@ _polyglot_abbreviate_path() {
   # Necessary for set -- $1 to work in zsh
   [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
 
-  [ "$PWD" = "$HOME" ] && return
-  [ "$PWD" = '/' ] && printf '%s' '/' && return
-
   POLYGLOT_ABBREVIATE_TO="$1"
   shift
 
@@ -188,12 +185,8 @@ _polyglot_prompt_dirtrim() {
   # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
   [ -n "$1" ] && [ "$1" -gt 0 ] || set 2
 
-  if [ "$PWD" = "$HOME" ]; then
-    case $HOME in
-      /) printf '%s' '/' && return ;;
-      *) printf '%s' '~' && return ;;
-    esac
-  fi
+  [ "$PWD" = '/' ] && printf '%s' '/' && return
+  [ "$PWD" = "$HOME" ] && printf '%s' '~' && return
 
   case $HOME in
     /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
