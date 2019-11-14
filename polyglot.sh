@@ -79,7 +79,7 @@ _polyglot_exit_status() {
 # Is the user connected via SSH?
 ###########################################################
 _polyglot_is_ssh() {
-  [ -n "${SSH_CONNECTION-}${SSH_CLIENT-}${SSH_TTY-}" ]
+  [ "${SSH_CONNECTION-}${SSH_CLIENT-}${SSH_TTY-}" ]
 }
 
 ###########################################################
@@ -154,24 +154,21 @@ _polyglot_has_colors() {
 ############################################################
 _polyglot_prompt_dirtrim() {
   # Necessary for set -- $1 to undergo field separation in zsh
-  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
+  [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
 
   # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-  if [ -n "$1" ]; then
-    POLYGLOT_DIRTRIM_ELEMENTS="$1"
-  else
-    POLYGLOT_DIRTRIM_ELEMENTS=2
-  fi
+  POLYGLOT_DIRTRIM_ELEMENTS="${1:-2}"
 
+  # If root has / as $HOME, print /, not ~
   [ "$PWD" = '/' ] && printf '%s' '/' && return
   [ "$PWD" = "$HOME" ] && printf '%s' '~' && return
 
   case $HOME in
-    /) POLYGLOT_PWD_MINUS_HOME=$PWD ;;            # In case root's $HOME is /
-    *) POLYGLOT_PWD_MINUS_HOME=${PWD#$HOME} ;;
+    /) POLYGLOT_PWD_MINUS_HOME="$PWD" ;;            # In case root's $HOME is /
+    *) POLYGLOT_PWD_MINUS_HOME="${PWD#$HOME}" ;;
   esac
 
-  if [ "$POLYGLOT_DIRTRIM_ELEMENTS" = 0 ]; then
+  if [ "$POLYGLOT_DIRTRIM_ELEMENTS" -eq 0 ]; then
     [ "$HOME" = '/' ] && printf '%s' "$PWD" && return
     case $PWD in
       ${HOME}*) printf '~%s' "$POLYGLOT_PWD_MINUS_HOME" ;;
@@ -234,7 +231,7 @@ _polyglot_prompt_dirtrim() {
 ###########################################################
 # shellcheck disable=SC2120
 _polyglot_branch_status() {
-  [ -n "$ZSH_VERSION" ] && \
+  [ "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
   POLYGLOT_REF=$(env git symbolic-ref --quiet HEAD 2> /dev/null)
   case $? in        # See what the exit code is.
@@ -244,7 +241,7 @@ _polyglot_branch_status() {
     *) POLYGLOT_REF=$(env git rev-parse --short HEAD 2> /dev/null) || return ;;
   esac
 
-  if [ -n "$POLYGLOT_REF" ]; then
+  if [ "$POLYGLOT_REF" ]; then
     printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes "$1")"
   fi
 
@@ -258,7 +255,7 @@ _polyglot_branch_status() {
 #   $1  If ksh, escape ! as !!
 ###########################################################
 _polyglot_branch_changes() {
-  [ -n "$ZSH_VERSION" ] && \
+  [ "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
 
   POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status 2>&1)
@@ -344,9 +341,7 @@ _polyglot_is_busybox() {
 _polyglot_is_pdksh() {
   case $KSH_VERSION in
     *'PD KSH'*)
-      case ${POLYGLOT_UNAME:=$(uname -s)} in
-        OpenBSD) POLYGLOT_KSH_BANG=ksh ;;
-      esac
+      [ "${POLYGLOT_UNAME:=$(uname -s)}" = 'OpenBSD' ] && POLYGLOT_KSH_BANG='ksh'
       return 0
       ;;
     *) return 1 ;;
@@ -369,7 +364,7 @@ _polyglot_is_dtksh() {
 #####################################################################
 
 # Make sure that ZSH is not emulating ksh or bash
-if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
+if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   && [ "$0" != 'bash' ] && [ "$0" != 'sh' ]; then
 
   setopt PROMPT_SUBST
@@ -440,7 +435,7 @@ if [ -n "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
 #####################################################################
 # bash
 #####################################################################
-elif [ -n "$BASH_VERSION" ]; then
+elif [ "$BASH_VERSION" ]; then
 
   ###########################################################
   # Create the bash $PROMPT_COMMAND
@@ -454,7 +449,7 @@ elif [ -n "$BASH_VERSION" ]; then
   ###########################################################
   _polyglot_prompt_command() {
     # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
-    [ -n "$1" ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
+    [ "$1" ] && PROMPT_DIRTRIM=$1 || PROMPT_DIRTRIM=2
 
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
@@ -515,7 +510,7 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93, mksh, and zsh in bash, ksh, and sh emulation mode
 #####################################################################
 
-elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
+elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
   && ! _polyglot_is_pdksh ; then
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
