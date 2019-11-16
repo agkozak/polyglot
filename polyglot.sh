@@ -455,18 +455,18 @@ elif [ "$BASH_VERSION" ]; then
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
         PS1+="\[\e[01;32m\]\u$(echo -n "$POLYGLOT_HOSTNAME_STRING")\[\e[0m\] "
-        case $BASH_VERSION in
-          4*) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
+        case ${BASH_VERSINFO[0]} in
           # bash, before v4.0, did not have $PROMPT_DIRTRIM
-          *) PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")[\e[0m\]" ;;
+          1|2|3) PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]" ;;
+          *) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
         esac
         PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
       else
         PS1="\$(_polyglot_exit_status \$?)"
         PS1+="\u$(echo -n "$POLYGLOT_HOSTNAME_STRING") "
-        case $BASH_VERSION in
-          4*) PS1+="\w" ;;
-          *) PS1="\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")" ;;
+        case ${BASH_VERSINFO[0]} in
+          1|2|3) PS1="\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")" ;;
+          *) PS1+="\w" ;;
         esac
         PS1+="\$(_polyglot_branch_status) \$ "
       fi
@@ -474,17 +474,17 @@ elif [ "$BASH_VERSION" ]; then
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
-        case $BASH_VERSION in
-          4*) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
-          *) PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]" ;;
+        case ${BASH_VERSINFO[0]} in
+          1|2|3) PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]" ;;
+          *) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
         esac
         PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] # "
       else
         PS1="\$(_polyglot_exit_status \$?)"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
-        case $BASH_VERSION in
-          4*) PS1+="\w" ;;
-          *) PS1+="\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")" ;;
+        case ${BASH_VERSINFO[0]} in
+          1|2|3) PS1+="\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")" ;;
+          *) PS1+="\w" ;;
         esac
         PS1+="\$(_polyglot_branch_status) # "
       fi
