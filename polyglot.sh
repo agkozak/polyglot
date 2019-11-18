@@ -117,6 +117,7 @@ _polyglot_has_colors() {
       if command -v tput > /dev/null 2>&1; then
         case ${POLYGLOT_UNAME:=$(uname -s)} in
           FreeBSD|DragonFly) POLYGLOT_TERM_COLORS=$(tput Co) ;;
+          UWIN*) POLYGLOT_TERM_COLORS=$(tput cols) ;;
           *) POLYGLOT_TERM_COLORS=$(tput colors) ;;
         esac
       else
