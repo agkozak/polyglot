@@ -350,7 +350,7 @@ _polyglot_is_pdksh() {
 }
 
 ###########################################################
-# Test to see if the currect shell is dtksh (Desktop Korn
+# Test to see if the current shell is dtksh (Desktop Korn
 # Shell).
 ###########################################################
 _polyglot_is_dtksh() {
