@@ -360,6 +360,16 @@ _polyglot_is_dtksh() {
   esac
 }
 
+###########################################################
+# Test to see if sh is really dash
+###########################################################
+_polyglot_sh_is_dash() {
+  case $(ls -l "$(command -v "$0")") in
+    *dash*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 #####################################################################
 # zsh
 #####################################################################
@@ -614,7 +624,8 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
 # pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
-elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox; then
+elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
+  || _polyglot_sh_is_dash; then
 
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
@@ -695,6 +706,6 @@ fi
 
 # Clean up environment
 unset -f _polyglot_is_ssh _polyglot_basename _polyglot_is_busybox \
-  _polyglot_is_dtksh _polyglot_is_pdksh
+  _polyglot_is_dtksh _polyglot_is_pdksh _polyglot_sh_is_dash
 
 # vim: ts=2:et:sts=2:sw=2
