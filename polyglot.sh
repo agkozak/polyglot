@@ -431,13 +431,19 @@ if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
 
   unset RPROMPT               # Clean up detritus from previously loaded prompts
 
+  PS1=''
+  # The ZSH vi mode indicator won't work in Emacs shell (but it does in term
+  # and ansi-term)
+  if [ "$TERM" != 'dumb' ]; then
+    PS1+='%(4V.:.+)'
+  fi
   if _polyglot_has_colors; then
-    PS1='%(4V.:.+)%(?..%B%F{red}(%?%)%b%f )'
+    PS1+='%(?..%B%F{red}(%?%)%b%f )'
     PS1+='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) '
     PS1+='%B%F{blue}%2v%f%b'
     PS1+='%F{yellow}%3v%f %# '
   else
-    PS1='%(4V.:.+)%(?..(%?%) )'
+    PS1+='%(?..(%?%) )'
     PS1+='%(!.%S.)%n%1v%(!.%s.) '
     PS1+='%2v'
     PS1+='%3v %# '
