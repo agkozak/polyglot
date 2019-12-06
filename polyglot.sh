@@ -157,7 +157,6 @@ _polyglot_prompt_dirtrim() {
   # Necessary for set -- $1 to undergo field separation in zsh
   [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
 
-  # $POLYGLOT_PROMPT_DIRTRIM must be greater than 0 and defaults to 2
   POLYGLOT_DIRTRIM_ELEMENTS="${1:-2}"
 
   # If root has / as $HOME, print /, not ~
