@@ -62,6 +62,12 @@ case $- in
   *) exit ;;
 esac
 
+# Bail if the shell doesn't have command
+if ! type command > /dev/null 2>&1; then
+  printf '%s\n' 'Polyglot Prompt does not support your shell.' >&2
+  return 1
+fi
+
 ############################################################
 # Display non-zero exit status
 #
