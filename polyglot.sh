@@ -109,6 +109,8 @@ _polyglot_is_superuser() {
 # Does the terminal support enough colors?
 ###########################################################
 _polyglot_has_colors() {
+  [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL
+
   # The DragonFly BSD system console has trouble displaying colors in pdksh
   case ${POLYGLOT_UNAME:=$(uname -s)} in
     DragonFly)
@@ -162,7 +164,8 @@ _polyglot_has_colors() {
 ############################################################
 _polyglot_prompt_dirtrim() {
   # Necessary for set -- $1 to undergo field separation in zsh
-  [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT
+  [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT \
+    NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR 2> /dev/null
 
   POLYGLOT_DIRTRIM_ELEMENTS="${1:-2}"
 
