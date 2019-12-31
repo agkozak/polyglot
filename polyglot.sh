@@ -142,6 +142,7 @@ _polyglot_has_colors() {
 
 ############################################################
 # Emulation of bash's PROMPT_DIRTRIM for all other shells
+# and for bash before v4.0
 #
 # In $PWD, substitute $HOME with ~; if the remainder of the
 # $PWD has more than a certain number of directory elements
