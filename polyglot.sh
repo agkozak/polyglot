@@ -239,73 +239,60 @@ _polyglot_prompt_dirtrim() {
 # Arguments:
 #   $1  If ksh, escape ! as !!
 ###########################################################
-# shellcheck disable=SC2120
 _polyglot_branch_status() {
   [ "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
-  POLYGLOT_REF=$(env git symbolic-ref --quiet HEAD 2> /dev/null)
+
+  POLYGLOT_REF="$(env git symbolic-ref --quiet HEAD 2> /dev/null)"
   case $? in        # See what the exit code is.
     0) ;;           # $POLYGLOT_REF contains the name of a checked-out branch.
     128) return ;;  # No Git repository here.
     # Otherwise, see if HEAD is in a detached state.
-    *) POLYGLOT_REF=$(env git rev-parse --short HEAD 2> /dev/null) || return ;;
+    *) POLYGLOT_REF="$(env git rev-parse --short HEAD 2> /dev/null)" || return ;;
   esac
 
   if [ "$POLYGLOT_REF" ]; then
-    printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$(_polyglot_branch_changes "$1")"
+    POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status 2>&1)
+
+    POLYGLOT_SYMBOLS=''
+
+    case $POLYGLOT_GIT_STATUS in
+      *' have diverged,'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&*" ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'Your branch is behind '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&" ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'Your branch is ahead of '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}*" ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'new file:   '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}+" ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'deleted:    '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}x" ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'modified:   '*)
+        if [ "$1" = 'ksh' ]; then
+          POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!!"
+        else
+          POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!"
+        fi
+        ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'renamed:    '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}>" ;;
+    esac
+    case $POLYGLOT_GIT_STATUS in
+      *'Untracked files:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}?" ;;
+    esac
+
+    [ -n "$POLYGLOT_SYMBOLS" ] && POLYGLOT_SYMBOLS=" $POLYGLOT_SYMBOLS"
+
+    printf ' (%s%s)' "${POLYGLOT_REF#refs/heads/}" "$POLYGLOT_SYMBOLS"
   fi
 
-  unset POLYGLOT_REF
-}
-
-###########################################################
-# Display symbols representing changes to the working copy
-#
-# Arguments:
-#   $1  If ksh, escape ! as !!
-###########################################################
-_polyglot_branch_changes() {
-  [ "$ZSH_VERSION" ] && \
-    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
-
-  POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status 2>&1)
-
-  POLYGLOT_SYMBOLS=''
-
-  case $POLYGLOT_GIT_STATUS in
-    *' have diverged,'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&*" ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'Your branch is behind '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}&" ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'Your branch is ahead of '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}*" ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'new file:   '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}+" ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'deleted:    '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}x" ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'modified:   '*)
-      if [ "$1" = 'ksh' ]; then
-        POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!!"
-      else
-        POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}!"
-      fi
-      ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'renamed:    '*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}>" ;;
-  esac
-  case $POLYGLOT_GIT_STATUS in
-    *'Untracked files:'*) POLYGLOT_SYMBOLS="${POLYGLOT_SYMBOLS}?" ;;
-  esac
-
-  [ "$POLYGLOT_SYMBOLS" ] && printf ' %s' "$POLYGLOT_SYMBOLS"
-
-  unset POLYGLOT_GIT_STATUS POLYGLOT_SYMBOLS
+  unset POLYGLOT_REF POLYGLOT_GIT_STATUS POLYGLOT_SYMBOLS
 }
 
 ###########################################################
