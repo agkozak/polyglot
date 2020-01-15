@@ -420,7 +420,7 @@ if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
 
   # Only display the $HOSTNAME for an ssh connection, except for a superuser
   if _polyglot_is_ssh || _polyglot_is_superuser; then
-    psvar[1]=$(print -P '@%m')
+    psvar[1]=${HOST%%.*}
   else
     psvar[1]=''
   fi
@@ -536,7 +536,7 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
-    POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%?${POLYGLOT_HOSTNAME_STRING#*.}}"
+    POLYGLOT_HOSTNAME_STRING="@${POLYGLOT_HOSTNAME_STRING%%.*}"
   else
     POLYGLOT_HOSTNAME_STRING=''
   fi
