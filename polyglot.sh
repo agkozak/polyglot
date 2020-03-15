@@ -360,7 +360,7 @@ _polyglot_is_dtksh() {
 # Test to see if sh is really dash
 ###########################################################
 _polyglot_sh_is_dash() {
-  case $(ls -l "$(command -v "$0")") in
+  case $(ls -l "$(command -v "${0#-}")") in
     *dash*) return 0 ;;
     *) return 1 ;;
   esac
