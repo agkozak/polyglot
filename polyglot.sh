@@ -252,7 +252,11 @@ _polyglot_branch_status() {
   esac
 
   if [ "$POLYGLOT_REF" ]; then
-    POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status 2>&1)
+    if [ "${POLYGLOT_SHOW_TRACKED:-1}" -eq 0 ]; then
+      POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status -uno 2>&1)
+    else
+      POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status 2>&1)
+    fi
 
     POLYGLOT_SYMBOLS=''
 
