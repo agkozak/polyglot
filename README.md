@@ -27,6 +27,7 @@ The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, 
 - [Local and Remote Sessions](#local-and-remote-sessions)
 - [Abbreviated Paths](#abbreviated-paths)
 - [Git Branch and Status](#git-branch-and-status)
+    + [`POLYGLOT_SHOW_UNTRACKED`](#polyglot_show_untracked)
 - [Exit Status](#exit-status)
 - [Kubernetes Integration](#kubernetes-integration)
 - [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
@@ -103,6 +104,10 @@ Deleted | x
 Modified | !
 Renamed | >
 Untracked | ?
+
+### `POLYGLOT_SHOW_UNTRACKED`
+
+If you are working on an extremely large Git repository, such as an operating system kernel, calculating the Git status can become very slow. If you need to, you may set `POLYGLOT_SHOW_UNTRACKED=0`, which will cause the Polyglot Prompt to ignore the Git status for untracked files. This will have the effect of speeding up the display of the prompt considerably.
 
 ## Exit Status
 
