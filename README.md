@@ -107,7 +107,7 @@ Untracked | ?
 
 ### `POLYGLOT_SHOW_UNTRACKED`
 
-If you are working on an extremely large Git repository, such as an operating system kernel, calculating the Git status can become very slow. If you need to, you may set `POLYGLOT_SHOW_UNTRACKED=0`, which will cause the Polyglot Prompt to ignore the Git status for untracked files. This will have the effect of speeding up the display of the prompt considerably.
+If you are working on an extremely large Git repository, such as an operating system kernel, calculating the Git status can be very slow. If you need to, you may set `POLYGLOT_SHOW_UNTRACKED=0`, which will cause the Polyglot Prompt to ignore the Git status for untracked files. This will have the effect of speeding up the display of the prompt considerably.
 
 ## Exit Status
 
