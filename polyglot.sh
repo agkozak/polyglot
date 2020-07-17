@@ -385,12 +385,15 @@ _polyglot_venv() {
   elif [ -n "$PIPENV_ACTIVE" ]; then
     POLYGLOT_VENV=${VIRTUAL_ENV%-*}
     POLYGLOT_VENV=${POLYGLOT_VENV##*/}
-  #virtualenv/venv
+  # virtualenv/venv
   elif [ -n "$VIRTUAL_ENV" ]; then
     POLYGLOT_VENV=${VIRTUAL_ENV##*/}
+  # conda
+  elif [ -n "$CONDA_DEFAULT_ENV" ]; then
+    POLYGLOT_VENV=$CONDA_DEFAULT_ENV
   fi
 
-  [ -z "$CONDA_EXE" ] && [ -n "$POLYGLOT_VENV" ] && printf '(%s) ' "$POLYGLOT_VENV"
+  [ -n "$POLYGLOT_VENV" ] && printf '(%s) ' "$POLYGLOT_VENV"
 
   unset POLYGLOT_VENV
 }
@@ -414,6 +417,26 @@ if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
     psvar[2]=$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     psvar[3]=$(_polyglot_branch_status)
     psvar[5]=$(_polyglot_venv)
+
+    PS1=''
+    # The ZSH vi mode indicator won't work in Emacs shell (but it does in term
+    # and ansi-term)
+    if [ "$TERM" != 'dumb' ]; then
+      PS1+='%(4V.:.+)'
+    fi
+    if _polyglot_has_colors; then
+      PS1+='%(?..%B%F{red}(%?%)%b%f )'
+      PS1+='%5v'
+      PS1+='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) '
+      PS1+='%B%F{blue}%2v%f%b'
+      PS1+='%F{yellow}%3v%f %# '
+    else
+      PS1+='%(?..(%?%) )'
+      PS1+='%5v'
+      PS1+='%(!.%S.)%n%1v%(!.%s.) '
+      PS1+='%2v'
+      PS1+='%3v %# '
+    fi
   }
 
   ###########################################################
@@ -456,26 +479,6 @@ if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   fi
 
   unset RPROMPT               # Clean up detritus from previously loaded prompts
-
-  PS1=''
-  # The ZSH vi mode indicator won't work in Emacs shell (but it does in term
-  # and ansi-term)
-  if [ "$TERM" != 'dumb' ]; then
-    PS1+='%(4V.:.+)'
-  fi
-  if _polyglot_has_colors; then
-    PS1+='%(?..%B%F{red}(%?%)%b%f )'
-    PS1+='%5v'
-    PS1+='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) '
-    PS1+='%B%F{blue}%2v%f%b'
-    PS1+='%F{yellow}%3v%f %# '
-  else
-    PS1+='%(?..(%?%) )'
-    PS1+='%5v'
-    PS1+='%(!.%S.)%n%1v%(!.%s.) '
-    PS1+='%2v'
-    PS1+='%3v %# '
-  fi
 
 #####################################################################
 # bash
