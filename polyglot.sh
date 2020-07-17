@@ -241,6 +241,8 @@ _polyglot_prompt_dirtrim() {
 #
 # Arguments:
 #   $1  If ksh, escape ! as !!
+#
+# shellcheck disable=SC2120
 ###########################################################
 _polyglot_branch_status() {
   [ "$ZSH_VERSION" ] && \
@@ -507,7 +509,7 @@ elif [ "$BASH_VERSION" ]; then
         case $BASH_VERSION in
           # bash, before v4.0, did not have $PROMPT_DIRTRIM
           1.*|2.*|3.*)
-            PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]"
+            PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)\[\e[0m\]"
             ;;
           *) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
         esac
@@ -518,7 +520,7 @@ elif [ "$BASH_VERSION" ]; then
         PS1+="\u$(echo -n "$POLYGLOT_HOSTNAME_STRING") "
         case $BASH_VERSION in
           1.*|2.*|3.*)
-           PS1="\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")"
+           PS1="\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)"
            ;;
           *) PS1+="\w" ;;
         esac
@@ -531,7 +533,7 @@ elif [ "$BASH_VERSION" ]; then
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         case $BASH_VERSION in
           1.*|2.*|3.*)
-            PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]"
+            PS1+="\[\e[01;34m\]\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)\[\e[0m\]"
             ;;
           *) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
         esac
@@ -542,7 +544,7 @@ elif [ "$BASH_VERSION" ]; then
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         case $BASH_VERSION in
           1.*|2.*|3.*)
-            PS1+="\$(_polyglot_prompt_dirtrim "\$POLYGLOT_PROMPT_DIRTRIM")"
+            PS1+="\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)"
             ;;
           *) PS1+="\w" ;;
         esac
