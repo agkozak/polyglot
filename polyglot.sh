@@ -390,7 +390,7 @@ _polyglot_venv() {
     [ -z "$CONDA_EXE" ] && POLYGLOT_VENV=${VIRTUAL_ENV##*/}
   fi
 
-  [ -n "$POLYGLOT_VENV" ] && printf ' [%s]' "$POLYGLOT_VENV"
+  [ -n "$POLYGLOT_VENV" ] && printf '(%s) ' "$POLYGLOT_VENV"
 
   unset POLYGLOT_VENV
 }
@@ -465,15 +465,16 @@ if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
   fi
   if _polyglot_has_colors; then
     PS1+='%(?..%B%F{red}(%?%)%b%f )'
+    PS1+='%5v'
     PS1+='%(!.%S.%B%F{green})%n%1v%(!.%s.%f%b) '
     PS1+='%B%F{blue}%2v%f%b'
-    PS1+='%F{yellow}%3v%f'
-    PS1+='%F{green}%5v%f %# '
+    PS1+='%F{yellow}%3v%f %# '
   else
     PS1+='%(?..(%?%) )'
+    PS1+='%5v'
     PS1+='%(!.%S.)%n%1v%(!.%s.) '
     PS1+='%2v'
-    PS1+='%3v%5v %# '
+    PS1+='%3v %# '
   fi
 
 #####################################################################
@@ -498,6 +499,7 @@ elif [ "$BASH_VERSION" ]; then
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
+        PS1+="\$(_polyglot_venv)"
         PS1+="\[\e[01;32m\]\u$(echo -n "$POLYGLOT_HOSTNAME_STRING")\[\e[0m\] "
         case $BASH_VERSION in
           # bash, before v4.0, did not have $PROMPT_DIRTRIM
@@ -506,10 +508,10 @@ elif [ "$BASH_VERSION" ]; then
             ;;
           *) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
         esac
-        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\]"
-        PS1+="\[\e[32m\]\$(_polyglot_venv)\[\e[0m\] \$ "
+        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
       else
         PS1="\$(_polyglot_exit_status \$?)"
+        PS1+="\$(_polyglot_venv)"
         PS1+="\u$(echo -n "$POLYGLOT_HOSTNAME_STRING") "
         case $BASH_VERSION in
           1.*|2.*|3.*)
@@ -517,11 +519,12 @@ elif [ "$BASH_VERSION" ]; then
            ;;
           *) PS1+="\w" ;;
         esac
-        PS1+="\$(_polyglot_branch_status)\$(_polyglot_venv) \$ "
+        PS1+="\$(_polyglot_branch_status) \$ "
       fi
     else  # Superuser
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
+        PS1+="\$(_polyglot_venv) "
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         case $BASH_VERSION in
           1.*|2.*|3.*)
@@ -529,10 +532,10 @@ elif [ "$BASH_VERSION" ]; then
             ;;
           *) PS1+="\[\e[01;34m\]\w\[\e[0m\]" ;;
         esac
-        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\]"
-        PS1+="\[\e[32m\]\$(_polyglot_venv)\[\e[0m\] # "
+        PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] # "
       else
         PS1="\$(_polyglot_exit_status \$?)"
+        PS1+="\$(_polyglot_venv)"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         case $BASH_VERSION in
           1.*|2.*|3.*)
@@ -540,7 +543,7 @@ elif [ "$BASH_VERSION" ]; then
             ;;
           *) PS1+="\w" ;;
         esac
-        PS1+="\$(_polyglot_branch_status)\$(_polyglot_venv) # "
+        PS1+="\$(_polyglot_branch_status) # "
       fi
     fi
   }
@@ -595,6 +598,7 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
           PS1+=$(print "\001\E[0m\E[32;1m\001")
+          PS1+='$(_polyglot_venv)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
@@ -603,22 +607,20 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
           PS1+=$(print "\001\E[0m\001")
-          PS1+=$(print "\001\E[0m\E[32m\001")
-          PS1+='$(_polyglot_venv)'
-          PS1+=$(print "\001\E[0m\001")
           PS1+=' \$ '
         else
           PS1='$(_polyglot_exit_status $?)'
+          PS1+='$(_polyglot_venv)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
           PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
-          PS1+='$(_polyglot_venv)'
           PS1+=' \$ '
         fi
       else # Superuser
         if _polyglot_has_colors; then
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
+          PS1+='$(_polyglot_venv)'
           PS1+=$(print "\001\E[0m\E[7m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
@@ -628,20 +630,17 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
           PS1+=$(print "\001\E[0m\E[33m\001")
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
           PS1+=$(print "\001\E[0m\001")
-          PS1+=$(print "\001\E[0m\E[32m\001")
-          PS1+='$(_polyglot_venv)'
-          PS1+=$(print "\001\E[0m\001")
           PS1+=' # '
         else
           PS1=$(print "\001\r")
           PS1+='$(_polyglot_exit_status $?)'
+          PS1+='$(_polyglot_venv)'
           PS1+=$(print "\001\E[7m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
           PS1+=' '
           PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
-          PS1+='$(_polyglot_venv)'
           PS1+=' # '
         fi
       fi
@@ -651,15 +650,15 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
         # zsh emulating other shells doesn't handle colors well
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m\E[32m$(_polyglot_venv)\E[0m \$ ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)$(_polyglot_venv)\E[0m\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
         else
-          PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG)$(_polyglot_venv) \$ '
+          PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m\E[32m$(_polyglot_venv)\E[0m # ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)$(_polyglot_venv)\E[0m\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m\E[0m # ')"
         else
-          PS1="$(print '$(_polyglot_exit_status $?)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG)$(_polyglot_venv) # ')"
+          PS1="$(print '$(_polyglot_exit_status $?)$(_polyglot_venv)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
         fi
       fi
       ;;
@@ -691,10 +690,12 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
     esac
     PS1=$PS1$(print "\033[31;1m$POLYGLOT_NP")
     PS1=$PS1'$(_polyglot_exit_status $?)'
+    PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
+    PS1=$PS1'$(_polyglot_venv)'
     if ! _polyglot_is_superuser; then
-      PS1=$PS1$(print "$POLYGLOT_NP\033[0m\033[32;1m$POLYGLOT_NP")
+      PS1=$PS1$(print "$POLYGLOT_NP\033[32;1m$POLYGLOT_NP")
     else
-      PS1=$PS1$(print "$POLYGLOT_NP\033[0m\033[7m$POLYGLOT_NP")
+      PS1=$PS1$(print "$POLYGLOT_NP\033[7m$POLYGLOT_NP")
     fi
     PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
@@ -704,11 +705,10 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m\033[33m$POLYGLOT_NP")
     PS1=$PS1'$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
-    PS1=$PS1'$(_polyglot_venv)'
     PS1=$PS1' \$ '
 
   elif ! _polyglot_is_superuser; then
-    PS1='$(_polyglot_exit_status $?)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG)$(_polyglot_venv) \$ '
+    PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
   else  # Superuser
 
     ##########################################################
@@ -735,6 +735,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
         NetBSD|OpenBSD) PS1="$PS1$(print "$POLYGLOT_NP")" ;;
       esac
     fi
+    PS1=$PS1'$(_polyglot_venv)'
     # shellcheck disable=SC2025
     ! _polyglot_is_dragonfly_console && [ "$0" != 'dash' ] && PS1="$PS1\033[7m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
@@ -743,7 +744,7 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
     # shellcheck disable=SC2025
     ! _polyglot_is_dragonfly_console && [ "$0" != 'dash' ] && PS1="$PS1\033[0m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
-    PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG)$(_polyglot_venv) # '
+    PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
   fi
 
 else
