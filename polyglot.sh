@@ -387,10 +387,10 @@ _polyglot_venv() {
     POLYGLOT_VENV=${POLYGLOT_VENV##*/}
   #virtualenv/venv
   elif [ -n "$VIRTUAL_ENV" ]; then
-    [ -z "$CONDA_EXE" ] && POLYGLOT_VENV=${VIRTUAL_ENV##*/}
+    POLYGLOT_VENV=${VIRTUAL_ENV##*/}
   fi
 
-  [ -n "$POLYGLOT_VENV" ] && printf '(%s) ' "$POLYGLOT_VENV"
+  [ -z "$CONDA_EXE" ] && [ -n "$POLYGLOT_VENV" ] && printf '(%s) ' "$POLYGLOT_VENV"
 
   unset POLYGLOT_VENV
 }
