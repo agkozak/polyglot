@@ -15,10 +15,11 @@ The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, 
 * an abbreviated path
 * the Git branch and status
 * the exit status of the last command, if it was not zero
+* any virtual environment created with `virtualenv`, `venv`, `pipenv`, `poetry`, or `conda`
 
 ![Polyglot Prompt demo](img/demo.gif)
 
-*Note: There is now support for color in `mksh` and `pdksh`.*
+*Note: There is also support for color in `pdksh`.*
 
 ## Table of Contents
 
@@ -28,6 +29,7 @@ The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, 
 - [Abbreviated Paths](#abbreviated-paths)
 - [Git Branch and Status](#git-branch-and-status)
 - [Exit Status](#exit-status)
+- [Virtual Environments](#virtual-environments)
 - [Kubernetes Integration](#kubernetes-integration)
 - [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
 
@@ -109,6 +111,12 @@ Untracked | ?
 If the exit status of the most recently executed command is other than zero (zero indicating success), the exit status will be displayed to the left of the prompt:
 
 ![Exit status displayed in `zsh`, `bash`, and `ksh`](img/exit-status.png)
+
+## Virtual Environments
+
+The Polyglot Prompt will display any active virtual environment created with `virtualenv`, `venv`, `pipenv`, `poetry`, or `conda` at the beginning of the prompt:
+
+![Virtual environments](img/venv.png)
 
 ## Kubernetes Integration
 
