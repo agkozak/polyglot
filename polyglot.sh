@@ -88,7 +88,7 @@ _polyglot_exit_status() {
 # Is the user connected via SSH?
 ###########################################################
 _polyglot_is_ssh() {
-  [ "${SSH_CONNECTION-}${SSH_CLIENT-}${SSH_TTY-}" ]
+  [ -n "${SSH_CONNECTION-}${SSH_CLIENT-}${SSH_TTY-}" ]
 }
 
 ###########################################################
@@ -112,7 +112,7 @@ _polyglot_is_superuser() {
 # Does the terminal support enough colors?
 ###########################################################
 _polyglot_has_colors() {
-  [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL
+  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL
 
   # The DragonFly BSD system console has trouble displaying colors in pdksh
   case ${POLYGLOT_UNAME:=$(uname -s)} in
@@ -167,7 +167,7 @@ _polyglot_has_colors() {
 ############################################################
 _polyglot_prompt_dirtrim() {
   # Necessary for set -- $1 to undergo field separation in zsh
-  [ "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT \
+  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS SH_WORD_SPLIT \
     NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR 2> /dev/null
 
   POLYGLOT_DIRTRIM_ELEMENTS="${1:-2}"
@@ -245,7 +245,7 @@ _polyglot_prompt_dirtrim() {
 # shellcheck disable=SC2120
 ###########################################################
 _polyglot_branch_status() {
-  [ "$ZSH_VERSION" ] && \
+  [ -n "$ZSH_VERSION" ] && \
     setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
 
   POLYGLOT_REF="$(env git symbolic-ref --quiet HEAD 2> /dev/null)"
@@ -256,7 +256,7 @@ _polyglot_branch_status() {
     *) POLYGLOT_REF="$(env git rev-parse --short HEAD 2> /dev/null)" || return ;;
   esac
 
-  if [ "$POLYGLOT_REF" ]; then
+  if [ -n "$POLYGLOT_REF" ]; then
     if [ "${POLYGLOT_SHOW_UNTRACKED:-1}" -eq 0 ]; then
       POLYGLOT_GIT_STATUS=$(LC_ALL=C GIT_OPTIONAL_LOCKS=0 env git status -uno 2>&1)
     else
@@ -405,7 +405,7 @@ _polyglot_venv() {
 #####################################################################
 
 # Make sure that ZSH is not emulating ksh or bash
-if [ "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] \
+if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] \
   && [ "${0#-}" != 'bash' ] && [ "${0#-}" != 'sh' ]; then
 
   setopt PROMPT_SUBST
@@ -485,7 +485,7 @@ if [ "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] \
 #####################################################################
 # bash
 #####################################################################
-elif [ "$BASH_VERSION" ]; then
+elif [ -n "$BASH_VERSION" ]; then
 
   ###########################################################
   # Create the bash $PROMPT_COMMAND
@@ -572,7 +572,7 @@ elif [ "$BASH_VERSION" ]; then
 # ksh93, mksh, and zsh in bash, ksh, and sh emulation mode
 #####################################################################
 
-elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
+elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
   && ! _polyglot_is_pdksh ; then
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
