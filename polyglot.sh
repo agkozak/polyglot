@@ -326,8 +326,8 @@ _polyglot_basename() {
 # Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
-  case $(_polyglot_basename "$0") in
-    ash|-ash|sh|-sh)
+  case $(_polyglot_basename "${0#-}") in
+    ash|sh)
       if command -v readlink > /dev/null 2>&1; then
         case $(exec 2> /dev/null; readlink /proc/$$/exe) in
           */busybox) return 0 ;;
@@ -359,7 +359,7 @@ _polyglot_is_pdksh() {
 # Shell).
 ###########################################################
 _polyglot_is_dtksh() {
-  case $0 in
+  case ${0#-} in
     *dtksh) return 0 ;;
     *) return 1 ;;
   esac
@@ -405,8 +405,8 @@ _polyglot_venv() {
 #####################################################################
 
 # Make sure that ZSH is not emulating ksh or bash
-if [ "$ZSH_VERSION" ] && [ "$0" != 'ksh' ] \
-  && [ "$0" != 'bash' ] && [ "$0" != 'sh' ]; then
+if [ "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] \
+  && [ "${0#-}" != 'bash' ] && [ "${0#-}" != 'sh' ]; then
 
   setopt PROMPT_SUBST
 
@@ -582,7 +582,7 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  if [ "$0" = 'bash' ] || [ "$0" = 'sh' ]; then
+  if [ "${0#-}" = 'bash' ] || [ "${0#-}" = 'sh' ]; then
     POLYGLOT_KSH_BANG=''
   else
     case $KSH_VERSION in
@@ -675,7 +675,7 @@ elif [ "$KSH_VERSION" ] || _polyglot_is_dtksh || [ "$ZSH_VERSION" ] \
 # pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
-elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
+elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox \
   || _polyglot_sh_is_dash; then
 
   # Only display the $HOSTNAME for an ssh connection
@@ -744,12 +744,12 @@ elif _polyglot_is_pdksh || [ "$0" = 'dash' ] || _polyglot_is_busybox \
     fi
     PS1=$PS1'$(_polyglot_venv)'
     # shellcheck disable=SC2025
-    ! _polyglot_is_dragonfly_console && [ "$0" != 'dash' ] && PS1="$PS1\033[7m"
+    ! _polyglot_is_dragonfly_console && [ "${0#-}" != 'dash' ] && PS1="$PS1\033[7m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     # shellcheck disable=SC2025
-    ! _polyglot_is_dragonfly_console && [ "$0" != 'dash' ] && PS1="$PS1\033[0m"
+    ! _polyglot_is_dragonfly_console && [ "${0#-}" != 'dash' ] && PS1="$PS1\033[0m"
     _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
     PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
   fi
