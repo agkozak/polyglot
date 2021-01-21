@@ -245,8 +245,8 @@ _polyglot_prompt_dirtrim() {
 # shellcheck disable=SC2120
 ###########################################################
 _polyglot_branch_status() {
-  [ -n "$ZSH_VERSION" ] && \
-    setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL NO_WARN_NESTED_VAR > /dev/null 2>&1
+  [ -n "$ZSH_VERSION" ] && setopt LOCAL_OPTIONS NO_WARN_CREATE_GLOBAL \
+    NO_WARN_NESTED_VAR > /dev/null 2>&1
 
   POLYGLOT_REF="$(env git symbolic-ref --quiet HEAD 2> /dev/null)"
   case $? in        # See what the exit code is.
@@ -405,8 +405,8 @@ _polyglot_venv() {
 #####################################################################
 
 # Make sure that ZSH is not emulating ksh or bash
-if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] \
-  && [ "${0#-}" != 'bash' ] && [ "${0#-}" != 'sh' ]; then
+if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] &&
+  [ "${0#-}" != 'bash' ] && [ "${0#-}" != 'sh' ]; then
 
   setopt PROMPT_SUBST
 
@@ -572,8 +572,8 @@ elif [ -n "$BASH_VERSION" ]; then
 # ksh93, mksh, and zsh in bash, ksh, and sh emulation mode
 #####################################################################
 
-elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
-  && ! _polyglot_is_pdksh ; then
+elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
+  ! _polyglot_is_pdksh ; then
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
     POLYGLOT_HOSTNAME_STRING=$(hostname)
@@ -675,8 +675,8 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] \
 # pdksh, dash, busybox ash, and zsh in sh emulation mode
 ####################################################################
 
-elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox \
-  || _polyglot_sh_is_dash; then
+elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
+  _polyglot_sh_is_dash; then
 
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
