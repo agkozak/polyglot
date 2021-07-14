@@ -54,6 +54,7 @@
 # https://github.com/agkozak/polyglot
 #
 
+# shellcheck shell=ksh
 # shellcheck disable=SC2016,SC2034,SC2088
 
 # Only run in interactive shells
