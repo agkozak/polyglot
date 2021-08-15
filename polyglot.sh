@@ -686,8 +686,12 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  # A non-printable character (Ctrl-Q) for delimiting escape sequences in pdksh
-  POLYGLOT_NP="\021"
+  # pdksh uses a non-printing character of the programmer's choice to delimit
+  # escape sequences in the prompt. In practice, however, it is hard to find a
+  # safe non-printing character. In the past, I used \021, but it is displayed
+  # in Windows Terminal, so I have settled on \016.
+
+  POLYGLOT_NP="\016"
 
   if _polyglot_is_pdksh && _polyglot_has_colors; then
 
