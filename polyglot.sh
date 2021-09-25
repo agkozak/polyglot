@@ -460,6 +460,7 @@ if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] &&
 
   zle -N _polyglot_zle_keymap_select
   zle -A _polyglot_zle_keymap_select zle-keymap-select
+  zle -A _polyglot_zle_keymap_select zle-line-init
 
   ###########################################################
   # Redraw prompt when terminal size changes
