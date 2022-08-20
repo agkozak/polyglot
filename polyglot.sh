@@ -695,41 +695,6 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
   else
     POLYGLOT_HOSTNAME_STRING=''
   fi
- 
-  # Configure the yash shell, which is similar to dash but with quality of life
-  # features like tab completion. The only thing yash lacks is the ability to
-  # show what mode you are in when using its rendition of Vi-mode.
-  if _polyglot_is_yash; then
-    if _polyglot_is_superuser; then
-      if _polyglot_has_colors; then
-        YASH_PS1='\[\e[01;31m\]$(_polyglot_exit_status $?)\[\e[0m\]'
-        YASH_PS1=$YASH_PS1'$(_polyglot_venv)'
-        YASH_PS1=$YASH_PS1'\[\e[01;32m\]${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\[\e[0m\] '
-        YASH_PS1=$YASH_PS1'\[\e[01;34m\]$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]'
-        YASH_PS1=$YASH_PS1'\[\e[33m\]$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\[\e[0m\] # '
-      else
-        YASH_PS1='$(_polyglot_exit_status $?)'
-        YASH_PS1=$YASH_PS1'$(_polyglot_venv)'
-        YASH_PS1=$YASH_PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
-        YASH_PS1=$YASH_PS1'$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-        YASH_PS1=$YASH_PS1'$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
-      fi
-    else
-      if _polyglot_has_colors; then
-        YASH_PS1='\[\e[01;31m\]$(_polyglot_exit_status $?)\[\e[0m\]'
-        YASH_PS1=$YASH_PS1'$(_polyglot_venv)'
-        YASH_PS1=$YASH_PS1'\[\e[01;32m\]${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\[\e[0m\] '
-        YASH_PS1=$YASH_PS1'\[\e[01;34m\]$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]'
-        YASH_PS1=$YASH_PS1'\[\e[33m\]$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\[\e[0m\] \$ '
-      else
-        YASH_PS1='$(_polyglot_exit_status $?)'
-        YASH_PS1=$YASH_PS1'$(_polyglot_venv)'
-        YASH_PS1=$YASH_PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
-        YASH_PS1=$YASH_PS1'$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
-        YASH_PS1=$YASH_PS1'$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
-      fi
-    fi
-  fi
 
   # pdksh uses a non-printing character of the programmer's choice to delimit
   # escape sequences in the prompt. In practice, however, it is hard to find a
@@ -762,7 +727,13 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     PS1=$PS1'$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
     PS1=$PS1' \$ '
-
+  
+  elif _polyglot_is_yash && _polyglot_has_colors; then
+    PS1='\[\e[01;31m\]$(_polyglot_exit_status $?)\[\e[0m\]'
+    PS1=$PS1'$(_polyglot_venv)'
+    PS1=$PS1'\[\e[01;32m\]${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\[\e[0m\] '
+    PS1=$PS1'\[\e[01;34m\]$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]'
+    PS1=$PS1'\[\e[33m\]$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\[\e[0m\] \$ '
   elif ! _polyglot_is_superuser; then
     PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
   else  # Superuser
