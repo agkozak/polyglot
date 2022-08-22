@@ -7,7 +7,7 @@
 #
 # Polyglot Prompt
 #
-# A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, dash, and
+# A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, dash, yash, and
 # busybox ash
 #
 #
@@ -327,17 +327,8 @@ _polyglot_basename() {
 # Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
-  case $(_polyglot_basename "${0#-}") in
-    ash|sh)
-      if command -v readlink > /dev/null 2>&1; then
-        case $(exec 2> /dev/null; readlink /proc/$$/exe) in
-          */busybox) return 0 ;;
-          *) return 1 ;;
-        esac
-      else
-        return 1
-      fi
-      ;;
+  case $(help 2> /dev/null) in
+    'Built-in commands:'*) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -372,6 +363,14 @@ _polyglot_is_dtksh() {
 _polyglot_sh_is_dash() {
   case $(ls -l "$(command -v "${0#-}")") in
     *dash*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+_polyglot_is_yash()
+{
+  case "${0#-}" in
+    *yash) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -674,11 +673,11 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
   esac
 
 ####################################################################
-# pdksh, dash, busybox ash, and zsh in sh emulation mode
+# pdksh, dash, busybox ash, yash, and zsh in sh emulation mode
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
-  _polyglot_sh_is_dash; then
+  _polyglot_is_yash || _polyglot_sh_is_dash; then
 
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then
@@ -720,46 +719,24 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
     PS1=$PS1' \$ '
 
-  elif ! _polyglot_is_superuser; then
-    PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
-  else  # Superuser
-
-    ##########################################################
-    # Tests to see if the terminal is the DragonFly BSD system
-    # console, which displays color in pdksh badly.
-    ##########################################################
-    _polyglot_is_dragonfly_console() {
-      case ${POLYGLOT_UNAME:=$(uname -s)} in
-        DragonFly)
-          case $(who am i) in
-            *ttyv*) return 0 ;;
-            *) return 1 ;;
-          esac
-          ;;
-        *) return 1 ;;
-      esac
-    }
-
-    PS1=
-    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$(print "$POLYGLOT_NP\r")
-    PS1=$PS1'$(_polyglot_exit_status $?)'
-    if _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console; then
-      case $POLYGLOT_UNAME in
-        NetBSD|OpenBSD) PS1="$PS1$(print "$POLYGLOT_NP")" ;;
-      esac
-    fi
+  elif _polyglot_is_yash && _polyglot_has_colors; then
+    PS1='\[\e[01;31m\]$(_polyglot_exit_status $?)\[\e[0m\]'
     PS1=$PS1'$(_polyglot_venv)'
-    # shellcheck disable=SC2025
-    ! _polyglot_is_dragonfly_console && [ "${0#-}" != 'dash' ] && PS1="$PS1\033[7m"
-    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
-    PS1=$PS1'${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
-    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
-    # shellcheck disable=SC2025
-    ! _polyglot_is_dragonfly_console && [ "${0#-}" != 'dash' ] && PS1="$PS1\033[0m"
-    _polyglot_is_pdksh && ! _polyglot_is_dragonfly_console && PS1=$PS1$(print "$POLYGLOT_NP")
-    PS1=$PS1' $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # '
+    if ! _polyglot_is_superuser; then
+      PS1=$PS1'\[\e[01;32m\]${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\[\e[0m\] '
+    else
+      PS1=$PS1'\[\e[7m\]${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\[\e[0m\] '
+    fi
+    PS1=$PS1'\[\e[01;34m\]$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]'
+    PS1=$PS1'\[\e[33m\]$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\[\e[0m\] \$ '
+  else
+    PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) '
+    if ! _polyglot_is_superuser; then
+      PS1=$PS1'$ '
+    else
+      PS1=$PS1'# '
+    fi
   fi
-
 else
   printf '%s\n' 'Polyglot Prompt does not support your shell.' >&2
 fi
