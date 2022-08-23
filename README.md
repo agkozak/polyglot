@@ -8,7 +8,7 @@
 
 # Polyglot Prompt
 
-The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, and `busybox ash` that uses basic ASCII symbols (and color, when possible) to show:
+The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, `yash`, and `busybox ash` that uses basic ASCII symbols (and color, when possible) to show:
 
 * the username
 * whether a session is local or remote over SSH
