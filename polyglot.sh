@@ -55,7 +55,7 @@
 #
 
 # shellcheck shell=ksh
-# shellcheck disable=SC2016,SC2034,SC2088
+# shellcheck disable=SC2016,SC2034,SC2088,SC3024
 
 # Only run in interactive shells
 case $- in
@@ -106,6 +106,7 @@ _polyglot_euid() {
 # Is the user a superuser?
 ###########################################################
 _polyglot_is_superuser() {
+  # shellcheck disable=SC3028
   [ ${EUID:-$(_polyglot_euid)} -eq 0 ]
 }
 
@@ -179,7 +180,7 @@ _polyglot_prompt_dirtrim() {
 
   case $HOME in
     /) POLYGLOT_PWD_MINUS_HOME="$PWD" ;;            # In case root's $HOME is /
-    *) POLYGLOT_PWD_MINUS_HOME="${PWD#$HOME}" ;;
+    *) POLYGLOT_PWD_MINUS_HOME="${PWD#"$HOME"}" ;;
   esac
 
   if [ "$POLYGLOT_DIRTRIM_ELEMENTS" -eq 0 ]; then
@@ -314,7 +315,7 @@ _polyglot_branch_status() {
 #   $2 Suffix
 ###########################################################
 _polyglot_basename() {
-  POLYGLOT_BASENAME_DIR=${1%${1##*[!/]}}
+  POLYGLOT_BASENAME_DIR=${1%"${1##*[!/]}"}
   POLYGLOT_BASENAME_DIR=${POLYGLOT_BASENAME_DIR##*/}
   POLYGLOT_BASENAME_DIR=${POLYGLOT_BASENAME_DIR%"$2"}
 
@@ -506,7 +507,7 @@ elif [ -n "$BASH_VERSION" ]; then
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
         PS1+="\$(_polyglot_venv)"
-        PS1+="\[\e[01;32m\]\u$(echo -n "$POLYGLOT_HOSTNAME_STRING")\[\e[0m\] "
+        PS1+="\[\e[01;32m\]\u$(printf '%s' "$POLYGLOT_HOSTNAME_STRING")\[\e[0m\] "
         case $BASH_VERSION in
           # bash, before v4.0, did not have $PROMPT_DIRTRIM
           1.*|2.*|3.*)
@@ -518,7 +519,7 @@ elif [ -n "$BASH_VERSION" ]; then
       else
         PS1="\$(_polyglot_exit_status \$?)"
         PS1+="\$(_polyglot_venv)"
-        PS1+="\u$(echo -n "$POLYGLOT_HOSTNAME_STRING") "
+        PS1+="\u$(printf '%s' "$POLYGLOT_HOSTNAME_STRING") "
         case $BASH_VERSION in
           1.*|2.*|3.*)
            PS1="\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)"
