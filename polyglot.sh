@@ -724,7 +724,7 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
     PS1=$PS1' \$ '
 
-  elif _polyglot_is_yash && _polyglot_has_colors; then
+  elif _polyglot_is_yash || [ "${0#-}" = 'osh' ] && _polyglot_has_colors; then
     PS1='\[\e[01;31m\]$(_polyglot_exit_status $?)\[\e[0m\]'
     PS1=$PS1'$(_polyglot_venv)'
     if ! _polyglot_is_superuser; then
