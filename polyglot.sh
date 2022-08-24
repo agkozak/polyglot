@@ -7,12 +7,12 @@
 #
 # Polyglot Prompt
 #
-# A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, dash, yash, and
-# busybox ash
+# A dynamic color Git prompt for zsh, bash, ksh93, mksh, pdksh, oksh, dash,
+# yash,busybox ash, and osh
 #
 #
 # Source this file from a relevant dotfile (e.g. .zshrc, .bashrc, .shrc, .kshrc,
-# or .mkshrc) thus:
+# .mkshrc, .yashrc, or ~/.config/oil/oshrc) thus:
 #
 #   . /path/to/polyglot.sh
 #
@@ -335,12 +335,15 @@ _polyglot_is_busybox() {
 }
 
 ###########################################################
-# Test to see if the current shell is pdksh
+# Test to see if the current shell is pdksh or oksh
 ###########################################################
 _polyglot_is_pdksh() {
   case $KSH_VERSION in
     *'PD KSH'*)
-      [ "${POLYGLOT_UNAME:=$(uname -s)}" = 'OpenBSD' ] && POLYGLOT_KSH_BANG='ksh'
+      if [ "${POLYGLOT_UNAME:=$(uname -s)}" = 'OpenBSD' ] ||
+         [ "${0#-}" = 'oksh' ]; then
+        POLYGLOT_KSH_BANG='ksh'
+      fi
       return 0
       ;;
     *) return 1 ;;
@@ -674,11 +677,12 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
   esac
 
 ####################################################################
-# pdksh, dash, busybox ash, yash, and zsh in sh emulation mode
+# pdksh, oksh, dash, busybox ash, yash, osh,
+# and zsh in sh emulation mode
 ####################################################################
 
 elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
-  _polyglot_is_yash || _polyglot_sh_is_dash; then
+  _polyglot_is_yash || _polyglot_sh_is_dash || [ "${0#-}" = 'osh' ]; then
 
   # Only display the $HOSTNAME for an ssh connection
   if _polyglot_is_ssh || _polyglot_is_superuser; then

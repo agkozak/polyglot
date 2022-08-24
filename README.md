@@ -8,7 +8,7 @@
 
 # Polyglot Prompt
 
-The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `dash`, `yash`, and `busybox ash` that uses basic ASCII symbols (and color, when possible) to show:
+The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `oksh`, `dash`, `yash`, `busybox ash`, and `osh` that uses basic ASCII symbols (and color, when possible) to show:
 
 * the username
 * whether a session is local or remote over SSH
@@ -19,7 +19,7 @@ The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, 
 
 ![Polyglot Prompt demo](img/demo.gif)
 
-*Note: There is also support for color in `pdksh`.*
+*Note: There is also support for color in `pdksh`, `oksh`, and `osh`.*
 
 ## Table of Contents
 
@@ -48,7 +48,7 @@ Additionally, in `zsh` and in `bash` v4.3 and higher, the Polyglot Prompt indica
 
 ## Installation
 
-The Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, or `.mkshrc`) of any supported shell:
+The Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, `.mkshrc`, or `.config/oil/oshrc`) of any supported shell:
 
     . /path/to/polyglot.sh
 
