@@ -48,7 +48,7 @@ Additionally, in `zsh` and in `bash` v4.3 and higher, the Polyglot Prompt indica
 
 ## Installation
 
-The Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the *rc* file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, `.mkshrc`, or `.config/oil/oshrc`) of any supported shell:
+The Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the `rc` file (`.zshrc`, `.bashrc`, `.kshrc`, `.shrc`, `.mkshrc`, `.yashrc`, or `.config/oil/oshrc`) of any supported shell:
 
     . /path/to/polyglot.sh
 
