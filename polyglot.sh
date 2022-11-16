@@ -60,7 +60,7 @@
 # Only run in interactive shells
 case $- in
   *i*) ;;
-  *) exit ;;
+  *) return ;;
 esac
 
 # Bail if the shell doesn't have command
