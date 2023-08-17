@@ -703,7 +703,9 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
 
     PS1=$(print "$POLYGLOT_NP\r")
     case $POLYGLOT_UNAME in
-      NetBSD*|OpenBSD*) PS1=$PS1$(print "$POLYGLOT_NP") ;;
+      NetBSD*|OpenBSD*)
+        POLYGLOT_NP="\021"
+        PS1=$PS1$(print "$POLYGLOT_NP") ;;
     esac
     PS1=$PS1$(print "\033[31;1m$POLYGLOT_NP")
     PS1=$PS1'$(_polyglot_exit_status $?)'
