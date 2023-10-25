@@ -32,6 +32,7 @@ The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, 
 - [Exit Status](#exit-status)
 - [Virtual Environments](#virtual-environments)
 - [Kubernetes Integration](#kubernetes-integration)
+- [Colors in `pdksh`](#colors-in-pdksh)
 - [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
 
 ## Basics
@@ -126,6 +127,14 @@ The Polyglot Prompt will display any active virtual environment created with `vi
 ## Kubernetes Integration
 
 If you are using the Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt with the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
+
+## Colors in `pdksh`
+
+`pdksh` supports the use of color in prompts by allowing the programmer to choose a non-printing character and to use it to delimit color escape sequences. In practice, however, there is no one non-printing character that will work perfectly for all operating systems and terminals. The Polyglot Prompt defaults to `\021` for NetBSD and OpenBSD and to `\016` for everything else. If you want to try using your own non-printing character, you can specify it with the environment variable `POLYGLOT_NP`:
+
+    POLYGLOT_NP="\016"  # Set this variable to any value you like
+
+If all else fails, you can set `POLYGLOT_PDKSH_COLORS=0` to disable color entirely in `pdksh`.
 
 ## Enabling `vi` editing mode in `zsh` and `bash`
 
