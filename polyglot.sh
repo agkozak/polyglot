@@ -692,14 +692,25 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     POLYGLOT_HOSTNAME_STRING=''
   fi
 
-  # pdksh uses a non-printing character of the programmer's choice to delimit
-  # escape sequences in the prompt. In practice, however, it is hard to find a
-  # safe non-printing character. In the past, I used \021, but it is displayed
-  # in Windows Terminal, so I have settled on \016.
+  # pdksh uses an arbitrary non-printing character to delimit color escape
+  # sequences in the prompt. In practice, however, it is impossible to find
+  # one single non-printing character that will work with all operating systems
+  # and terminals. The Polyglot Prompt defaults to \021 for OpenBSD/NetBSD
+  # and \016 for everything else. If you want to specify your own non-printing
+  # character, do so thus:
+  #
+  # POLYGLOT_NP="\016" # Set this variable to whatever value you like
+  #
+  # Or set POLYGLOT_PDKSH_COLORS=0 to disable color entirely in pdksh.
 
-  POLYGLOT_NP="\016"
+  case ${POLYGLOT_UNAME} in
+    NetBSD*|OpenBSD*) POLYGLOT_NP=${POLYGLOT_NP:-"\021"} ;;
+    *) POLYGLOT_NP=${POLYGLOT_NP:-"\016"} ;;
+  esac
 
-  if _polyglot_is_pdksh && _polyglot_has_colors; then
+  if _polyglot_is_pdksh &&
+     _polyglot_has_colors &&
+     [ ${POLYGLOT_PDKSH_COLORS:-1} -ne 0 ]; then
 
     PS1=$(print "$POLYGLOT_NP\r")
     case $POLYGLOT_UNAME in
