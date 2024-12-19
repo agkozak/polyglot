@@ -8,7 +8,7 @@
 
 # Polyglot Prompt
 
-The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, `pdksh`, `oksh`, `dash`, `yash`, `busybox ash`, and `osh` that uses basic ASCII symbols (and color, when possible) to show:
+The **Polyglot Prompt** is a dynamic prompt for Zsh, `bash`, `ksh93`, `mksh`, `pdksh`, `oksh`, `dash`, `yash`, `busybox ash`, and `osh` that uses basic ASCII symbols (and color, when possible) to show:
 
 * the username
 * whether a session is local or remote over SSH
@@ -33,7 +33,7 @@ The **Polyglot Prompt** is a dynamic prompt for `zsh`, `bash`, `ksh93`, `mksh`, 
 - [Virtual Environments](#virtual-environments)
 - [Kubernetes Integration](#kubernetes-integration)
 - [Colors in `pdksh`](#colors-in-pdksh)
-- [Enabling `vi` editing mode in `zsh` and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
+- [Enabling `vi` editing mode in Zsh and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
 
 ## Basics
 
@@ -41,9 +41,9 @@ The central functions of the prompt are the same in all supported shells:
 
 ![Polyglot working in several shells](img/polyglot-with-several-shells.png)
 
-Additionally, in `zsh` and in `bash` v4.3 and higher, the Polyglot Prompt indicates `vi` insert mode with a `+`, and command mode with a `:`, at the beginning of the prompt:
+Additionally, in Zsh and in `bash` v4.3 and higher, the Polyglot Prompt indicates `vi` insert mode with a `+`, and command mode with a `:`, at the beginning of the prompt:
 
-![`zsh` line editing](img/zsh-line-editing.png)
+![Zsh line editing](img/zsh-line-editing.png)
 
 [See below](#enabling-vi-editing-mode-in-zsh-and-bash) for instructions on how to enable `vi` mode in your shell.
 
@@ -53,7 +53,7 @@ The Polyglot Prompt uses one script (`polyglot.sh`) that can be sourced from the
 
     . /path/to/polyglot.sh
 
-Although no framework is required, a shim (`polyglot.plugin.zsh`) is provided to help with certain `zsh` frameworks.
+Although no framework is required, a shim (`polyglot.plugin.zsh`) is provided to help with certain Zsh frameworks.
 
 ## Local and Remote Sessions
 
@@ -61,7 +61,7 @@ When a session is local, only the username is shown; when it is remote over SSH 
 
 ![Local and remote sessions](img/local-and-remote-sessions.png)
 
-*Note: It is exceedingly difficult to determine with accuracy whether a superuser is connected over SSH or not. In the interests of providing useful and not misleading information, this prompt always displays both username and hostname for a superuser in reverse video.*
+*Note: It is exceedingly difficult to determine with accuracy whether a superuser is connected over SSH or not. In the interest of providing useful and not misleading information, this prompt always displays both username and hostname for a superuser in reverse video.*
 
 ## Abbreviated Paths
 
@@ -83,7 +83,7 @@ is displayed as
 
 that is, without a tilde.
 
-If you would like to display a different number of directory elements in your Polyglot Prompt, set the environment variable `$POLYGLOT_PROMPT_DIRTRIM` in an *rc* file thus:
+If you want to display a different number of directory elements in your Polyglot Prompt, set the environment variable `$POLYGLOT_PROMPT_DIRTRIM` in an *rc* file thus:
 
     POLYGLOT_PROMPT_DIRTRIM=4     # Or whatever number you like
 
@@ -110,13 +110,13 @@ Untracked | ?
 
 ### `POLYGLOT_SHOW_UNTRACKED`
 
-If you are working on an extremely large Git repository, such as an operating system kernel, calculating the Git status can be very slow. If you need to, you may set `POLYGLOT_SHOW_UNTRACKED=0`, which will cause the Polyglot Prompt to ignore the Git status for untracked files. This will have the effect of speeding up the display of the prompt considerably.
+If you are working on an extremely large Git repository, such as an operating system kernel, calculating the Git status can be very slow. If you need to, you can set `POLYGLOT_SHOW_UNTRACKED=0`, which will cause the Polyglot Prompt to ignore the Git status for untracked files. This will have the effect of speeding up the display of the prompt considerably.
 
 ## Exit Status
 
 If the exit status of the most recently executed command is other than zero (zero indicating success), the exit status will be displayed to the left of the prompt:
 
-![Exit status displayed in `zsh`, `bash`, and `ksh`](img/exit-status.png)
+![Exit status displayed in Zsh, `bash`, and `ksh`](img/exit-status.png)
 
 ## Virtual Environments
 
@@ -126,7 +126,7 @@ The Polyglot Prompt will display any active virtual environment created with `vi
 
 ## Kubernetes Integration
 
-If you are using the Polyglot Prompt with `bash` or `zsh`, you may add the Kubernetes context and namespace to your prompt with the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
+If you are using the Polyglot Prompt with `bash` or Zsh, you can add the Kubernetes context and namespace to your prompt with the add-on package [polyglot-kube-ps1](https://github.com/agkozak/polyglot-kube-ps1).
 
 ## Colors in `pdksh`
 
@@ -136,9 +136,9 @@ If you are using the Polyglot Prompt with `bash` or `zsh`, you may add the Kuber
 
 If all else fails, you can set `POLYGLOT_PDKSH_COLORS=0` to disable color entirely in `pdksh`.
 
-## Enabling `vi` editing mode in `zsh` and `bash`
+## Enabling `vi` editing mode in Zsh and `bash`
 
-The Polyglot Prompt does not enable `vi` editing mode for you. In `zsh`, you may add
+The Polyglot Prompt does not enable `vi` editing mode for you. In Zsh, you can add
 
     bindkey -v
 
