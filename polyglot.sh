@@ -759,6 +759,6 @@ fi
 
 # Clean up environment
 unset -f _polyglot_is_ssh _polyglot_basename _polyglot_is_busybox \
-  _polyglot_is_dtksh _polyglot_is_pdksh _polyglot_sh_is_dash
+  _polyglot_is_dtksh _polyglot_is_pdksh _polyglot_sh_is_dash _polyglot_is_yash
 
 # vim: ts=2:et:sts=2:sw=2
