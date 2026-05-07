@@ -127,7 +127,9 @@ _polyglot_has_colors() {
     *-256color) POLYGLOT_TERM_COLORS=256 ;;
     vt100|dumb) POLYGLOT_TERM_COLORS=-1 ;;
     *)
-      if command -v tput > /dev/null 2>&1; then
+      if command -v tput > /dev/null 2>&1 &&
+          # Watch out for MobaXterm's dreadful alias
+          ! alias tput > /dev/null 2>&1; then
         case ${POLYGLOT_UNAME:=$(uname -s)} in
           FreeBSD|DragonFly) POLYGLOT_TERM_COLORS=$(tput Co) ;;
           UWIN*) POLYGLOT_TERM_COLORS=$(tput cols) ;;
