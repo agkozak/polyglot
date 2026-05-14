@@ -694,7 +694,7 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
 
   if _polyglot_is_pdksh &&
      _polyglot_has_colors &&
-     [ ${POLYGLOT_PDKSH_COLORS:-1} -ne 0 ]; then
+     [ "${POLYGLOT_PDKSH_COLORS:-1}" -ne 0 ]; then
 
     PS1=$(print "$POLYGLOT_NP\r")
     case $POLYGLOT_UNAME in
