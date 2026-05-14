@@ -309,24 +309,6 @@ _polyglot_branch_status() {
 }
 
 ###########################################################
-# Native sh alternative to basename. See
-# https://github.com/dylanaraps/pure-sh-bible
-#
-# Arguments:
-#   $1 Filename
-#   $2 Suffix
-###########################################################
-_polyglot_basename() {
-  POLYGLOT_BASENAME_DIR=${1%"${1##*[!/]}"}
-  POLYGLOT_BASENAME_DIR=${POLYGLOT_BASENAME_DIR##*/}
-  POLYGLOT_BASENAME_DIR=${POLYGLOT_BASENAME_DIR%"$2"}
-
-  printf '%s\n' "${POLYGLOT_BASENAME_DIR:-/}"
-
-  unset POLYGLOT_BASENAME_DIR
-}
-
-###########################################################
 # Tests to see if the current shell is busybox ash
 ###########################################################
 _polyglot_is_busybox() {
@@ -760,7 +742,7 @@ else
 fi
 
 # Clean up environment
-unset -f _polyglot_is_ssh _polyglot_basename _polyglot_is_busybox \
-  _polyglot_is_dtksh _polyglot_is_pdksh _polyglot_sh_is_dash _polyglot_is_yash
+unset -f _polyglot_is_ssh _polyglot_is_busybox _polyglot_is_dtksh \
+         _polyglot_is_pdksh _polyglot_sh_is_dash _polyglot_is_yash
 
 # vim: ts=2:et:sts=2:sw=2
