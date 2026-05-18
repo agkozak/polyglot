@@ -33,6 +33,7 @@ The **Polyglot Prompt** is a dynamic prompt for Zsh, `bash`, `ksh93`, `mksh`, `p
 - [Virtual Environments](#virtual-environments)
 - [Kubernetes Integration](#kubernetes-integration)
 - [Colors in `pdksh`](#colors-in-pdksh)
+- [Colors in MobaXterm](#colors-in-mobaxterm)
 - [Enabling `vi` editing mode in Zsh and `bash`](#enabling-vi-editing-mode-in-zsh-and-bash)
 
 ## Basics
@@ -135,6 +136,13 @@ If you are using the Polyglot Prompt with `bash` or Zsh, you can add the Kuberne
     POLYGLOT_NP="\016"  # Set this variable to any value you like
 
 If all else fails, you can set `POLYGLOT_PDKSH_COLORS=0` to disable color entirely in `pdksh`.
+
+## Colors in MobaXterm
+
+If you want to use colors in MobaXterm, but sure to install a working version of the `ncurses` library, which contains `tput`:
+
+    apt install ncurses
+
 
 ## Enabling `vi` editing mode in Zsh and `bash`
 
