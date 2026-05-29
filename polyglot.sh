@@ -509,7 +509,7 @@ elif [ -n "$BASH_VERSION" ]; then
         PS1+="\u$(printf '%s' "$POLYGLOT_HOSTNAME_STRING") "
         case $BASH_VERSION in
           1.*|2.*|3.*)
-           PS1="\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)"
+           PS1+="\$(_polyglot_prompt_dirtrim \$POLYGLOT_PROMPT_DIRTRIM)"
            ;;
           *) PS1+="\w" ;;
         esac
