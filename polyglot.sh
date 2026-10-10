@@ -388,6 +388,44 @@ _polyglot_venv() {
   unset POLYGLOT_VENV
 }
 
+###########################################################
+# Output Nix development environment label
+###########################################################
+_polyglot_nix() {
+  # Older versions of nix develop do not set IN_NIX_SHELL.
+  if [ -n "${IN_NIX_SHELL-}${NIX_BUILD_TOP-}" ]; then
+    printf '(%s) ' "${POLYGLOT_NIX_LABEL:-nix}"
+  fi
+}
+
+###########################################################
+# Output active environment labels
+###########################################################
+_polyglot_env() {
+  _polyglot_nix
+  _polyglot_venv
+}
+
+#####################################################################
+# Cursor shape escape sequences for vi mode
+#
+#
+# POLYGLOT_VI_MODE_CURSOR values:
+#   0 - Disabled
+#   1 - Enabled (default)
+#####################################################################
+_polyglot_cursor_block() {
+  printf '%b' '\e[2 q'
+}
+
+_polyglot_cursor_bar() {
+  printf '%b' '\e[6 q'
+}
+
+_polyglot_cursor_blink_block() {
+  printf '%b' '\e[0 q'
+}
+
 #####################################################################
 # zsh
 #####################################################################
@@ -406,7 +444,7 @@ if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] &&
   _polyglot_precmd() {
     psvar[2]=$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")
     psvar[3]=$(_polyglot_branch_status)
-    psvar[5]=$(_polyglot_venv)
+    psvar[5]=$(_polyglot_env)
 
     PS1=''
     # The ZSH vi mode indicator won't work in Emacs shell (but it does in term
@@ -440,7 +478,17 @@ if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] &&
   # dash from choking on hyphens
   ###########################################################
   _polyglot_zle_keymap_select() {
-    [ "$KEYMAP" = 'vicmd' ] && psvar[4]='vicmd' || psvar[4]=''
+    if [ "$KEYMAP" = 'vicmd' ]; then
+      psvar[4]='vicmd'
+      if [ "${POLYGLOT_VI_MODE_CURSOR:-1}" -ne 0 ]; then
+        _polyglot_cursor_block
+      fi
+    else
+      psvar[4]=''
+      if [ "${POLYGLOT_VI_MODE_CURSOR:-1}" -ne 0 ]; then
+        _polyglot_cursor_bar
+      fi
+    fi
     zle reset-prompt
     zle -R
   }
@@ -448,6 +496,18 @@ if [ -n "$ZSH_VERSION" ] && [ "${0#-}" != 'ksh' ] &&
   zle -N _polyglot_zle_keymap_select
   zle -A _polyglot_zle_keymap_select zle-keymap-select
   zle -A _polyglot_zle_keymap_select zle-line-init
+
+  ###########################################################
+  # Reset cursor shape when command line is accepted
+  ###########################################################
+  _polyglot_zle_line_finish() {
+    if [ "${POLYGLOT_VI_MODE_CURSOR:-1}" -ne 0 ]; then
+      _polyglot_cursor_blink_block
+    fi
+  }
+
+  zle -N _polyglot_zle_line_finish
+  zle -A _polyglot_zle_line_finish zle-line-finish
 
   ###########################################################
   # Redraw prompt when terminal size changes
@@ -493,7 +553,7 @@ elif [ -n "$BASH_VERSION" ]; then
     if ! _polyglot_is_superuser; then
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
-        PS1+="\$(_polyglot_venv)"
+        PS1+="\$(_polyglot_env)"
         PS1+="\[\e[01;32m\]\u$(printf '%s' "$POLYGLOT_HOSTNAME_STRING")\[\e[0m\] "
         case $BASH_VERSION in
           # bash, before v4.0, did not have $PROMPT_DIRTRIM
@@ -505,7 +565,7 @@ elif [ -n "$BASH_VERSION" ]; then
         PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] \$ "
       else
         PS1="\$(_polyglot_exit_status \$?)"
-        PS1+="\$(_polyglot_venv)"
+        PS1+="\$(_polyglot_env)"
         PS1+="\u$(printf '%s' "$POLYGLOT_HOSTNAME_STRING") "
         case $BASH_VERSION in
           1.*|2.*|3.*)
@@ -518,7 +578,7 @@ elif [ -n "$BASH_VERSION" ]; then
     else  # Superuser
       if _polyglot_has_colors; then
         PS1="\[\e[01;31m\]\$(_polyglot_exit_status \$?)\[\e[0m\]"
-        PS1+="\$(_polyglot_venv)"
+        PS1+="\$(_polyglot_env)"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         case $BASH_VERSION in
           1.*|2.*|3.*)
@@ -529,7 +589,7 @@ elif [ -n "$BASH_VERSION" ]; then
         PS1+="\[\e[33m\]\$(_polyglot_branch_status)\[\e[0m\] # "
       else
         PS1="\$(_polyglot_exit_status \$?)"
-        PS1+="\$(_polyglot_venv)"
+        PS1+="\$(_polyglot_env)"
         PS1+="\[\e[7m\]\u@\h\[\e[0m\] "
         case $BASH_VERSION in
           1.*|2.*|3.*)
@@ -592,7 +652,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
           PS1+=$(print "\001\E[0m")
-          PS1+='$(_polyglot_venv)'
+          PS1+='$(_polyglot_env)'
           PS1+=$(print "\E[32;1m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
@@ -605,7 +665,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
           PS1+=' \$ '
         else
           PS1='$(_polyglot_exit_status $?)'
-          PS1+='$(_polyglot_venv)'
+          PS1+='$(_polyglot_env)'
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING '
           PS1+='$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")'
           PS1+='$(_polyglot_branch_status $POLYGLOT_KSH_BANG)'
@@ -616,7 +676,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
           PS1=$(print "\001\r\001\E[31;1m\001")
           PS1+='$(_polyglot_exit_status $?)'
           PS1+=$(print "\001\E[0m")
-          PS1+='$(_polyglot_venv)'
+          PS1+='$(_polyglot_env)'
           PS1+=$(print "\E[7m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
@@ -630,7 +690,7 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
         else
           PS1=$(print "\001\r")
           PS1+='$(_polyglot_exit_status $?)'
-          PS1+='$(_polyglot_venv)'
+          PS1+='$(_polyglot_env)'
           PS1+=$(print "\001\E[7m\001")
           PS1+='${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING'
           PS1+=$(print "\001\E[0m\001")
@@ -646,15 +706,15 @@ elif [ -n "$KSH_VERSION" ] || _polyglot_is_dtksh || [ -n "$ZSH_VERSION" ] &&
         # zsh emulating other shells doesn't handle colors well
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
           # FreeBSD sh chokes on ANSI C quoting, so I'll avoid it
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m$(_polyglot_venv)\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m$(_polyglot_env)\E[32;1m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m \$ ')"
         else
-          PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
+          PS1='$(_polyglot_exit_status $?)$(_polyglot_env)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) \$ '
         fi
       else  # Superuser
         if _polyglot_has_colors && [ -z "$ZSH_VERSION" ]; then
-          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m$(_polyglot_venv)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m\E[0m # ')"
+          PS1="$(print '\E[31;1m$(_polyglot_exit_status $?)\E[0m$(_polyglot_env)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m \E[34;1m$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\E[0m\E[33m$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\E[0m\E[0m # ')"
         else
-          PS1="$(print '$(_polyglot_exit_status $?)$(_polyglot_venv)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
+          PS1="$(print '$(_polyglot_exit_status $?)$(_polyglot_env)\E[7m${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\E[0m $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) # ')"
         fi
       fi
       ;;
@@ -703,7 +763,7 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     PS1=$PS1$(print "\033[31;1m$POLYGLOT_NP")
     PS1=$PS1'$(_polyglot_exit_status $?)'
     PS1=$PS1$(print "$POLYGLOT_NP\033[0m$POLYGLOT_NP")
-    PS1=$PS1'$(_polyglot_venv)'
+    PS1=$PS1'$(_polyglot_env)'
     if ! _polyglot_is_superuser; then
       PS1=$PS1$(print "$POLYGLOT_NP\033[32;1m$POLYGLOT_NP")
     else
@@ -721,7 +781,7 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
 
   elif _polyglot_is_yash || [ "${0#-}" = 'osh' ] && _polyglot_has_colors; then
     PS1='\[\e[01;31m\]$(_polyglot_exit_status $?)\[\e[0m\]'
-    PS1=$PS1'$(_polyglot_venv)'
+    PS1=$PS1'$(_polyglot_env)'
     if ! _polyglot_is_superuser; then
       PS1=$PS1'\[\e[01;32m\]${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING\[\e[0m\] '
     else
@@ -730,7 +790,7 @@ elif _polyglot_is_pdksh || [ "${0#-}" = 'dash' ] || _polyglot_is_busybox ||
     PS1=$PS1'\[\e[01;34m\]$(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")\[\e[0m\]'
     PS1=$PS1'\[\e[33m\]$(_polyglot_branch_status $POLYGLOT_KSH_BANG)\[\e[0m\] \$ '
   else
-    PS1='$(_polyglot_exit_status $?)$(_polyglot_venv)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) '
+    PS1='$(_polyglot_exit_status $?)$(_polyglot_env)${LOGNAME:-$(logname)}$POLYGLOT_HOSTNAME_STRING $(_polyglot_prompt_dirtrim "$POLYGLOT_PROMPT_DIRTRIM")$(_polyglot_branch_status $POLYGLOT_KSH_BANG) '
     if ! _polyglot_is_superuser; then
       PS1=$PS1'$ '
     else

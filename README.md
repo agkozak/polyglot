@@ -16,6 +16,7 @@ The **Polyglot Prompt** is a dynamic prompt for Zsh, `bash`, `ksh93`, `mksh`, `p
 * the Git branch and status
 * the exit status of the last command, if it was not zero
 * any virtual environment created with `virtualenv`, `venv`, `pipenv`, `poetry`, or `conda`
+* a configurable label for Nix development environments
 
 ![Polyglot Prompt demo](img/demo.gif)
 
@@ -31,6 +32,8 @@ The **Polyglot Prompt** is a dynamic prompt for Zsh, `bash`, `ksh93`, `mksh`, `p
     + [`POLYGLOT_SHOW_UNTRACKED`](#polyglot_show_untracked)
 - [Exit Status](#exit-status)
 - [Virtual Environments](#virtual-environments)
+- [Nix Development Environments](#nix-development-environments)
+    + [`POLYGLOT_NIX_LABEL`](#polyglot_nix_label)
 - [Kubernetes Integration](#kubernetes-integration)
 - [Colors in `pdksh`](#colors-in-pdksh)
 - [Colors in MobaXterm](#colors-in-mobaxterm)
@@ -124,6 +127,31 @@ If the exit status of the most recently executed command is other than zero (zer
 The Polyglot Prompt will display any active virtual environment created with `virtualenv`, `venv`, `pipenv`, `poetry`, or `conda` at the beginning of the prompt:
 
 ![Virtual environments](img/venv.png)
+
+## Nix Development Environments
+
+The Polyglot Prompt displays `(nix)` at the beginning of the prompt inside `nix develop` or `nix-shell`:
+
+```text
+(nix) user ~/project (main) $
+```
+
+The environment is detected using `IN_NIX_SHELL` or `NIX_BUILD_TOP` on every prompt, so detection also works when Nix sets these variables after your shell configuration has loaded. Exiting the development shell restores the parent shell's prompt. Python and Conda environments are still displayed alongside the Nix label, e.g. `(nix) (my-venv)`.
+
+### `POLYGLOT_NIX_LABEL`
+
+Set `POLYGLOT_NIX_LABEL` in your development shell to customize the label. For example, in your flake's `devShells` definition:
+
+```nix
+devShells.${system}.default = pkgs.mkShell {
+  POLYGLOT_NIX_LABEL = "my-project";
+  # Keep your existing packages and shellHook here.
+};
+```
+
+This displays `(my-project)` instead of `(nix)`. You can also set the variable in an existing `shellHook` with `export POLYGLOT_NIX_LABEL="my-project"`.
+
+An unset or empty label falls back to `(nix)`. Setting the label alone does not mark a shell as a Nix environment. Polyglot must be loaded in the shell you use inside Nix (normally from `.bashrc`, or from `.zshrc` when using `nix develop --command zsh`).
 
 ## Kubernetes Integration
 
