@@ -180,17 +180,28 @@ _polyglot_prompt_dirtrim() {
   [ "$PWD" = '/' ] && printf '%s' '/' && return
   [ "$PWD" = "$HOME" ] && printf '%s' '~' && return
 
+  POLYGLOT_PWD_IS_HOME=0
   case $HOME in
     /) POLYGLOT_PWD_MINUS_HOME="$PWD" ;;            # In case root's $HOME is /
-    *) POLYGLOT_PWD_MINUS_HOME="${PWD#"$HOME"}" ;;
+    '') POLYGLOT_PWD_MINUS_HOME="$PWD" ;;
+    *)
+      case $PWD in
+        "$HOME"|"$HOME"/*)
+          POLYGLOT_PWD_MINUS_HOME="${PWD#"$HOME"}"
+          POLYGLOT_PWD_IS_HOME=1
+          ;;
+        *) POLYGLOT_PWD_MINUS_HOME="$PWD" ;;
+      esac
+      ;;
   esac
 
   if [ "$POLYGLOT_DIRTRIM_ELEMENTS" -eq 0 ]; then
     [ "$HOME" = '/' ] && printf '%s' "$PWD" && return
-    case $PWD in
-      ${HOME}*) printf '~%s' "$POLYGLOT_PWD_MINUS_HOME" ;;
-      *) printf '%s' "$PWD" ;;
-    esac
+    if [ "$POLYGLOT_PWD_IS_HOME" -eq 1 ]; then
+      printf '~%s' "$POLYGLOT_PWD_MINUS_HOME"
+    else
+      printf '%s' "$PWD"
+    fi
   else
     # Calculate the part of $PWD that will be displayed in the prompt
     POLYGLOT_OLD_IFS="$IFS"
@@ -216,27 +227,27 @@ _polyglot_prompt_dirtrim() {
     if [ "$POLYGLOT_ABBREVIATED_PATH" = "${POLYGLOT_PWD_MINUS_HOME}" ]; then
       if [ "$HOME" = '/' ]; then
         printf '%s' "$PWD"
+      elif [ "$POLYGLOT_PWD_IS_HOME" -eq 1 ]; then
+        printf '~%s' "$POLYGLOT_PWD_MINUS_HOME"
       else
-        case $PWD in
-          ${HOME}*) printf '~%s' "${POLYGLOT_PWD_MINUS_HOME}" ;;
-          *) printf '%s' "$PWD" ;;
-        esac
+        printf '%s' "$PWD"
       fi
     # Otherwise include an ellipsis to show that abbreviation has taken place
     else
       if [ "$HOME" = '/' ]; then
         printf '...%s' "$POLYGLOT_ABBREVIATED_PATH"
       else
-        case $PWD in
-          ${HOME}*) printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-          *) printf '...%s' "$POLYGLOT_ABBREVIATED_PATH" ;;
-        esac
+        if [ "$POLYGLOT_PWD_IS_HOME" -eq 1 ]; then
+          printf '~/...%s' "$POLYGLOT_ABBREVIATED_PATH"
+        else
+          printf '...%s' "$POLYGLOT_ABBREVIATED_PATH"
+        fi
       fi
     fi
   fi
 
-  unset POLYGLOT_DIRTRIM_ELEMENTS POLYGLOT_PWD_MINUS_HOME POLYGLOT_OLD_IFS \
-    POLYGLOT_ABBREVIATED_PATH
+  unset POLYGLOT_DIRTRIM_ELEMENTS POLYGLOT_PWD_MINUS_HOME POLYGLOT_PWD_IS_HOME \
+    POLYGLOT_OLD_IFS POLYGLOT_ABBREVIATED_PATH
 }
 
 ###########################################################
